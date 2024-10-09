@@ -5,6 +5,7 @@ import java.util.Map;
 public class InformacionCliente {
     public Map<String, String> domicilioCliente;
     public String claveRFCCliente;
+    public Pago pago;
 
 
     public void obtenerDatosCliente() {
