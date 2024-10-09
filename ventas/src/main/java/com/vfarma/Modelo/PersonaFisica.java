@@ -1,6 +1,6 @@
 package com.vfarma.Modelo;
 
-public class PersonaFisica {
+public class PersonaFisica extends InformacionCliente{
 
     public String nombreCliente;
     public String apellidosCliente;

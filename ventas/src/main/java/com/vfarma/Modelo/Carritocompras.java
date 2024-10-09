@@ -2,7 +2,7 @@ package com.vfarma.Modelo;
 
 import java.util.ArrayList;
 
-public class Carritocompras {
+public class CarritoCompras {
     private ArrayList<Producto> listaProductos = new ArrayList<>();
 
     public void agregarProducto(Producto producto) {

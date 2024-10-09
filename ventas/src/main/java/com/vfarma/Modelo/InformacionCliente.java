@@ -6,10 +6,6 @@ public class InformacionCliente {
     public Map<String, String> domicilioCliente;
     public String claveRFCCliente;
 
-    public InformacionCliente(Map<String, String> domicilioCliente, String claveRFCCliente) {
-        this.domicilioCliente = domicilioCliente;
-        this.claveRFCCliente = claveRFCCliente;
-    }
 
     public void obtenerDatosCliente() {
         System.out.println("Domicilio del cliente: " + domicilioCliente);

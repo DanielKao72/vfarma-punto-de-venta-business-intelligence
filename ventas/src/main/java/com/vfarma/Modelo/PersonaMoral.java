@@ -1,6 +1,6 @@
 package com.vfarma.Modelo;
 
-public class PersonaMoral {
+public class PersonaMoral extends InformacionCliente{
     public String razonSocial;
     public String regimenFiscal;
 
