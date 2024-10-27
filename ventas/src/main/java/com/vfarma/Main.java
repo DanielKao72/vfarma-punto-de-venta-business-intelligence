@@ -1,11 +1,20 @@
 package com.vfarma;
 
-import com.vfarma.Modelo.PersonaMoral;
+import java.util.List;
+
+import com.vfarma.BaseDatos.BaseDeDatos;
+import com.vfarma.BaseDatos.Producto;
 
 public class Main {
+
     public static void main(String[] args) {
-        System.out.println("Hello world!");
-        PersonaMoral personaMoral = new PersonaMoral("VFarma", "General");
-        System.out.println("Razón social: " + personaMoral.obtenerRazonSocial());
+        BaseDeDatos baseDeDatos = BaseDeDatos.obtenerInstancia();
+        List<Producto> productos = baseDeDatos.obtenerTodaLaInfoDeTodosLosProductos();
+
+        for (Producto producto : productos) {
+            System.out.println(producto);
+        }
+
+       
     }
 }
