@@ -21,25 +21,8 @@ CREATE TABLE Familia (
     Nombre VARCHAR(100) NOT NULL                  -- Nombre de la familia
 );
 
--- Crear tabla Proveedor
-CREATE TABLE Proveedor (
-    ProveedorID INT PRIMARY KEY AUTO_INCREMENT,   -- ID del proveedor
-    Nombre VARCHAR(100) NOT NULL                  -- Nombre del proveedor
-);
 
--- Crear tabla Producto
-CREATE TABLE Producto (
-    ProductoID INT PRIMARY KEY AUTO_INCREMENT,    -- ID del producto
-    Nombre VARCHAR(100) NOT NULL,                 -- Nombre del producto
-    Descripcion VARCHAR(255),                     -- Descripción del producto
-    Precio DECIMAL(10, 2) NOT NULL,               -- Precio del producto
-    CategoriaID INT NOT NULL,                     -- ID de la categoría (FK)
-    FamiliaID INT NOT NULL,                       -- ID de la familia (FK)
-    ProveedorID INT NOT NULL,                     -- ID del proveedor (FK)
-    FOREIGN KEY (CategoriaID) REFERENCES Categoria(CategoriaID),
-    FOREIGN KEY (FamiliaID) REFERENCES Familia(FamiliaID),
-    FOREIGN KEY (ProveedorID) REFERENCES Proveedor(ProveedorID)
-);
+
 
 -- Crear tabla Mov
 CREATE TABLE Mov (
@@ -127,8 +110,30 @@ CREATE TABLE VentaCobro (
     FOREIGN KEY (CajeroID) REFERENCES Usuario(UsuarioID)
 );
 
+-- Crear tabla Proveedor
+CREATE TABLE Proveedor (
+    ProveedorID INT PRIMARY KEY AUTO_INCREMENT,   -- ID del proveedor
+    Nombre VARCHAR(100) NOT NULL                  -- Nombre del proveedor
+);
+
+-- Crear tabla Producto
+CREATE TABLE Producto (
+    ProductoID INT PRIMARY KEY AUTO_INCREMENT,    -- ID del producto
+    Nombre VARCHAR(100) NOT NULL,                 -- Nombre del producto
+    Descripcion VARCHAR(255),                     -- Descripción del producto
+    Precio DECIMAL(10, 2) NOT NULL,
+    Existencia INT DEFAULT 0 NOT NULL;               -- Precio del producto
+    CategoriaID INT NOT NULL,                     -- ID de la categoría (FK)
+    FamiliaID INT NOT NULL,                       -- ID de la familia (FK)
+    ProveedorID INT NOT NULL,                     -- ID del proveedor (FK)
+    FOREIGN KEY (CategoriaID) REFERENCES Categoria(CategoriaID),
+    FOREIGN KEY (FamiliaID) REFERENCES Familia(FamiliaID),
+    FOREIGN KEY (ProveedorID) REFERENCES Proveedor(ProveedorID)
+);
+
+/*
 ALTER TABLE Producto 
-ADD COLUMN Existencia INT DEFAULT 0 NOT NULL; 
+ADD COLUMN Existencia INT DEFAULT 0 NOT NULL; */
 
 CREATE TABLE Compra (
     ProductoID INT NOT NULL,                   -- ID del producto (FK)

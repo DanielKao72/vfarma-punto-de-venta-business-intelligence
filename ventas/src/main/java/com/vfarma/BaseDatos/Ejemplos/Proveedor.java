@@ -1,7 +1,9 @@
-package com.vfarma.BaseDatos;
+package com.vfarma.BaseDatos.Ejemplos;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+
+import com.vfarma.BaseDatos.MapeadorBaseDatos;
 
 public class Proveedor implements MapeadorBaseDatos {
     private int proveedorID;
