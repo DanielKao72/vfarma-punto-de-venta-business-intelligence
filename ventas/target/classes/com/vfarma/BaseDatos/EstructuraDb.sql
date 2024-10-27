@@ -138,4 +138,5 @@ CREATE TABLE Compra (
     Cantidad INT NOT NULL,                     -- Cantidad comprada
     FOREIGN KEY (ProductoID) REFERENCES Producto(ProductoID),
     FOREIGN KEY (ProveedorID) REFERENCES Proveedor(ProveedorID)
+    PRIMARY KEY (ProductoID, ProveedorID, Fecha),
 );

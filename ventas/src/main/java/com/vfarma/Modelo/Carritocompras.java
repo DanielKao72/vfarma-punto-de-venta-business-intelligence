@@ -9,15 +9,15 @@ public class CarritoCompras {
         listaProductos.add(producto);
     }
 
-    public void eliminarProducto(Producto producto) {
+    public void removerProducto(Producto producto) {
         listaProductos.remove(producto);
     }
 
-    public void vaciarLista() {
+    public void vaciarCarrito() {
         listaProductos.clear();
     }
 
-    public ArrayList<Producto> obtenerListaProductos() {
+    public ArrayList<Producto> obtenerTodosProductos() {
         return listaProductos;
     }
 }
