@@ -5,11 +5,6 @@ public class InformacionPersonaFisica extends InformacionCliente{
     private String nombreCliente;
     private String apellidosCliente;
 
-    public InformacionPersonaFisica(String nombreCliente, String apellidosCliente) {
-        this.nombreCliente = nombreCliente;
-        this.apellidosCliente = apellidosCliente;
-    }
-
     public String obtenerNombreCliente() {
         return nombreCliente;
     }

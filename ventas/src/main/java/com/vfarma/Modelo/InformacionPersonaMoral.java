@@ -4,10 +4,6 @@ public class InformacionPersonaMoral extends InformacionCliente{
     private String razonSocial;
     private String regimenFiscal;
 
-    public InformacionPersonaMoral(String razonSocial, String regimenFiscal) {
-        this.razonSocial = razonSocial;
-        this.regimenFiscal = regimenFiscal;
-    }
 
     public String obtenerRazonSocial() {
         return this.razonSocial;

@@ -5,6 +5,13 @@ public class InformacionFarmacia {
     private String nombreFarmacia;
     private String domicilioSucursalFarmacia;
 
+    public InformacionFarmacia() {
+        this.claveRFCFarmacia = " XLR8";
+        this.nombreFarmacia = "Farmacia Guadalajara";
+        this.domicilioSucursalFarmacia = "Al lado de FMAT";
+    }
+
+    /* 
     public String obtenerClaveRFCFarmacia() {
         return claveRFCFarmacia;
     }
@@ -28,6 +35,6 @@ public class InformacionFarmacia {
     public void colocarDomicilioSucursalFarmacia(String domicilioSucursalFarmacia) {
         this.domicilioSucursalFarmacia = domicilioSucursalFarmacia;
     }
-
+    */
     
 }

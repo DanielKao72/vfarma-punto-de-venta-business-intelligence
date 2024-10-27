@@ -1,17 +1,20 @@
 package com.vfarma.Modelo;
 
 public class TarjetaCredito implements MetodoPago {
+
+ 
+
+    public void autorizarTransaccion() {
+        System.out.println("Autorizando transacción con tarjeta de crédito...");
+    }
+
     @Override
     public void obtenerDetallesPago() {
-        System.out.println("Pago con tarjeta de crédito");
+        this.autorizarTransaccion();
     }
 
     @Override
     public boolean estaPagado() {
-        return true;    
-    }
-
-    public void autorizarTransaccion() {
-        System.out.println("Autorizando transacción con tarjeta de crédito...");
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 }

@@ -1,13 +1,11 @@
 package com.vfarma.Modelo;
 
 public class Pago {
-    private MetodoPago metodoPago;
-
-    public Pago(MetodoPago metodoPago) {
-        this.metodoPago = metodoPago;
-    }
+    public MetodoPago metodoPago;
 
     public void procesarPago() {
 
     }
+
+   
 }

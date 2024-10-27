@@ -1,20 +1,17 @@
 package com.vfarma.Modelo;
 
-public class Comprobante {
+public abstract class Comprobante {
     private InformacionFarmacia informacionFarmacia;
 
-
-    public void llenarInformacionComprobante(){
-        
+    public Comprobante() {
+        this.informacionFarmacia = new InformacionFarmacia();
     }
 
-    public void generarComprobante(){
-        
-    }
+    public abstract void llenarInformacionComprobante(InformacionVenta informacionVenta);
 
-    public void imprimir(){
-        
-    }
+    public abstract void generarComprobante();
+
+    public abstract void imprimir();
 
     
     
