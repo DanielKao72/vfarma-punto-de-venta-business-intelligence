@@ -1,11 +1,11 @@
 package com.vfarma.Modelo;
 
-public class PersonaFisica extends InformacionCliente{
+public class InformacionPersonaFisica extends InformacionCliente{
 
-    public String nombreCliente;
-    public String apellidosCliente;
+    private String nombreCliente;
+    private String apellidosCliente;
 
-    public PersonaFisica(String nombreCliente, String apellidosCliente) {
+    public InformacionPersonaFisica(String nombreCliente, String apellidosCliente) {
         this.nombreCliente = nombreCliente;
         this.apellidosCliente = apellidosCliente;
     }

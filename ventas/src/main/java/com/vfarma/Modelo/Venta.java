@@ -1,9 +1,9 @@
 package com.vfarma.Modelo;
 
 public class Venta {
-    public String claveVenta;
-    public String fechaVenta;
-    public float montoTotalVenta;
+    private String claveVenta;
+    private String fechaVenta;
+    private float montoTotalVenta;
     public Comprobante comprobante;
     public CarritoCompras carritoCompras;
     public InformacionCliente informacionCliente;

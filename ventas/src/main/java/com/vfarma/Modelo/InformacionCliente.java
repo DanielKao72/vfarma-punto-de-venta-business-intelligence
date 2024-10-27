@@ -1,10 +1,8 @@
 package com.vfarma.Modelo;
 
-import java.util.Map;
-
 public class InformacionCliente {
-    public Map<String, String> domicilioCliente;
-    public String claveRFCCliente;
+    private String domicilioCliente;
+    private String claveRFCCliente;
     public Pago pago;
 
 
@@ -13,11 +11,11 @@ public class InformacionCliente {
         System.out.println("Clave RFC del cliente: " + claveRFCCliente);
     }
 
-    public Map<String, String> getDomicilioCliente() {
+    public String getDomicilioCliente() {
         return domicilioCliente;
     }
 
-    public void setDomicilioCliente(Map<String, String> domicilioCliente) {
+    public void setDomicilioCliente(String domicilioCliente) {
         this.domicilioCliente = domicilioCliente;
     }
 

@@ -1,10 +1,10 @@
 package com.vfarma.Modelo;
 
-public class PersonaMoral extends InformacionCliente{
-    public String razonSocial;
-    public String regimenFiscal;
+public class InformacionPersonaMoral extends InformacionCliente{
+    private String razonSocial;
+    private String regimenFiscal;
 
-    public PersonaMoral(String razonSocial, String regimenFiscal) {
+    public InformacionPersonaMoral(String razonSocial, String regimenFiscal) {
         this.razonSocial = razonSocial;
         this.regimenFiscal = regimenFiscal;
     }
@@ -17,11 +17,11 @@ public class PersonaMoral extends InformacionCliente{
         return this.regimenFiscal;
     }
 
-    public void establecerRazonSocial(String razonSocial) {
+    public void colocarRazonSocial(String razonSocial) {
         this.razonSocial = razonSocial;
     }
 
-    public void establecerRegimenFiscal(String regimenFiscal) {
+    public void colocarRegimenFiscal(String regimenFiscal) {
         this.regimenFiscal = regimenFiscal;
     }
 }
