@@ -5,6 +5,9 @@ public class InformacionCliente {
     private String claveRFCCliente;
     public Pago pago;
 
+    public InformacionCliente(){
+
+    }
 
     public void obtenerDatosCliente() {
         System.out.println("Domicilio del cliente: " + domicilioCliente);

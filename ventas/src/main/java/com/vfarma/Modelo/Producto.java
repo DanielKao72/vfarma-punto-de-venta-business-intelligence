@@ -4,6 +4,7 @@ import java.sql.SQLException;
 
 import com.vfarma.BaseDatos.ConsultasProducto;
 import com.vfarma.BaseDatos.MapeadorBaseDatos;
+
 public class Producto implements MapeadorBaseDatos {
 
     private int claveProducto;

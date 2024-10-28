@@ -29,12 +29,12 @@ public class Cajero {
             return;
         }
         Producto productoEncontrado = this.consultasProducto.buscarProductoPorID(idProducto);
-        this.informacionVenta.carritoCompras.agregarProducto(productoEncontrado);
+        this.informacionVenta.obtenerCarritoCompras().agregarProducto(productoEncontrado);
     }
 
     public void retirarProductoDeCarrito(int idProducto) {
-        Producto productoEncontrado = this.informacionVenta.carritoCompras.buscarProductoPorId(idProducto);
-        this.informacionVenta.carritoCompras.removerProducto(productoEncontrado);
+        Producto productoEncontrado = this.informacionVenta.obtenerCarritoCompras().buscarProductoPorId(idProducto);
+        this.informacionVenta.obtenerCarritoCompras().removerProducto(productoEncontrado);
     }
 
     public enum TipoCliente {
@@ -45,12 +45,12 @@ public class Cajero {
     public void seleccionarTipoCliente(TipoCliente tipoCliente) {
         switch (tipoCliente) {
             case PERSONA_MORAL -> {
-                this.informacionVenta.informacionCliente = new InformacionPersonaMoral();
-                this.informacionVenta.comprobante = new Factura(this.informacionVenta);
+                this.informacionVenta.colocarInformacionCliente(new InformacionPersonaMoral());
+                this.informacionVenta.colocarComprobante(new Factura(this.informacionVenta) );
             }
             case PERSONA_FISICA -> {
-                this.informacionVenta.informacionCliente = new InformacionPersonaFisica();
-                this.informacionVenta.comprobante = new Recibo(this.informacionVenta);
+                this.informacionVenta.colocarInformacionCliente(new InformacionPersonaFisica()) ;
+                this.informacionVenta.colocarComprobante(new Recibo(this.informacionVenta));
             }
             default ->
                 System.out.println("Tipo de cliente no válido");
@@ -65,10 +65,10 @@ public class Cajero {
     public void seleccionarTipoPagoCliente(TipoPago tipoPago) {
         switch (tipoPago) {
             case EFECTIVO -> {
-                this.informacionVenta.informacionCliente.pago.metodoPago = new Efectivo();
+                this.informacionVenta.obtenerInformacionCliente().pago.metodoPago = new Efectivo();
             }
             case TARJETA -> {
-                this.informacionVenta.informacionCliente.pago.metodoPago = new TarjetaCredito();
+                this.informacionVenta.obtenerInformacionCliente().pago.metodoPago = new TarjetaCredito();
             }
             default ->
                 System.out.println("Tipo de pago no válido");
@@ -77,12 +77,12 @@ public class Cajero {
     }
 
     public void efectuarPago() {
-        this.informacionVenta.informacionCliente.pago.metodoPago.obtenerDetallesPago();
+        this.informacionVenta.obtenerInformacionCliente().pago.metodoPago.obtenerDetallesPago();
     }
 
     public void imprimirComprobante() {
         try {
-            this.informacionVenta.comprobante.generarComprobante(this.informacionVenta);
+            this.informacionVenta.obtenerComprobante().generarComprobante(this.informacionVenta);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
@@ -90,7 +90,7 @@ public class Cajero {
 
     public void finalizarVenta() {
         this.efectuarPago();
-        this.informacionVenta.carritoCompras.obtenerTodosProductos().forEach(producto -> {
+        this.informacionVenta.obtenerCarritoCompras().obtenerTodosProductos().forEach(producto -> {
             this.consultasProducto.restarExistenciaProducto(producto.obtenerClaveProducto(), 1);
         });
         this.imprimirComprobante();

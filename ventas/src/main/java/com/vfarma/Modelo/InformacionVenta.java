@@ -8,26 +8,27 @@ public class InformacionVenta {
     private final String claveVenta;
     private final String fechaVenta;
     private Float montoTotalVenta;
-    public InformacionCliente informacionCliente;
-    public Comprobante comprobante;
-    public CarritoCompras carritoCompras;
+    private InformacionCliente informacionCliente;
+    private Comprobante comprobante;
+    private CarritoCompras carritoCompras;
 
     public InformacionVenta() {
         this.claveVenta = this.generarClaveVenta();
         this.fechaVenta = this.obtenerFechaActual();
         this.montoTotalVenta = 0.0f;
         this.carritoCompras = new CarritoCompras();
+        
     }
 
-    public String getClaveVenta() {
+    public String obtenerClaveVenta() {
         return claveVenta;
     }
 
-    public String getFechaVenta() {
+    public String obtenerFechaVenta() {
         return fechaVenta;
     }
 
-    public Float getMontoTotalVenta() {
+    public Float obtenerMontoTotalVenta() {
         return montoTotalVenta;
     }
 
@@ -55,6 +56,30 @@ public class InformacionVenta {
         int mes = fechaHoy.getMonthValue();
         int anio = fechaHoy.getYear();
         return dia + "/" + mes + "/" + anio;
+    }
+
+    public Comprobante obtenerComprobante() {
+        return comprobante;
+    }
+
+    public void colocarComprobante(Comprobante comprobante) {
+        this.comprobante = comprobante;
+    }
+
+    public CarritoCompras obtenerCarritoCompras() {
+        return carritoCompras;
+    }
+
+    public void colocarCarritoCompras(CarritoCompras carritoCompras) {
+        this.carritoCompras = carritoCompras;
+    }
+
+    public InformacionCliente obtenerInformacionCliente() {
+        return informacionCliente;
+    }
+
+    public void colocarInformacionCliente(InformacionCliente informacionCliente) {
+        this.informacionCliente = informacionCliente;
     }
 
 }

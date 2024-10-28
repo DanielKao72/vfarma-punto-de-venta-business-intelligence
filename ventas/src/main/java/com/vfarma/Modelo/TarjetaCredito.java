@@ -2,8 +2,6 @@ package com.vfarma.Modelo;
 
 public class TarjetaCredito implements MetodoPago {
 
- 
-
     public void autorizarTransaccion() {
         System.out.println("Autorizando transacción con tarjeta de crédito...");
     }
