@@ -6,7 +6,6 @@ public class InformacionCaja {
     private String encargadoCaja;
     private String balanceCaja;
 
-
     public String obtenerClaveCaja() {
         return claveCaja;
     }

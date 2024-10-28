@@ -3,7 +3,7 @@ package com.vfarma.Modelo;
 public class InformacionCliente {
     private String domicilioCliente;
     private String claveRFCCliente;
-    public Pago pago;
+    private Pago pago;
 
     public InformacionCliente(){
 
@@ -22,12 +22,20 @@ public class InformacionCliente {
         this.domicilioCliente = domicilioCliente;
     }
 
-    public String getClaveRFCCliente() {
+    public String obtenerClaveRFCCliente() {
         return claveRFCCliente;
     }
 
-    public void setClaveRFCCliente(String claveRFCCliente) {
+    public void colocarClaveRFCCliente(String claveRFCCliente) {
         this.claveRFCCliente = claveRFCCliente;
+    }
+
+    public Pago obtenerPago() {
+        return pago;
+    }
+
+    public void colocarPago(Pago pago) {
+        this.pago = pago;
     }
 
 }

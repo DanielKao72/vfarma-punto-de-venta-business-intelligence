@@ -65,10 +65,10 @@ public class Cajero {
     public void seleccionarTipoPagoCliente(TipoPago tipoPago) {
         switch (tipoPago) {
             case EFECTIVO -> {
-                this.informacionVenta.obtenerInformacionCliente().pago.metodoPago = new Efectivo();
+                this.informacionVenta.obtenerInformacionCliente().obtenerPago().colocarMetodoPago(new Efectivo()); 
             }
             case TARJETA -> {
-                this.informacionVenta.obtenerInformacionCliente().pago.metodoPago = new TarjetaCredito();
+                this.informacionVenta.obtenerInformacionCliente().obtenerPago().colocarMetodoPago(new TarjetaCredito());
             }
             default ->
                 System.out.println("Tipo de pago no válido");
@@ -77,7 +77,7 @@ public class Cajero {
     }
 
     public void efectuarPago() {
-        this.informacionVenta.obtenerInformacionCliente().pago.metodoPago.obtenerDetallesPago();
+        this.informacionVenta.obtenerInformacionCliente().obtenerPago().obtenerMetodoPago().obtenerDetallesPago();
     }
 
     public void imprimirComprobante() {

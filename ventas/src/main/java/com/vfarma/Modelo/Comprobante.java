@@ -42,7 +42,7 @@ public abstract class Comprobante {
     protected HashMap<String, String> llenarInformacionComprobante(InformacionVenta informacionVenta) {
         HashMap<String, String> campos = new HashMap<>();
         campos.put("Domicilio Cliente", informacionVenta.obtenerInformacionCliente().getDomicilioCliente());
-        campos.put("RFC Cliente", informacionVenta.obtenerInformacionCliente().getClaveRFCCliente());
+        campos.put("RFC Cliente", informacionVenta.obtenerInformacionCliente().obtenerClaveRFCCliente());
         campos.put("Clave RFC Farmacia", this.informacionFarmacia.obtenerClaveRFCFarmacia());
         campos.put("Domicilio Sucursal Farmacia", this.informacionFarmacia.obtenerDomicilioSucursalFarmacia());
         campos.put("Nombre Farmacia", this.informacionFarmacia.obtenerNombreFarmacia());
