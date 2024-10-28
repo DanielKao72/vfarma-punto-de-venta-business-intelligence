@@ -1,5 +1,7 @@
 package com.vfarma.RegistroVenta;
 
+import java.io.FileNotFoundException;
+
 import com.vfarma.BaseDatos.ConsultasProducto;
 import com.vfarma.Modelo.Efectivo;
 import com.vfarma.Modelo.Factura;
@@ -11,6 +13,7 @@ import com.vfarma.Modelo.Recibo;
 import com.vfarma.Modelo.TarjetaCredito;
 
 public class Cajero {
+
     public InformacionVenta informacionVenta;
     public ConsultasProducto consultasProducto;
     //public InformacionEmpleado datosCajero;
@@ -43,13 +46,14 @@ public class Cajero {
         switch (tipoCliente) {
             case PERSONA_MORAL -> {
                 this.informacionVenta.informacionCliente = new InformacionPersonaMoral();
-                this.informacionVenta.comprobante = new Factura();
+                this.informacionVenta.comprobante = new Factura(this.informacionVenta);
             }
             case PERSONA_FISICA -> {
                 this.informacionVenta.informacionCliente = new InformacionPersonaFisica();
-                this.informacionVenta.comprobante = new Recibo();
+                this.informacionVenta.comprobante = new Recibo(this.informacionVenta);
             }
-            default -> System.out.println("Tipo de cliente no válido");
+            default ->
+                System.out.println("Tipo de cliente no válido");
         }
     }
 
@@ -57,7 +61,6 @@ public class Cajero {
         EFECTIVO,
         TARJETA
     }
-    
 
     public void seleccionarTipoPagoCliente(TipoPago tipoPago) {
         switch (tipoPago) {
@@ -67,17 +70,22 @@ public class Cajero {
             case TARJETA -> {
                 this.informacionVenta.informacionCliente.pago.metodoPago = new TarjetaCredito();
             }
-            default -> System.out.println("Tipo de pago no válido");
+            default ->
+                System.out.println("Tipo de pago no válido");
         }
-        
+
     }
 
     public void efectuarPago() {
         this.informacionVenta.informacionCliente.pago.metodoPago.obtenerDetallesPago();
     }
 
-    public void imprimirComprobante(){
-        this.informacionVenta.comprobante.llenarInformacionComprobante(this.informacionVenta);
+    public void imprimirComprobante() {
+        try {
+            this.informacionVenta.comprobante.generarComprobante(this.informacionVenta);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
     }
 
     public void finalizarVenta() {
@@ -86,7 +94,7 @@ public class Cajero {
             this.consultasProducto.restarExistenciaProducto(producto.obtenerClaveProducto(), 1);
         });
         this.imprimirComprobante();
-        
+
     }
 
     /* 
@@ -100,5 +108,5 @@ public class Cajero {
 
     public void cerrarCaja(){
     }
-    */
+     */
 }

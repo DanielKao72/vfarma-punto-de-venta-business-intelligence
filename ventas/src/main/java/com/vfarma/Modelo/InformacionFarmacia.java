@@ -1,6 +1,7 @@
 package com.vfarma.Modelo;
 
 public class InformacionFarmacia {
+
     private String claveRFCFarmacia;
     private String nombreFarmacia;
     private String domicilioSucursalFarmacia;
@@ -11,7 +12,6 @@ public class InformacionFarmacia {
         this.domicilioSucursalFarmacia = "Al lado de FMAT";
     }
 
-    /* 
     public String obtenerClaveRFCFarmacia() {
         return claveRFCFarmacia;
     }
@@ -35,6 +35,5 @@ public class InformacionFarmacia {
     public void colocarDomicilioSucursalFarmacia(String domicilioSucursalFarmacia) {
         this.domicilioSucursalFarmacia = domicilioSucursalFarmacia;
     }
-    */
-    
+
 }

@@ -3,6 +3,7 @@ package com.vfarma.Modelo;
 import java.util.ArrayList;
 
 public class CarritoCompras {
+
     private final ArrayList<Producto> listaProductos;
 
     public CarritoCompras() {
@@ -17,7 +18,7 @@ public class CarritoCompras {
         listaProductos.remove(producto);
     }
 
-    public Producto buscarProductoPorId( int id) {
+    public Producto buscarProductoPorId(int id) {
         for (Producto producto : this.listaProductos) {
             if (producto.obtenerClaveProducto() == id) {
                 return producto;
