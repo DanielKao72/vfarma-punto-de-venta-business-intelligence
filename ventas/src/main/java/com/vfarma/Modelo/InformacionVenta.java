@@ -1,36 +1,85 @@
 package com.vfarma.Modelo;
 
+import java.time.LocalDate;
+import java.util.Random;
+
 public class InformacionVenta {
 
-    private String claveVenta;
-    private String fechaVenta;
-    private Float montoTotalVenta; 
-    public InformacionCliente informacionCliente;
-    public Comprobante comprobante;
-    public CarritoCompras carritoCompras;
+    private final String claveVenta;
+    private final String fechaVenta;
+    private Float montoTotalVenta;
+    private InformacionCliente informacionCliente;
+    private Comprobante comprobante;
+    private CarritoCompras carritoCompras;
 
-    public String getClaveVenta() {
+    public InformacionVenta() {
+        this.claveVenta = this.generarClaveVenta();
+        this.fechaVenta = this.obtenerFechaActual();
+        this.montoTotalVenta = 0.0f;
+        this.carritoCompras = new CarritoCompras();
+        
+    }
+
+    public String obtenerClaveVenta() {
         return claveVenta;
     }
 
-    public void setClaveVenta(String claveVenta) {
-        this.claveVenta = claveVenta;
-    }
-
-    public String getFechaVenta() {
+    public String obtenerFechaVenta() {
         return fechaVenta;
     }
 
-    public void setFechaVenta(String fechaVenta) {
-        this.fechaVenta = fechaVenta;
-    }
-
-    public Float getMontoTotalVenta() {
+    public Float obtenerMontoTotalVenta() {
         return montoTotalVenta;
     }
 
     public void setMontoTotalVenta(Float montoTotalVenta) {
         this.montoTotalVenta = montoTotalVenta;
     }
-    
+
+    private String generarClaveVenta() {
+        String CARACTERES = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        Random RANDOM = new Random();
+        int longitudClaveVentaAleatoria = 8;
+
+        StringBuilder cadena = new StringBuilder(longitudClaveVentaAleatoria);
+        for (int i = 0; i < longitudClaveVentaAleatoria; i++) {
+            int index = RANDOM.nextInt(CARACTERES.length());
+            cadena.append(CARACTERES.charAt(index));
+        }
+        return cadena.toString();
+    }
+
+    private String obtenerFechaActual() {
+        LocalDate fechaHoy = LocalDate.now();
+
+        int dia = fechaHoy.getDayOfMonth();
+        int mes = fechaHoy.getMonthValue();
+        int anio = fechaHoy.getYear();
+        return dia + "/" + mes + "/" + anio;
+    }
+
+    public Comprobante obtenerComprobante() {
+        return comprobante;
+    }
+
+    public void colocarComprobante(Comprobante comprobante) {
+        this.comprobante = comprobante;
+    }
+
+    public CarritoCompras obtenerCarritoCompras() {
+        return carritoCompras;
+    }
+
+    public void colocarCarritoCompras(CarritoCompras carritoCompras) {
+        this.carritoCompras = carritoCompras;
+    }
+
+    public InformacionCliente obtenerInformacionCliente() {
+        return informacionCliente;
+    }
+
+    public void colocarInformacionCliente(InformacionCliente informacionCliente) {
+        this.informacionCliente = informacionCliente;
+    }
+
 }

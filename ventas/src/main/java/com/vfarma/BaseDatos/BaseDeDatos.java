@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+
 public class BaseDeDatos {
 
     private static BaseDeDatos instancia;
@@ -55,10 +56,10 @@ public class BaseDeDatos {
 
     protected <T> T consultarUnValor(String query, Class<T> type) {
         T resultado = null;
-    
+
         try (Statement declaracion = this.conexionBaseDatos.createStatement()) {
             ResultSet conjuntoResultado = declaracion.executeQuery(query);
-    
+
             if (conjuntoResultado.next()) {
                 resultado = type.getDeclaredConstructor().newInstance();
                 if (resultado instanceof MapeadorBaseDatos) {
@@ -74,22 +75,12 @@ public class BaseDeDatos {
             System.out.println("Error al mapear los resultados: " + e.getMessage());
             e.printStackTrace();
         }
-    
+
         return resultado;
     }
 
     public Connection obtenerConexionBaseDatos() {
         return conexionBaseDatos;
     }
-    
-    
-
-    
-    
-
-
-    
-    
-
 
 }

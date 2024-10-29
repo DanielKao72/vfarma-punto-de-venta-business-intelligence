@@ -4,7 +4,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.List;
 
-import com.vfarma.BaseDatos.Ejemplos.Producto;
+import com.vfarma.Modelo.Producto;
 
 public class ConsultasProducto {
     private final BaseDeDatos baseDeDatos;

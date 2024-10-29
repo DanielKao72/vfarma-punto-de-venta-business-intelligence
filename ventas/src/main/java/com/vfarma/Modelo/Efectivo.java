@@ -1,17 +1,18 @@
 package com.vfarma.Modelo;
 
-public class Efectivo implements MetodoPago {
+public class Efectivo  implements MetodoPago {
+
+    public void contarCambio() {
+        System.out.println("Contando el cambio...");
+    }
+
     @Override
     public void obtenerDetallesPago() {
-        System.out.println("Pago en efectivo");
+        this.contarCambio();
     }
 
     @Override
     public boolean estaPagado() {
-        return true;
-    }
-
-    public void contarCambio() {
-        System.out.println("Contando el cambio...");
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 }

@@ -1,9 +1,11 @@
 package com.vfarma.Modelo;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import com.vfarma.BaseDatos.ConsultasProducto;
 import com.vfarma.BaseDatos.MapeadorBaseDatos;
+
 public class Producto implements MapeadorBaseDatos {
 
     private int claveProducto;
@@ -12,19 +14,17 @@ public class Producto implements MapeadorBaseDatos {
     private String fechaCaducidad;
     private int existenciaProducto;
 
-
     @Override
     public void mapearDelConjuntoResultado(ResultSet conjuntoResultado) throws SQLException {
         this.claveProducto = conjuntoResultado.getInt("ProductoID");
         this.nombreProducto = conjuntoResultado.getString("Nombre");
         this.precioProducto = conjuntoResultado.getInt("Precio");
-        
+
         ConsultasProducto consultasProducto = new ConsultasProducto();
         this.fechaCaducidad = consultasProducto.obtenerFechaCaducidad(this.claveProducto);
         this.existenciaProducto = consultasProducto.existenciaProducto(this.claveProducto);
         // se podria agregar el proveedor
     }
-
 
     public int obtenerClaveProducto() {
         return claveProducto;
@@ -66,5 +66,4 @@ public class Producto implements MapeadorBaseDatos {
         this.existenciaProducto = existenciaProducto;
     }
 
-   
 }

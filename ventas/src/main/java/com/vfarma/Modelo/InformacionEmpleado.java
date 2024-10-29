@@ -6,7 +6,7 @@ public class InformacionEmpleado {
     private String nombreEmpleado;
     private String sucursalFarmacia;
     private String turno;
-    public InformacionCaja informacionCaja;
+    private InformacionCaja informacionCaja;
 
     public String obtenerClaveEmpleado() {
         return claveEmpleado;
@@ -40,9 +40,12 @@ public class InformacionEmpleado {
         this.turno = turno;
     }
 
+    public InformacionCaja obtenerInformacionCaja() {
+        return informacionCaja;
+    }
 
-  
-    
-
+    public void colocarInformacionCaja(InformacionCaja informacionCaja) {
+        this.informacionCaja = informacionCaja;
+    }
 
 }
