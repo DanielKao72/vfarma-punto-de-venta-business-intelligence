@@ -5,13 +5,8 @@ public class InformacionCliente {
     private String claveRFCCliente;
     private Pago pago;
 
-    public InformacionCliente(){
-
-    }
-
-    public void obtenerDatosCliente() {
-        System.out.println("Domicilio del cliente: " + domicilioCliente);
-        System.out.println("Clave RFC del cliente: " + claveRFCCliente);
+    public InformacionCliente obtenerDatosCliente() {
+        return this;
     }
 
     public String getDomicilioCliente() {

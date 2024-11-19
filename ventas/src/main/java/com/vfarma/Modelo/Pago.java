@@ -8,10 +8,6 @@ public class Pago {
         return metodoPago;
     }
 
-    public void procesarPago() {
-
-    }
-
     public MetodoPago obtenerMetodoPago() {
         return this.metodoPago;
     }
@@ -19,5 +15,13 @@ public class Pago {
     public void colocarMetodoPago(MetodoPago metodoPago) {
         this.metodoPago = metodoPago;
     }
+
+    public void procesarPago() {
+
+    }
+
+    
+
+    
 
 }

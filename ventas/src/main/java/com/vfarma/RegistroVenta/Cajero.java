@@ -10,13 +10,12 @@ import com.vfarma.Modelo.InformacionPersonaMoral;
 import com.vfarma.Modelo.InformacionVenta;
 import com.vfarma.Modelo.Producto;
 import com.vfarma.Modelo.Recibo;
-import com.vfarma.Modelo.TarjetaCredito;
+import com.itextpdf.layout.Document;
 
 public class Cajero {
 
     public InformacionVenta informacionVenta;
     public ConsultasProducto consultasProducto;
-    //public InformacionEmpleado datosCajero;
 
     public Cajero() {
         this.informacionVenta = new InformacionVenta();
@@ -58,17 +57,13 @@ public class Cajero {
     }
 
     public enum TipoPago {
-        EFECTIVO,
-        TARJETA
+        EFECTIVO
     }
 
     public void seleccionarTipoPagoCliente(TipoPago tipoPago) {
         switch (tipoPago) {
             case EFECTIVO -> {
                 this.informacionVenta.obtenerInformacionCliente().obtenerPago().colocarMetodoPago(new Efectivo()); 
-            }
-            case TARJETA -> {
-                this.informacionVenta.obtenerInformacionCliente().obtenerPago().colocarMetodoPago(new TarjetaCredito());
             }
             default ->
                 System.out.println("Tipo de pago no válido");
@@ -80,11 +75,10 @@ public class Cajero {
         this.informacionVenta.obtenerInformacionCliente().obtenerPago().obtenerMetodoPago().obtenerDetallesPago();
     }
 
-    //--------disonancia cognitiva
     public void imprimirComprobante() {
         try {
-            this.informacionVenta.obtenerComprobante().generarComprobante(this.informacionVenta);
-            //imprimelo aqui
+            Document comprobanteLlenado = this.informacionVenta.obtenerComprobante().llenarInformacionComprobante();
+            this.informacionVenta.obtenerComprobante().enviarAImpresionComprobante(comprobanteLlenado);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
@@ -98,16 +92,17 @@ public class Cajero {
         this.imprimirComprobante();
     }
 
-    /* 
+    
     public void establecerBalanceInicial(){
-
+        ;
     }
 
     public void abrirCaja(){
-
+        ;
     }
 
     public void cerrarCaja(){
+        ;
     }
-     */
+     
 }

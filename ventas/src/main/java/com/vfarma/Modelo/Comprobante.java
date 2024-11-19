@@ -4,7 +4,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
-import java.util.HashMap;
 
 import javax.print.Doc;
 import javax.print.DocFlavor;
@@ -32,22 +31,11 @@ public abstract class Comprobante {
         this.informacionVenta = informacionVenta;
     }
 
-    //-----------!!!!!!!!!!!!!!!!!-----------------
-    public abstract void generarComprobante(InformacionVenta informacionVenta) throws FileNotFoundException;
+    //public abstract void generarComprobante(InformacionVenta informacionVenta) throws FileNotFoundException;
 
-    protected HashMap<String, String> llenarInformacionComprobante(InformacionVenta informacionVenta) {
-        HashMap<String, String> camposGeneralesComprobante = new HashMap<>();
-        camposGeneralesComprobante.put("Domicilio Cliente", informacionVenta.obtenerInformacionCliente().getDomicilioCliente());
-        camposGeneralesComprobante.put("RFC Cliente", informacionVenta.obtenerInformacionCliente().obtenerClaveRFCCliente());
-        camposGeneralesComprobante.put("Clave RFC Farmacia", this.informacionFarmacia.obtenerClaveRFCFarmacia());
-        camposGeneralesComprobante.put("Domicilio Sucursal Farmacia", this.informacionFarmacia.obtenerDomicilioSucursalFarmacia());
-        camposGeneralesComprobante.put("Nombre Farmacia", this.informacionFarmacia.obtenerNombreFarmacia());
-        return camposGeneralesComprobante;
-    }
+    public abstract Document llenarInformacionComprobante() throws FileNotFoundException;
 
-    protected abstract Document rellenarDatosComprobante(HashMap<String, String> campos) throws FileNotFoundException;
-
-    protected void enviarAImpresionComprobante(Document comprobante) {
+    public void enviarAImpresionComprobante(Document comprobante) {
         comprobante.close();
         try {
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
@@ -79,16 +67,8 @@ public abstract class Comprobante {
         }
     }
 
-    protected HashMap<String, String> unirDatosComprobante(HashMap<String, String> map1, HashMap<String, String> map2) {
-        HashMap<String, String> HashMapResultante = new HashMap<>(map1);
-
-        for (String key : map2.keySet()) {
-            HashMapResultante.put(key, map2.get(key));
-        }
-
-        return HashMapResultante;
+    protected InformacionFarmacia obtenerInformacionFarmacia() {
+        return this.informacionFarmacia;
     }
-
-    
 
 }

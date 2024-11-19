@@ -1,7 +1,7 @@
 package com.vfarma.Modelo;
 
 import java.io.FileNotFoundException;
-import java.util.HashMap;
+import java.util.ArrayList;
 
 import com.itextpdf.kernel.colors.ColorConstants;
 import com.itextpdf.kernel.pdf.PdfDocument;
@@ -17,31 +17,30 @@ public class Recibo extends Comprobante {
         super(informacionVenta);
     }
 
-    @Override
-    public void generarComprobante(InformacionVenta informacionVenta) throws FileNotFoundException {
-        HashMap<String, String> informacionRecibo = this.llenarInformacionComprobante(informacionVenta);
-        Document reciboCompleto = this.rellenarDatosComprobante(informacionRecibo);
-        super.enviarAImpresionComprobante(reciboCompleto);
-    }
+    //@Override
+    //public void generarComprobante(InformacionVenta informacionVenta) throws FileNotFoundException {
+       // Document reciboCompleto = this.llenarInformacionComprobante();
+        //super.enviarAImpresionComprobante(reciboCompleto);
+    //}
 
     @Override
-    protected HashMap<String, String> llenarInformacionComprobante(InformacionVenta informacionVenta) {
+    public Document llenarInformacionComprobante() throws FileNotFoundException {
 
-        HashMap<String, String> camposGeneralesComprobante = super.llenarInformacionComprobante(informacionVenta);
+        // El siguiente recibo contiene los siguientes campos:
+        String domicilioCliente = informacionVenta.obtenerInformacionCliente().getDomicilioCliente();
+        String rfcCliente = informacionVenta.obtenerInformacionCliente().obtenerClaveRFCCliente();
+        String claveRFCFarmacia = this.obtenerInformacionFarmacia().obtenerClaveRFCFarmacia();
+        String domicilioSucursalFarmacia = this.obtenerInformacionFarmacia().obtenerDomicilioSucursalFarmacia();
+        String nombreFarmacia = this.obtenerInformacionFarmacia().obtenerNombreFarmacia();
 
-        HashMap<String, String> camposParticularesRecibo = new HashMap<>();
         InformacionPersonaFisica informacionCliente = (InformacionPersonaFisica) informacionVenta.obtenerInformacionCliente();
+        String nombreCliente = informacionCliente.obtenerNombreCliente();
+        String apellidosCliente = informacionCliente.obtenerApellidosCliente();
 
-        camposParticularesRecibo.put("Nombre Cliente", informacionCliente.obtenerNombreCliente());
-        camposParticularesRecibo.put("Apellido Cliente", informacionCliente.obtenerApellidosCliente());
+        ArrayList<Producto> productos = informacionVenta.obtenerCarritoCompras().obtenerTodosProductos();
+        //--------------------------------------------------------------------------------------------------------
 
-        return unirDatosComprobante(camposParticularesRecibo, camposGeneralesComprobante);
-    }
 
-    @Override
-    protected Document rellenarDatosComprobante(HashMap<String, String> campos) throws FileNotFoundException {
-        String nombrefamracia = informacionCliente.obtenerNombreCliente();
-        
         PdfWriter escritorPDF = new PdfWriter("Recibo");
         PdfDocument documentoPDF = new PdfDocument(escritorPDF);
         Document documento = new Document(documentoPDF);
@@ -52,12 +51,12 @@ public class Recibo extends Comprobante {
                 .setFontColor(ColorConstants.BLUE)
                 .setMarginBottom(20));
 
-        documento.add(new Paragraph(campos.get("Nombre Farmacia"))
+        documento.add(new Paragraph(nombreFarmacia)
                 .setFontSize(16)
                 .setBold()
                 .setMarginBottom(5));
 
-        documento.add(new Paragraph(campos.get("Domicilio Sucursal Farmacia"))
+        documento.add(new Paragraph(domicilioSucursalFarmacia)
                 .setFontSize(12)
                 .setMarginBottom(5));
 
@@ -67,8 +66,7 @@ public class Recibo extends Comprobante {
         tabla.addHeaderCell("Producto");
         tabla.addHeaderCell("Precio");
 
-        //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        super.informacionVenta.obtenerCarritoCompras().obtenerTodosProductos().forEach(producto -> {
+        productos.forEach(producto -> {
             tabla.addCell(producto.obtenerNombreProducto());
             tabla.addCell(String.valueOf(producto.obtenerPrecioProducto()));
         });

@@ -7,17 +7,17 @@ public class InformacionVenta {
 
     private final String claveVenta;
     private final String fechaVenta;
-    private Float montoTotalVenta;
+    private float montoTotalVenta;
     private InformacionCliente informacionCliente;
     private Comprobante comprobante;
     private CarritoCompras carritoCompras;
+    private InformacionEmpleado informacionEmpleado;
 
     public InformacionVenta() {
         this.claveVenta = this.generarClaveVenta();
         this.fechaVenta = this.obtenerFechaActual();
         this.montoTotalVenta = 0.0f;
         this.carritoCompras = new CarritoCompras();
-        
     }
 
     public String obtenerClaveVenta() {
@@ -82,4 +82,11 @@ public class InformacionVenta {
         this.informacionCliente = informacionCliente;
     }
 
+    public InformacionEmpleado obtenerInformacionEmpleado() {
+        return this.informacionEmpleado;
+    }
+
+    public void colocarInformacionEmpleado(InformacionEmpleado informacionEmpleado) {
+        this.informacionEmpleado = informacionEmpleado;
+    }
 }

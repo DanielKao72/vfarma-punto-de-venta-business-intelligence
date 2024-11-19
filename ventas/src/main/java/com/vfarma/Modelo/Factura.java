@@ -1,7 +1,7 @@
 package com.vfarma.Modelo;
 
 import java.io.FileNotFoundException;
-import java.util.HashMap;
+import java.util.ArrayList;
 
 import com.itextpdf.kernel.colors.ColorConstants;
 import com.itextpdf.kernel.pdf.PdfDocument;
@@ -18,38 +18,33 @@ public class Factura extends Comprobante {
         super(informacionVenta);
     }
 
-    @Override
-    public void generarComprobante(InformacionVenta informacionVenta) throws FileNotFoundException {
-        HashMap<String, String> informacionRecibo = this.llenarInformacionComprobante(informacionVenta);
-        Document reciboCompleto = this.rellenarDatosComprobante(informacionRecibo);
-        super.enviarAImpresionComprobante(reciboCompleto);
-    }
+    //@Override
+   // public void generarComprobante(InformacionVenta informacionVenta) throws FileNotFoundException {
+       // Document reciboCompleto = this.llenarInformacionComprobante();
+       // super.enviarAImpresionComprobante(reciboCompleto);
+    //}
+
 
     @Override
-    public HashMap<String, String> llenarInformacionComprobante(InformacionVenta informacionVenta) {
+    public Document llenarInformacionComprobante() throws FileNotFoundException {
 
-        HashMap<String, String> camposgenerales = super.llenarInformacionComprobante(informacionVenta);
+        // La siguiente factura contiene los siguientes campos:
+        String domicilioCliente = informacionVenta.obtenerInformacionCliente().getDomicilioCliente();
+        String rfcCliente = informacionVenta.obtenerInformacionCliente().obtenerClaveRFCCliente();
+        String claveRFCFarmacia = this.obtenerInformacionFarmacia().obtenerClaveRFCFarmacia();
+        String domicilioSucursalFarmacia = this.obtenerInformacionFarmacia().obtenerDomicilioSucursalFarmacia();
+        String nombreFarmacia = this.obtenerInformacionFarmacia().obtenerNombreFarmacia();
 
-        HashMap<String, String> camposParticulares = new HashMap<>();
         InformacionPersonaMoral informacionCliente = (InformacionPersonaMoral) informacionVenta.obtenerInformacionCliente();
+        String regimenFiscal = informacionCliente.obtenerRegimenFiscal();
+        String razonSocial = informacionCliente.obtenerRazonSocial();
 
-        camposParticulares.put("Regimen Fiscal", informacionCliente.obtenerRegimenFiscal());
-        camposParticulares.put("Razon Social", informacionCliente.obtenerRazonSocial());
+        ArrayList<Producto> productos = informacionVenta.obtenerCarritoCompras().obtenerTodosProductos();
+        //--------------------------------------------------------------------------------------------------------
 
-        return unirDatosComprobante(camposParticulares, camposgenerales);
-    } //quitar
-
-    @Override
-    public Document rellenarDatosComprobante(HashMap<String, String> campos) throws FileNotFoundException {
         PdfWriter escritorPDF = new PdfWriter("Factura");
         PdfDocument documentoPDF = new PdfDocument(escritorPDF);
         Document documento = new Document(documentoPDF);
-
-
-        super.informacionVenta.obtenerCarritoCompras().obtenerTodosProductos().forEach(producto -> {
-                tabla.addCell(producto.obtenerNombreProducto());
-                tabla.addCell(String.valueOf(producto.obtenerPrecioProducto()));
-            });
 
         documento.add(new Paragraph("Factura de Compra")
                 .setFontSize(24)
@@ -58,12 +53,12 @@ public class Factura extends Comprobante {
                 .setMarginBottom(20)
                 .setTextAlignment(TextAlignment.CENTER));
 
-        documento.add(new Paragraph(campos.get("Nombre Farmacia"))
+        documento.add(new Paragraph(nombreFarmacia)
                 .setFontSize(18)
                 .setBold()
                 .setMarginBottom(5)
                 .setTextAlignment(TextAlignment.CENTER));
-        documento.add(new Paragraph(campos.get("Domicilio Sucursal Farmacia"))
+        documento.add(new Paragraph(domicilioSucursalFarmacia)
                 .setFontSize(12)
                 .setMarginBottom(5)
                 .setTextAlignment(TextAlignment.CENTER));
@@ -86,10 +81,10 @@ public class Factura extends Comprobante {
         tabla.addHeaderCell("Producto");
         tabla.addHeaderCell("Precio");
 
-        //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        
-
-        documento.add(tabla);
+        productos.forEach(producto -> {
+            tabla.addCell(producto.obtenerNombreProducto());
+            tabla.addCell(String.valueOf(producto.obtenerPrecioProducto()));
+        });
 
         documento.add(new AreaBreak());
         documento.add(new Paragraph("Gracias por su compra!")
