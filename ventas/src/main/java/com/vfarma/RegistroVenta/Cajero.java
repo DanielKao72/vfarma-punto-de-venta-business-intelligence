@@ -2,6 +2,7 @@ package com.vfarma.RegistroVenta;
 
 import java.io.FileNotFoundException;
 
+import com.itextpdf.layout.Document;
 import com.vfarma.BaseDatos.ConsultasProducto;
 import com.vfarma.Modelo.Efectivo;
 import com.vfarma.Modelo.Factura;
@@ -10,7 +11,6 @@ import com.vfarma.Modelo.InformacionPersonaMoral;
 import com.vfarma.Modelo.InformacionVenta;
 import com.vfarma.Modelo.Producto;
 import com.vfarma.Modelo.Recibo;
-import com.itextpdf.layout.Document;
 
 public class Cajero {
 
@@ -23,7 +23,7 @@ public class Cajero {
     }
 
     public void agregarProductoACarrito(int idProducto) {
-        if (this.consultasProducto.existenciaProducto(idProducto) == 0) {
+        if (this.consultasProducto.contarExistenciaProducto(idProducto) == 0) {
             System.out.println("Producto no disponible");
             return;
         }
@@ -45,7 +45,7 @@ public class Cajero {
         switch (tipoCliente) {
             case PERSONA_MORAL -> {
                 this.informacionVenta.colocarInformacionCliente(new InformacionPersonaMoral());
-                this.informacionVenta.colocarComprobante(new Factura(this.informacionVenta) );
+                this.informacionVenta.colocarComprobante(new Factura(this.informacionVenta));
             }
             case PERSONA_FISICA -> {
                 this.informacionVenta.colocarInformacionCliente(new InformacionPersonaFisica());
@@ -63,7 +63,7 @@ public class Cajero {
     public void seleccionarTipoPagoCliente(TipoPago tipoPago) {
         switch (tipoPago) {
             case EFECTIVO -> {
-                this.informacionVenta.obtenerInformacionCliente().obtenerPago().colocarMetodoPago(new Efectivo()); 
+                this.informacionVenta.obtenerInformacionCliente().obtenerPago().colocarMetodoPago(new Efectivo());
             }
             default ->
                 System.out.println("Tipo de pago no válido");
@@ -78,9 +78,8 @@ public class Cajero {
     public void imprimirComprobante() {
         try {
             Document comprobanteLlenado = this.informacionVenta.obtenerComprobante().llenarInformacionComprobante();
-            this.informacionVenta.obtenerComprobante().enviarAImpresionComprobante(comprobanteLlenado);
+            this.informacionVenta.obtenerComprobante().enviarAImpresion(comprobanteLlenado);
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
         }
     }
 
@@ -92,17 +91,16 @@ public class Cajero {
         this.imprimirComprobante();
     }
 
-    
-    public void establecerBalanceInicial(){
+    public void establecerBalanceInicial() {
         ;
     }
 
-    public void abrirCaja(){
+    public void abrirCaja() {
         ;
     }
 
-    public void cerrarCaja(){
+    public void cerrarCaja() {
         ;
     }
-     
+
 }

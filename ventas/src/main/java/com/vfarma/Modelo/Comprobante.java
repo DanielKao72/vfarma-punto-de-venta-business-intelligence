@@ -19,23 +19,28 @@ import javax.print.attribute.standard.MediaSizeName;
 import javax.print.attribute.standard.OrientationRequested;
 
 import com.itextpdf.io.exceptions.IOException;
+import com.itextpdf.kernel.colors.Color;
 import com.itextpdf.layout.Document;
+import com.itextpdf.layout.element.AreaBreak;
+import com.itextpdf.layout.element.Paragraph;
+import com.itextpdf.layout.properties.TextAlignment;
 
 public abstract class Comprobante {
 
-    private final InformacionFarmacia informacionFarmacia;
+    protected final InformacionFarmacia informacionFarmacia;
     protected final InformacionVenta informacionVenta;
+    protected Document hojaDocumento;
 
     public Comprobante(InformacionVenta informacionVenta) {
         this.informacionFarmacia = new InformacionFarmacia();
         this.informacionVenta = informacionVenta;
     }
 
-    //public abstract void generarComprobante(InformacionVenta informacionVenta) throws FileNotFoundException;
+    protected abstract Document crearHojaVacia();
 
     public abstract Document llenarInformacionComprobante() throws FileNotFoundException;
 
-    public void enviarAImpresionComprobante(Document comprobante) {
+    public void enviarAImpresion(Document comprobante) {
         comprobante.close();
         try {
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
@@ -63,12 +68,28 @@ public abstract class Comprobante {
             inputStream.close();
 
         } catch (IOException | PrintException | java.io.IOException e) {
-            e.printStackTrace();
         }
     }
 
-    protected InformacionFarmacia obtenerInformacionFarmacia() {
-        return this.informacionFarmacia;
+    protected void agregarParrafoTexto(String texto, int fontSize, boolean esNegrita, Color color, float marginBottom, TextAlignment alineacion) {
+        Paragraph parrafo = new Paragraph(texto)
+                .setFontSize(fontSize)
+                .setMarginBottom(marginBottom)
+                .setTextAlignment(alineacion);
+
+        if (esNegrita) {
+            parrafo.setBold();
+        }
+
+        if (color != null) {
+            parrafo.setFontColor(color);
+        }
+
+        this.hojaDocumento.add(parrafo);
+    }
+
+    protected void agregarSaltoDeLinea() {
+        this.hojaDocumento.add(new AreaBreak());
     }
 
 }

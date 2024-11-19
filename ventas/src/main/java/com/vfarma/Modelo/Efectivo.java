@@ -1,6 +1,6 @@
 package com.vfarma.Modelo;
 
-public class Efectivo  implements MetodoPago {
+public class Efectivo implements MetodoPago {
 
     public void contarCambio() {
         System.out.println("Contando el cambio...");

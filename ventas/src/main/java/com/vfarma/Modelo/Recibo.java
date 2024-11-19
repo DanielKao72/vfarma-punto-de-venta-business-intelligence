@@ -7,21 +7,31 @@ import com.itextpdf.kernel.colors.ColorConstants;
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.layout.Document;
-import com.itextpdf.layout.element.AreaBreak;
-import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.element.Table;
+import com.itextpdf.layout.properties.TextAlignment;
 
-public class Recibo extends Comprobante {
+public final class Recibo extends Comprobante {
+
+
 
     public Recibo(InformacionVenta informacionVenta) {
         super(informacionVenta);
+        super.hojaDocumento = this.crearHojaVacia();
     }
 
-    //@Override
-    //public void generarComprobante(InformacionVenta informacionVenta) throws FileNotFoundException {
-       // Document reciboCompleto = this.llenarInformacionComprobante();
-        //super.enviarAImpresionComprobante(reciboCompleto);
-    //}
+    @Override
+    protected Document crearHojaVacia() {
+        PdfWriter escritorPDF;
+        try {
+            escritorPDF = new PdfWriter("Recibo.pdf");
+            PdfDocument documentoPDF = new PdfDocument(escritorPDF);
+            Document documento = new Document(documentoPDF);
+            return documento;
+        } catch (FileNotFoundException ex) {
+        }
+        return null;
+
+    }
 
     @Override
     public Document llenarInformacionComprobante() throws FileNotFoundException {
@@ -29,9 +39,9 @@ public class Recibo extends Comprobante {
         // El siguiente recibo contiene los siguientes campos:
         String domicilioCliente = informacionVenta.obtenerInformacionCliente().getDomicilioCliente();
         String rfcCliente = informacionVenta.obtenerInformacionCliente().obtenerClaveRFCCliente();
-        String claveRFCFarmacia = this.obtenerInformacionFarmacia().obtenerClaveRFCFarmacia();
-        String domicilioSucursalFarmacia = this.obtenerInformacionFarmacia().obtenerDomicilioSucursalFarmacia();
-        String nombreFarmacia = this.obtenerInformacionFarmacia().obtenerNombreFarmacia();
+        String claveRFCFarmacia = super.informacionFarmacia.obtenerClaveRFCFarmacia();
+        String domicilioSucursalFarmacia = super.informacionFarmacia.obtenerDomicilioSucursalFarmacia();
+        String nombreFarmacia = super.informacionFarmacia.obtenerNombreFarmacia();
 
         InformacionPersonaFisica informacionCliente = (InformacionPersonaFisica) informacionVenta.obtenerInformacionCliente();
         String nombreCliente = informacionCliente.obtenerNombreCliente();
@@ -40,50 +50,38 @@ public class Recibo extends Comprobante {
         ArrayList<Producto> productos = informacionVenta.obtenerCarritoCompras().obtenerTodosProductos();
         //--------------------------------------------------------------------------------------------------------
 
+        super.agregarParrafoTexto("Recibo de Compra", 20, true, ColorConstants.BLUE, 20, TextAlignment.CENTER);
+        super.agregarParrafoTexto(nombreFarmacia, 16, true, null, 5, TextAlignment.CENTER);
+        super.agregarParrafoTexto(claveRFCFarmacia, 16, true, null, 5, TextAlignment.CENTER);
+        super.agregarParrafoTexto(domicilioSucursalFarmacia, 12, false, null, 5, TextAlignment.CENTER);
 
-        PdfWriter escritorPDF = new PdfWriter("Recibo");
-        PdfDocument documentoPDF = new PdfDocument(escritorPDF);
-        Document documento = new Document(documentoPDF);
+        agregarSaltoDeLinea();
 
-        documento.add(new Paragraph("Recibo de Compra")
-                .setFontSize(20)
-                .setBold()
-                .setFontColor(ColorConstants.BLUE)
-                .setMarginBottom(20));
+        agregarParrafoTexto("Datos del Cliente:", 14, true, null, 10, TextAlignment.LEFT);
+        agregarParrafoTexto("Nombre: " + nombreCliente + " " + apellidosCliente, 12, false, null, 0, TextAlignment.LEFT);
+        agregarParrafoTexto("RFC: " + rfcCliente, 12, false, null, 0, TextAlignment.LEFT);
+        agregarParrafoTexto("Domicilio: " + domicilioCliente, 12, false, null, 0, TextAlignment.LEFT);
 
-        documento.add(new Paragraph(nombreFarmacia)
-                .setFontSize(16)
-                .setBold()
-                .setMarginBottom(5));
+        agregarSaltoDeLinea();
 
-        documento.add(new Paragraph(domicilioSucursalFarmacia)
-                .setFontSize(12)
-                .setMarginBottom(5));
+        agregarParrafoTexto("Productos Comprados:", 14, true, null, 10, TextAlignment.LEFT);
 
-        documento.add(new AreaBreak());
-
-        Table tabla = new Table(2);
-        tabla.addHeaderCell("Producto");
-        tabla.addHeaderCell("Precio");
+        Table tablaProductos = new Table(2);
+        tablaProductos.addHeaderCell("Producto");
+        tablaProductos.addHeaderCell("Precio");
 
         productos.forEach(producto -> {
-            tabla.addCell(producto.obtenerNombreProducto());
-            tabla.addCell(String.valueOf(producto.obtenerPrecioProducto()));
+            tablaProductos.addCell(producto.obtenerNombreProducto());
+            tablaProductos.addCell(String.format("$ %.2f", producto.obtenerPrecioProducto()));
         });
 
-        documento.add(new AreaBreak());
-        documento.add(new Paragraph("Gracias por su compra!")
-                .setFontSize(14)
-                .setBold()
-                .setFontColor(ColorConstants.GREEN)
-                .setMarginTop(20));
-        documento.add(new Paragraph("Fecha: " + java.time.LocalDate.now())
-                .setFontSize(12)
-                .setMarginTop(5));
+        super.hojaDocumento.add(tablaProductos);
 
-        documento.close();
-        return documento;
-
+        agregarSaltoDeLinea();
+        agregarParrafoTexto("Gracias por su compra!", 14, true, ColorConstants.GREEN, 20, TextAlignment.CENTER);
+        agregarParrafoTexto("Fecha: " + java.time.LocalDate.now(), 12, false, null, 5, TextAlignment.CENTER);
+        
+        return super.hojaDocumento;
     }
 
 }

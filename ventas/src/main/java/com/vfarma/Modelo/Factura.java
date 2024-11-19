@@ -7,23 +7,31 @@ import com.itextpdf.kernel.colors.ColorConstants;
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.layout.Document;
-import com.itextpdf.layout.element.AreaBreak;
+import com.itextpdf.layout.element.Cell;
 import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.element.Table;
 import com.itextpdf.layout.properties.TextAlignment;
 
-public class Factura extends Comprobante {
+public final class Factura extends Comprobante {
 
     public Factura(InformacionVenta informacionVenta) {
         super(informacionVenta);
+        super.hojaDocumento = this.crearHojaVacia();
     }
 
-    //@Override
-   // public void generarComprobante(InformacionVenta informacionVenta) throws FileNotFoundException {
-       // Document reciboCompleto = this.llenarInformacionComprobante();
-       // super.enviarAImpresionComprobante(reciboCompleto);
-    //}
+    @Override
+    protected Document crearHojaVacia() {
+        PdfWriter escritorPDF;
+        try {
+            escritorPDF = new PdfWriter("Factura.pdf");
+            PdfDocument documentoPDF = new PdfDocument(escritorPDF);
+            Document documento = new Document(documentoPDF);
+            return documento;
+        } catch (FileNotFoundException ex) {
+        }
+        return null;
 
+    }
 
     @Override
     public Document llenarInformacionComprobante() throws FileNotFoundException {
@@ -31,9 +39,9 @@ public class Factura extends Comprobante {
         // La siguiente factura contiene los siguientes campos:
         String domicilioCliente = informacionVenta.obtenerInformacionCliente().getDomicilioCliente();
         String rfcCliente = informacionVenta.obtenerInformacionCliente().obtenerClaveRFCCliente();
-        String claveRFCFarmacia = this.obtenerInformacionFarmacia().obtenerClaveRFCFarmacia();
-        String domicilioSucursalFarmacia = this.obtenerInformacionFarmacia().obtenerDomicilioSucursalFarmacia();
-        String nombreFarmacia = this.obtenerInformacionFarmacia().obtenerNombreFarmacia();
+        String claveRFCFarmacia = super.informacionFarmacia.obtenerClaveRFCFarmacia();
+        String domicilioSucursalFarmacia = super.informacionFarmacia.obtenerDomicilioSucursalFarmacia();
+        String nombreFarmacia = super.informacionFarmacia.obtenerNombreFarmacia();
 
         InformacionPersonaMoral informacionCliente = (InformacionPersonaMoral) informacionVenta.obtenerInformacionCliente();
         String regimenFiscal = informacionCliente.obtenerRegimenFiscal();
@@ -42,63 +50,40 @@ public class Factura extends Comprobante {
         ArrayList<Producto> productos = informacionVenta.obtenerCarritoCompras().obtenerTodosProductos();
         //--------------------------------------------------------------------------------------------------------
 
-        PdfWriter escritorPDF = new PdfWriter("Factura");
-        PdfDocument documentoPDF = new PdfDocument(escritorPDF);
-        Document documento = new Document(documentoPDF);
+        super.agregarParrafoTexto("Factura de Compra", 24, true, ColorConstants.BLUE, 20, TextAlignment.CENTER);
+        super.agregarParrafoTexto(nombreFarmacia, 18, true, null, 5, TextAlignment.CENTER);
+        super.agregarParrafoTexto(domicilioSucursalFarmacia, 12, false, null, 5, TextAlignment.CENTER);
+        super.agregarParrafoTexto("RFC: " + claveRFCFarmacia, 12, false, null, 15, TextAlignment.CENTER);
 
-        documento.add(new Paragraph("Factura de Compra")
-                .setFontSize(24)
-                .setBold()
-                .setFontColor(ColorConstants.BLUE)
-                .setMarginBottom(20)
-                .setTextAlignment(TextAlignment.CENTER));
+        super.agregarSaltoDeLinea();
 
-        documento.add(new Paragraph(nombreFarmacia)
-                .setFontSize(18)
-                .setBold()
-                .setMarginBottom(5)
-                .setTextAlignment(TextAlignment.CENTER));
-        documento.add(new Paragraph(domicilioSucursalFarmacia)
-                .setFontSize(12)
-                .setMarginBottom(5)
-                .setTextAlignment(TextAlignment.CENTER));
+        super.agregarParrafoTexto("Datos del Cliente:", 14, true, null, 10, TextAlignment.LEFT);
+        super.agregarParrafoTexto("Razón Social: " + razonSocial, 12, false, null, 0, TextAlignment.LEFT);
+        super.agregarParrafoTexto("RFC: " + rfcCliente, 12, false, null, 0, TextAlignment.LEFT);
+        super.agregarParrafoTexto("Domicilio: " + domicilioCliente, 12, false, null, 0, TextAlignment.LEFT);
+        super.agregarParrafoTexto("Régimen Fiscal: " + regimenFiscal, 12, false, null, 0, TextAlignment.LEFT);
 
-        documento.add(new AreaBreak());
+        super.agregarSaltoDeLinea();
 
-        documento.add(new Paragraph("Datos del Cliente:")
-                .setFontSize(14)
-                .setBold()
-                .setMarginTop(10));
+        super.agregarParrafoTexto("Productos Comprados:", 14, true, null, 10, TextAlignment.LEFT);
 
-        documento.add(new AreaBreak());
-
-        documento.add(new Paragraph("Productos Comprados:")
-                .setFontSize(14)
-                .setBold()
-                .setMarginTop(10));
-
-        Table tabla = new Table(2);
-        tabla.addHeaderCell("Producto");
-        tabla.addHeaderCell("Precio");
+        Table tablaProductos = new Table(2);
+        tablaProductos.addHeaderCell(new Cell().add(new Paragraph("Producto").setBold()));
+        tablaProductos.addHeaderCell(new Cell().add(new Paragraph("Precio").setBold()));
 
         productos.forEach(producto -> {
-            tabla.addCell(producto.obtenerNombreProducto());
-            tabla.addCell(String.valueOf(producto.obtenerPrecioProducto()));
+            tablaProductos.addCell(new Cell().add(new Paragraph(producto.obtenerNombreProducto())));
+            tablaProductos.addCell(new Cell().add(new Paragraph(String.format("$ %.2f", producto.obtenerPrecioProducto()))));
         });
 
-        documento.add(new AreaBreak());
-        documento.add(new Paragraph("Gracias por su compra!")
-                .setFontSize(16)
-                .setBold()
-                .setFontColor(ColorConstants.GREEN)
-                .setMarginTop(20)
-                .setTextAlignment(TextAlignment.CENTER));
-        documento.add(new Paragraph("Fecha: " + java.time.LocalDate.now())
-                .setFontSize(12)
-                .setMarginTop(5)
-                .setTextAlignment(TextAlignment.CENTER));
+        super.hojaDocumento.add(tablaProductos);
 
-        return documento;
+        super.agregarSaltoDeLinea();
+
+        super.agregarParrafoTexto("Gracias por su compra!", 16, true, ColorConstants.GREEN, 20, TextAlignment.CENTER);
+        super.agregarParrafoTexto("Fecha: " + java.time.LocalDate.now(), 12, false, null, 5, TextAlignment.CENTER);
+
+        return super.hojaDocumento;
 
     }
 

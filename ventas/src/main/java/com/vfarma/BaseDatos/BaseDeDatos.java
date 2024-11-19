@@ -28,10 +28,6 @@ public class BaseDeDatos {
         return instancia;
     }
 
-   
-
-    
-
     public Connection obtenerConexionBaseDatos() {
         return conexionBaseDatos;
     }

@@ -1,6 +1,7 @@
 package com.vfarma.Modelo;
 
 public class InformacionCliente {
+
     private String domicilioCliente;
     private String claveRFCCliente;
     private Pago pago;

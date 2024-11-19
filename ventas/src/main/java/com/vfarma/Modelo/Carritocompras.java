@@ -18,6 +18,14 @@ public class CarritoCompras {
         listaProductos.remove(producto);
     }
 
+    public void vaciarCarrito() {
+        listaProductos.clear();
+    }
+
+    public ArrayList<Producto> obtenerTodosProductos() {
+        return this.listaProductos;
+    }
+
     public Producto buscarProductoPorIdDelProducto(int id) {
         for (Producto producto : this.listaProductos) {
             if (producto.obtenerClaveProducto() == id) {
@@ -25,13 +33,5 @@ public class CarritoCompras {
             }
         }
         return null;
-    }
-
-    public void vaciarCarrito() {
-        listaProductos.clear();
-    }
-
-    public ArrayList<Producto> obtenerTodosProductos() {
-        return listaProductos;
     }
 }
