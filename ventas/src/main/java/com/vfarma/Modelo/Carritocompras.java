@@ -18,7 +18,7 @@ public class CarritoCompras {
         listaProductos.remove(producto);
     }
 
-    public Producto buscarProductoPorId(int id) {
+    public Producto buscarProductoPorIdDelProducto(int id) {
         for (Producto producto : this.listaProductos) {
             if (producto.obtenerClaveProducto() == id) {
                 return producto;

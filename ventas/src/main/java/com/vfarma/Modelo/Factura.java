@@ -20,9 +20,9 @@ public class Factura extends Comprobante {
 
     @Override
     public void generarComprobante(InformacionVenta informacionVenta) throws FileNotFoundException {
-        HashMap<String, String> informacionRecibo = llenarInformacionComprobante(informacionVenta);
-        Document reciboCompleto = construirComprobante(informacionRecibo);
-        super.imprimirComprobante(reciboCompleto);
+        HashMap<String, String> informacionRecibo = this.llenarInformacionComprobante(informacionVenta);
+        Document reciboCompleto = this.rellenarDatosComprobante(informacionRecibo);
+        super.enviarAImpresionComprobante(reciboCompleto);
     }
 
     @Override
@@ -36,14 +36,20 @@ public class Factura extends Comprobante {
         camposParticulares.put("Regimen Fiscal", informacionCliente.obtenerRegimenFiscal());
         camposParticulares.put("Razon Social", informacionCliente.obtenerRazonSocial());
 
-        return unirHashMaps(camposParticulares, camposgenerales);
-    }
+        return unirDatosComprobante(camposParticulares, camposgenerales);
+    } //quitar
 
     @Override
-    public Document construirComprobante(HashMap<String, String> campos) throws FileNotFoundException {
+    public Document rellenarDatosComprobante(HashMap<String, String> campos) throws FileNotFoundException {
         PdfWriter escritorPDF = new PdfWriter("Factura");
         PdfDocument documentoPDF = new PdfDocument(escritorPDF);
         Document documento = new Document(documentoPDF);
+
+
+        super.informacionVenta.obtenerCarritoCompras().obtenerTodosProductos().forEach(producto -> {
+                tabla.addCell(producto.obtenerNombreProducto());
+                tabla.addCell(String.valueOf(producto.obtenerPrecioProducto()));
+            });
 
         documento.add(new Paragraph("Factura de Compra")
                 .setFontSize(24)
@@ -80,11 +86,8 @@ public class Factura extends Comprobante {
         tabla.addHeaderCell("Producto");
         tabla.addHeaderCell("Precio");
 
-        super.obtenerProductosComprados().forEach(producto -> {
-
-            tabla.addCell(producto.obtenerNombreProducto());
-            tabla.addCell(String.valueOf(producto.obtenerPrecioProducto()));
-        });
+        //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        
 
         documento.add(tabla);
 

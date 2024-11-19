@@ -19,28 +19,29 @@ public class Recibo extends Comprobante {
 
     @Override
     public void generarComprobante(InformacionVenta informacionVenta) throws FileNotFoundException {
-        HashMap<String, String> informacionRecibo = llenarInformacionComprobante(informacionVenta);
-        Document reciboCompleto = construirComprobante(informacionRecibo);
-        imprimirComprobante(reciboCompleto);
+        HashMap<String, String> informacionRecibo = this.llenarInformacionComprobante(informacionVenta);
+        Document reciboCompleto = this.rellenarDatosComprobante(informacionRecibo);
+        super.enviarAImpresionComprobante(reciboCompleto);
     }
 
     @Override
-    public HashMap<String, String> llenarInformacionComprobante(InformacionVenta informacionVenta) {
+    protected HashMap<String, String> llenarInformacionComprobante(InformacionVenta informacionVenta) {
 
-        HashMap<String, String> camposgenerales = super.llenarInformacionComprobante(informacionVenta);
+        HashMap<String, String> camposGeneralesComprobante = super.llenarInformacionComprobante(informacionVenta);
 
-        HashMap<String, String> camposParticulares = new HashMap<>();
+        HashMap<String, String> camposParticularesRecibo = new HashMap<>();
         InformacionPersonaFisica informacionCliente = (InformacionPersonaFisica) informacionVenta.obtenerInformacionCliente();
 
-        camposParticulares.put("Nombre Cliente", informacionCliente.obtenerNombreCliente());
-        camposParticulares.put("Apellido Cliente", informacionCliente.obtenerApellidosCliente());
+        camposParticularesRecibo.put("Nombre Cliente", informacionCliente.obtenerNombreCliente());
+        camposParticularesRecibo.put("Apellido Cliente", informacionCliente.obtenerApellidosCliente());
 
-        return unirHashMaps(camposParticulares, camposgenerales);
+        return unirDatosComprobante(camposParticularesRecibo, camposGeneralesComprobante);
     }
 
     @Override
-    public Document construirComprobante(HashMap<String, String> campos) throws FileNotFoundException {
-
+    protected Document rellenarDatosComprobante(HashMap<String, String> campos) throws FileNotFoundException {
+        String nombrefamracia = informacionCliente.obtenerNombreCliente();
+        
         PdfWriter escritorPDF = new PdfWriter("Recibo");
         PdfDocument documentoPDF = new PdfDocument(escritorPDF);
         Document documento = new Document(documentoPDF);
@@ -55,22 +56,22 @@ public class Recibo extends Comprobante {
                 .setFontSize(16)
                 .setBold()
                 .setMarginBottom(5));
+
         documento.add(new Paragraph(campos.get("Domicilio Sucursal Farmacia"))
                 .setFontSize(12)
                 .setMarginBottom(5));
 
         documento.add(new AreaBreak());
 
-         Table tabla = new Table(2);
-         tabla.addHeaderCell("Producto");
-         tabla.addHeaderCell("Precio");
+        Table tabla = new Table(2);
+        tabla.addHeaderCell("Producto");
+        tabla.addHeaderCell("Precio");
 
-        super.obtenerProductosComprados().forEach(producto -> {
-
+        //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        super.informacionVenta.obtenerCarritoCompras().obtenerTodosProductos().forEach(producto -> {
             tabla.addCell(producto.obtenerNombreProducto());
             tabla.addCell(String.valueOf(producto.obtenerPrecioProducto()));
         });
-
 
         documento.add(new AreaBreak());
         documento.add(new Paragraph("Gracias por su compra!")

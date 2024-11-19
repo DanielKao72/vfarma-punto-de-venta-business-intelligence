@@ -4,7 +4,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.HashMap;
 
 import javax.print.Doc;
@@ -26,42 +25,29 @@ import com.itextpdf.layout.Document;
 public abstract class Comprobante {
 
     private final InformacionFarmacia informacionFarmacia;
-    private final InformacionVenta informacionVenta;
+    protected final InformacionVenta informacionVenta;
 
     public Comprobante(InformacionVenta informacionVenta) {
         this.informacionFarmacia = new InformacionFarmacia();
         this.informacionVenta = informacionVenta;
     }
 
-    protected ArrayList<Producto> obtenerProductosComprados(){
-        return this.informacionVenta.obtenerCarritoCompras().obtenerTodosProductos();
-    }
-
+    //-----------!!!!!!!!!!!!!!!!!-----------------
     public abstract void generarComprobante(InformacionVenta informacionVenta) throws FileNotFoundException;
 
     protected HashMap<String, String> llenarInformacionComprobante(InformacionVenta informacionVenta) {
-        HashMap<String, String> campos = new HashMap<>();
-        campos.put("Domicilio Cliente", informacionVenta.obtenerInformacionCliente().getDomicilioCliente());
-        campos.put("RFC Cliente", informacionVenta.obtenerInformacionCliente().obtenerClaveRFCCliente());
-        campos.put("Clave RFC Farmacia", this.informacionFarmacia.obtenerClaveRFCFarmacia());
-        campos.put("Domicilio Sucursal Farmacia", this.informacionFarmacia.obtenerDomicilioSucursalFarmacia());
-        campos.put("Nombre Farmacia", this.informacionFarmacia.obtenerNombreFarmacia());
-        return campos;
+        HashMap<String, String> camposGeneralesComprobante = new HashMap<>();
+        camposGeneralesComprobante.put("Domicilio Cliente", informacionVenta.obtenerInformacionCliente().getDomicilioCliente());
+        camposGeneralesComprobante.put("RFC Cliente", informacionVenta.obtenerInformacionCliente().obtenerClaveRFCCliente());
+        camposGeneralesComprobante.put("Clave RFC Farmacia", this.informacionFarmacia.obtenerClaveRFCFarmacia());
+        camposGeneralesComprobante.put("Domicilio Sucursal Farmacia", this.informacionFarmacia.obtenerDomicilioSucursalFarmacia());
+        camposGeneralesComprobante.put("Nombre Farmacia", this.informacionFarmacia.obtenerNombreFarmacia());
+        return camposGeneralesComprobante;
     }
 
-    protected abstract Document construirComprobante(HashMap<String, String> campos) throws FileNotFoundException;
+    protected abstract Document rellenarDatosComprobante(HashMap<String, String> campos) throws FileNotFoundException;
 
-    protected HashMap<String, String> unirHashMaps(HashMap<String, String> map1, HashMap<String, String> map2) {
-        HashMap<String, String> HashMapResultante = new HashMap<>(map1);
-
-        for (String key : map2.keySet()) {
-            HashMapResultante.put(key, map2.get(key));
-        }
-
-        return HashMapResultante;
-    }
-
-    protected void imprimirComprobante(Document comprobante) {
+    protected void enviarAImpresionComprobante(Document comprobante) {
         comprobante.close();
         try {
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
@@ -92,5 +78,17 @@ public abstract class Comprobante {
             e.printStackTrace();
         }
     }
+
+    protected HashMap<String, String> unirDatosComprobante(HashMap<String, String> map1, HashMap<String, String> map2) {
+        HashMap<String, String> HashMapResultante = new HashMap<>(map1);
+
+        for (String key : map2.keySet()) {
+            HashMapResultante.put(key, map2.get(key));
+        }
+
+        return HashMapResultante;
+    }
+
+    
 
 }

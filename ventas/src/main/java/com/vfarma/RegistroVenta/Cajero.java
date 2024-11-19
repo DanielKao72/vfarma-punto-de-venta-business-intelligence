@@ -33,7 +33,7 @@ public class Cajero {
     }
 
     public void retirarProductoDeCarrito(int idProducto) {
-        Producto productoEncontrado = this.informacionVenta.obtenerCarritoCompras().buscarProductoPorId(idProducto);
+        Producto productoEncontrado = this.informacionVenta.obtenerCarritoCompras().buscarProductoPorIdDelProducto(idProducto);
         this.informacionVenta.obtenerCarritoCompras().removerProducto(productoEncontrado);
     }
 
@@ -49,7 +49,7 @@ public class Cajero {
                 this.informacionVenta.colocarComprobante(new Factura(this.informacionVenta) );
             }
             case PERSONA_FISICA -> {
-                this.informacionVenta.colocarInformacionCliente(new InformacionPersonaFisica()) ;
+                this.informacionVenta.colocarInformacionCliente(new InformacionPersonaFisica());
                 this.informacionVenta.colocarComprobante(new Recibo(this.informacionVenta));
             }
             default ->
@@ -80,9 +80,11 @@ public class Cajero {
         this.informacionVenta.obtenerInformacionCliente().obtenerPago().obtenerMetodoPago().obtenerDetallesPago();
     }
 
+    //--------disonancia cognitiva
     public void imprimirComprobante() {
         try {
             this.informacionVenta.obtenerComprobante().generarComprobante(this.informacionVenta);
+            //imprimelo aqui
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
@@ -94,7 +96,6 @@ public class Cajero {
             this.consultasProducto.restarExistenciaProducto(producto.obtenerClaveProducto(), 1);
         });
         this.imprimirComprobante();
-
     }
 
     /* 
