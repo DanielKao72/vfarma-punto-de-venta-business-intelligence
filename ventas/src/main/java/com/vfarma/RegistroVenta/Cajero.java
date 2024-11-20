@@ -14,12 +14,25 @@ import com.vfarma.Modelo.Recibo;
 
 public class Cajero {
 
+    private static Cajero instanciaUnica; 
     public InformacionVenta informacionVenta;
     public ConsultasProducto consultasProducto;
 
     public Cajero() {
         this.informacionVenta = new InformacionVenta();
         this.consultasProducto = new ConsultasProducto();
+    }
+
+    public static Cajero obtenerInstancia() {
+        if (instanciaUnica == null) {
+            instanciaUnica = new Cajero();
+        }
+        return instanciaUnica;
+    }
+
+
+    public void dummy(Object ejemplo){
+        System.out.println("Ejemplo: " + ejemplo);
     }
 
     public void agregarProductoACarrito(int idProducto) {
