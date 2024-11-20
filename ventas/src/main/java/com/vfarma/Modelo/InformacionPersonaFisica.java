@@ -5,6 +5,7 @@ public class InformacionPersonaFisica extends InformacionCliente {
     private String nombreCliente;
     private String apellidosCliente;
 
+
     public String obtenerNombreCliente() {
         return nombreCliente;
     }

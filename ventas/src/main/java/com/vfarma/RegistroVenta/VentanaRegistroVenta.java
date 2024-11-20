@@ -11,6 +11,7 @@ import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.table.DefaultTableModel;
 
 import com.vfarma.ComponentesVentana.Formulario;
 import com.vfarma.ComponentesVentana.InformacionBoton;
@@ -20,8 +21,8 @@ import com.vfarma.GestoresComponentesVentana.GestorComponentes;
 import com.vfarma.GestoresComponentesVentana.GestorFormulario;
 import com.vfarma.Ventanas.VentanaFormulario;
 
-
 public class VentanaRegistroVenta extends VentanaFormulario {
+
     private JComboBox<String> productosAlmacen;
     private JTextField campoCantidad;
     private JTextField campoDineroRecibido;
@@ -37,6 +38,26 @@ public class VentanaRegistroVenta extends VentanaFormulario {
 
     public VentanaRegistroVenta(String titulo) {
         super(titulo);
+        this.productosAlmacen = new JComboBox<>();
+        this.productosAlmacen.addItem("Aspirina 500mg");
+        this.productosAlmacen.addItem("Paracetamol 650mg");
+        this.productosAlmacen.addItem("Ibuprofeno 400mg");
+        this.productosAlmacen.addItem("Amoxicilina 500mg");
+        this.productosAlmacen.addItem("Vitamina C 1000mg");
+
+        // Crear la tabla con datos por defecto
+        this.carritoCompras = GestorFormulario.crearTabla(new String[] { "Producto", "Cantidad", "Precio" });
+this.carritoCompras.setFillsViewportHeight(true); 
+this.carritoCompras.setAutoResizeMode(JTable.AUTO_RESIZE_SUBSEQUENT_COLUMNS);
+
+// Establecer un tamaño preferido para la tabla dentro del JScrollPane
+this.tablaCarritoCompras = new JScrollPane(this.carritoCompras);
+this.carritoCompras.setPreferredScrollableViewportSize(new java.awt.Dimension(400, 150)); 
+
+      
+        this.carritoCompras.setFillsViewportHeight(true);
+        this.carritoCompras.setAutoResizeMode(JTable.AUTO_RESIZE_SUBSEQUENT_COLUMNS);
+        this.tablaCarritoCompras = new JScrollPane(this.carritoCompras);
     }
 
     @Override
@@ -50,12 +71,10 @@ public class VentanaRegistroVenta extends VentanaFormulario {
         opciones.add(this.opcionRecibo);
 
         this.tipoComprobante = GestorFormulario.crearGrupoBotones(opciones);
-        this.productosAlmacen = GestorFormulario.crearListaOpciones();
+
         this.campoCantidad = GestorFormulario.crearCampoTexto(2);
         this.campoDineroRecibido = GestorFormulario.crearCampoTexto(2);
-        this.carritoCompras = GestorFormulario.crearTabla(new String[] { "Producto", "Cantidad", "Precio" });
-        this.tablaCarritoCompras = new JScrollPane(this.carritoCompras);
-        
+
         formulario.agregarCampo(new InformacionCampoFormulario("Producto:", this.productosAlmacen));
         formulario.agregarCampo(new InformacionCampoFormulario("Cantidad:", this.campoCantidad));
         formulario.agregarCampo(new InformacionCampoFormulario("Tipo de Comprobante:", this.tipoComprobante));
@@ -119,6 +138,46 @@ public class VentanaRegistroVenta extends VentanaFormulario {
             ventanaFactura.mostrarVentana();
             this.cerrarVentana();
         });
+
+        this.botonAgregar.addActionListener(e -> {
+            // Recuperar los valores de los campos
+            String productoSeleccionado = (String) this.productosAlmacen.getSelectedItem();
+            String cantidadText = (String) this.campoCantidad.getText().trim(); // Agregar trim() para eliminar espacios extra
+            String precio = "10.00"; // Precio de ejemplo
+
+            // Obtener el modelo de la tabla para agregar la fila
+            DefaultTableModel modeloCarrito = (DefaultTableModel) this.carritoCompras.getModel();
+
+            // Agregar la fila con los datos seleccionados
+            modeloCarrito.addRow(new Object[]{productoSeleccionado, cantidadText, precio});
+            this.carritoCompras.revalidate();
+            this.carritoCompras.repaint();
+        });
+
+        this.botonFinalizar.addActionListener(e -> {
+            if (this.opcionRecibo.isSelected()) {
+                String productoSeleccionado = (String) this.productosAlmacen.getSelectedItem();
+                String cantidad = this.campoCantidad.getText();
+                String dineroRecibido = this.campoDineroRecibido.getText();
+
+                ArrayList<String[]> detallesCarrito = new ArrayList<>();
+                for (int i = 0; i < this.carritoCompras.getRowCount(); i++) {
+                    String producto = (String) this.carritoCompras.getValueAt(i, 0);
+                    String cantidadProducto = (String) this.carritoCompras.getValueAt(i, 1);
+                    String precio = (String) this.carritoCompras.getValueAt(i, 2);
+                    detallesCarrito.add(new String[]{producto, cantidadProducto, precio});
+                }
+
+                System.out.println("Datos para el Recibo:");
+                System.out.println("Producto Seleccionado: " + productoSeleccionado);
+                System.out.println("Cantidad: " + cantidad);
+                System.out.println("Dinero Recibido: " + dineroRecibido);
+                System.out.println("Carrito de Compras:");
+                for (String[] detalle : detallesCarrito) {
+                    System.out.println("Producto: " + detalle[0] + ", Cantidad: " + detalle[1] + ", Precio: " + detalle[2]);
+                }
+            }
+            this.cerrarVentana();
+        });
     }
-    
 }

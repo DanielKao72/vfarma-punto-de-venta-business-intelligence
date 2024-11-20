@@ -64,7 +64,8 @@ public class VentanaSeleccionCaja extends VentanaFormulario {
         this.botonContinuar.addActionListener(e -> {
             Cajero cajero = Cajero.obtenerInstancia();
             String itemSeleccionado = (String) this.seleccionCaja.getSelectedItem();
-            cajero.dummy(itemSeleccionado);
+            cajero.colocarNombreCaja(itemSeleccionado);
+            
             VentanaRegistroVenta ventana = new VentanaRegistroVenta("Registro de Venta");
             ventana.iniciarVentana();
             ventana.mostrarVentana();

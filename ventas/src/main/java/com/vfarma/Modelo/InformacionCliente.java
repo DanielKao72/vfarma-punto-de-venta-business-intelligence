@@ -10,6 +10,8 @@ public class InformacionCliente {
         return this;
     }
 
+
+
     public String getDomicilioCliente() {
         return domicilioCliente;
     }

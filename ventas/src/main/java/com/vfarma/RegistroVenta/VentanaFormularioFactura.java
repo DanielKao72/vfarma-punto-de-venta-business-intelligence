@@ -15,9 +15,14 @@ import com.vfarma.ComponentesVentana.InformacionCampoFormulario;
 import com.vfarma.ComponentesVentana.InformacionEstilosBoton;
 import com.vfarma.GestoresComponentesVentana.GestorComponentes;
 import com.vfarma.GestoresComponentesVentana.GestorFormulario;
+import com.vfarma.Modelo.Factura;
+import com.vfarma.Modelo.InformacionCliente;
+import com.vfarma.Modelo.InformacionPersonaFisica;
+import com.vfarma.Modelo.InformacionPersonaMoral;
 import com.vfarma.Ventanas.VentanaFormulario;
 
 public class VentanaFormularioFactura extends VentanaFormulario {
+
     private ButtonGroup tipoPersona;
     private JRadioButton opcionPersonaFisica;
     private JRadioButton opcionPersonaMoral;
@@ -97,31 +102,62 @@ public class VentanaFormularioFactura extends VentanaFormulario {
         });
 
         this.opcionPersonaMoral.addActionListener(e -> {
-                this.campoNombre.setEditable(false);
-                this.campoApellidos.setEditable(false);
-                this.campoNombre.setText("");
-                this.campoApellidos.setText("");
-                this.campoRazonSocial.setEditable(true);
-                this.campoRegimenFiscal.setEditable(true);
-            }
+            this.campoNombre.setEditable(false);
+            this.campoApellidos.setEditable(false);
+            this.campoNombre.setText("");
+            this.campoApellidos.setText("");
+            this.campoRazonSocial.setEditable(true);
+            this.campoRegimenFiscal.setEditable(true);
+        }
         );
 
         this.opcionPersonaFisica.addActionListener(e -> {
-                this.campoNombre.setEditable(true);
-                this.campoApellidos.setEditable(true);
-                this.campoRazonSocial.setEditable(false);
-                this.campoRegimenFiscal.setEditable(false);
-                this.campoRazonSocial.setText("");
-                this.campoRegimenFiscal.setText("");
-            }
+            this.campoNombre.setEditable(true);
+            this.campoApellidos.setEditable(true);
+            this.campoRazonSocial.setEditable(false);
+            this.campoRegimenFiscal.setEditable(false);
+            this.campoRazonSocial.setText("");
+            this.campoRegimenFiscal.setText("");
+        }
         );
 
         this.botonFinalizar.addActionListener(e -> {
+            String rfc = this.campoRFC.getText();
+            String domicilio = this.campoDomicilio.getText();
+
+            Cajero cajero = Cajero.obtenerInstancia();
+
+            if (this.opcionPersonaFisica.isSelected()) {
+                String nombre = this.campoNombre.getText();
+                String apellidos = this.campoApellidos.getText();
+
+                InformacionPersonaFisica cliente = new InformacionPersonaFisica();
+                cliente.colocarClaveRFCCliente(rfc);
+                cliente.setDomicilioCliente(domicilio);
+                cliente.colocarNombreCliente(nombre);
+                cliente.colocarApellidosCliente(apellidos);
+
+                cajero.seleccionarTipoCliente(cliente);
+
+            } else if (this.opcionPersonaMoral.isSelected()) {
+                String razonSocial = this.campoRazonSocial.getText();
+                String regimenFiscal = this.campoRegimenFiscal.getText();
+
+                InformacionPersonaMoral cliente = new InformacionPersonaMoral();
+                cliente.colocarClaveRFCCliente(rfc);
+                cliente.setDomicilioCliente(domicilio);
+                cliente.colocarRazonSocial(razonSocial);
+                cliente.colocarRegimenFiscal(regimenFiscal);
+
+                cajero.seleccionarTipoCliente(cliente);
+            }
+            cajero.finalizarVenta();
+
             this.cerrarVentana();
             VentanaMenuVentas ventana = new VentanaMenuVentas("Menú Ventas");
             ventana.iniciarVentana();
             ventana.mostrarVentana();
         });
     }
-    
+
 }
