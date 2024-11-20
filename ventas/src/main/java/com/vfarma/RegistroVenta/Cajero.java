@@ -2,6 +2,7 @@ package com.vfarma.RegistroVenta;
 
 import java.io.FileNotFoundException;
 
+import com.itextpdf.layout.Document;
 import com.vfarma.BaseDatos.ConsultasProducto;
 import com.vfarma.Modelo.Efectivo;
 import com.vfarma.Modelo.Factura;
@@ -10,13 +11,11 @@ import com.vfarma.Modelo.InformacionPersonaMoral;
 import com.vfarma.Modelo.InformacionVenta;
 import com.vfarma.Modelo.Producto;
 import com.vfarma.Modelo.Recibo;
-import com.vfarma.Modelo.TarjetaCredito;
 
 public class Cajero {
 
     public InformacionVenta informacionVenta;
     public ConsultasProducto consultasProducto;
-    //public InformacionEmpleado datosCajero;
 
     public Cajero() {
         this.informacionVenta = new InformacionVenta();
@@ -24,7 +23,7 @@ public class Cajero {
     }
 
     public void agregarProductoACarrito(int idProducto) {
-        if (this.consultasProducto.existenciaProducto(idProducto) == 0) {
+        if (this.consultasProducto.contarExistenciaProducto(idProducto) == 0) {
             System.out.println("Producto no disponible");
             return;
         }
@@ -33,7 +32,7 @@ public class Cajero {
     }
 
     public void retirarProductoDeCarrito(int idProducto) {
-        Producto productoEncontrado = this.informacionVenta.obtenerCarritoCompras().buscarProductoPorId(idProducto);
+        Producto productoEncontrado = this.informacionVenta.obtenerCarritoCompras().buscarProductoPorIdDelProducto(idProducto);
         this.informacionVenta.obtenerCarritoCompras().removerProducto(productoEncontrado);
     }
 
@@ -46,10 +45,10 @@ public class Cajero {
         switch (tipoCliente) {
             case PERSONA_MORAL -> {
                 this.informacionVenta.colocarInformacionCliente(new InformacionPersonaMoral());
-                this.informacionVenta.colocarComprobante(new Factura(this.informacionVenta) );
+                this.informacionVenta.colocarComprobante(new Factura(this.informacionVenta));
             }
             case PERSONA_FISICA -> {
-                this.informacionVenta.colocarInformacionCliente(new InformacionPersonaFisica()) ;
+                this.informacionVenta.colocarInformacionCliente(new InformacionPersonaFisica());
                 this.informacionVenta.colocarComprobante(new Recibo(this.informacionVenta));
             }
             default ->
@@ -58,17 +57,13 @@ public class Cajero {
     }
 
     public enum TipoPago {
-        EFECTIVO,
-        TARJETA
+        EFECTIVO
     }
 
     public void seleccionarTipoPagoCliente(TipoPago tipoPago) {
         switch (tipoPago) {
             case EFECTIVO -> {
-                this.informacionVenta.obtenerInformacionCliente().obtenerPago().colocarMetodoPago(new Efectivo()); 
-            }
-            case TARJETA -> {
-                this.informacionVenta.obtenerInformacionCliente().obtenerPago().colocarMetodoPago(new TarjetaCredito());
+                this.informacionVenta.obtenerInformacionCliente().obtenerPago().colocarMetodoPago(new Efectivo());
             }
             default ->
                 System.out.println("Tipo de pago no válido");
@@ -82,9 +77,9 @@ public class Cajero {
 
     public void imprimirComprobante() {
         try {
-            this.informacionVenta.obtenerComprobante().generarComprobante(this.informacionVenta);
+            Document comprobanteLlenado = this.informacionVenta.obtenerComprobante().llenarInformacionComprobante();
+            this.informacionVenta.obtenerComprobante().enviarAImpresion(comprobanteLlenado);
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
         }
     }
 
@@ -94,19 +89,18 @@ public class Cajero {
             this.consultasProducto.restarExistenciaProducto(producto.obtenerClaveProducto(), 1);
         });
         this.imprimirComprobante();
-
     }
 
-    /* 
-    public void establecerBalanceInicial(){
-
+    public void establecerBalanceInicial() {
+        ;
     }
 
-    public void abrirCaja(){
-
+    public void abrirCaja() {
+        ;
     }
 
-    public void cerrarCaja(){
+    public void cerrarCaja() {
+        ;
     }
-     */
+
 }

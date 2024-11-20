@@ -4,8 +4,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
 
 import javax.print.Doc;
 import javax.print.DocFlavor;
@@ -21,47 +19,28 @@ import javax.print.attribute.standard.MediaSizeName;
 import javax.print.attribute.standard.OrientationRequested;
 
 import com.itextpdf.io.exceptions.IOException;
+import com.itextpdf.kernel.colors.Color;
 import com.itextpdf.layout.Document;
+import com.itextpdf.layout.element.AreaBreak;
+import com.itextpdf.layout.element.Paragraph;
+import com.itextpdf.layout.properties.TextAlignment;
 
 public abstract class Comprobante {
 
-    private final InformacionFarmacia informacionFarmacia;
-    private final InformacionVenta informacionVenta;
+    protected final InformacionFarmacia informacionFarmacia;
+    protected final InformacionVenta informacionVenta;
+    protected Document hojaDocumento;
 
     public Comprobante(InformacionVenta informacionVenta) {
         this.informacionFarmacia = new InformacionFarmacia();
         this.informacionVenta = informacionVenta;
     }
 
-    protected ArrayList<Producto> obtenerProductosComprados(){
-        return this.informacionVenta.obtenerCarritoCompras().obtenerTodosProductos();
-    }
+    protected abstract Document crearHojaVacia();
 
-    public abstract void generarComprobante(InformacionVenta informacionVenta) throws FileNotFoundException;
+    public abstract Document llenarInformacionComprobante() throws FileNotFoundException;
 
-    protected HashMap<String, String> llenarInformacionComprobante(InformacionVenta informacionVenta) {
-        HashMap<String, String> campos = new HashMap<>();
-        campos.put("Domicilio Cliente", informacionVenta.obtenerInformacionCliente().getDomicilioCliente());
-        campos.put("RFC Cliente", informacionVenta.obtenerInformacionCliente().obtenerClaveRFCCliente());
-        campos.put("Clave RFC Farmacia", this.informacionFarmacia.obtenerClaveRFCFarmacia());
-        campos.put("Domicilio Sucursal Farmacia", this.informacionFarmacia.obtenerDomicilioSucursalFarmacia());
-        campos.put("Nombre Farmacia", this.informacionFarmacia.obtenerNombreFarmacia());
-        return campos;
-    }
-
-    protected abstract Document construirComprobante(HashMap<String, String> campos) throws FileNotFoundException;
-
-    protected HashMap<String, String> unirHashMaps(HashMap<String, String> map1, HashMap<String, String> map2) {
-        HashMap<String, String> HashMapResultante = new HashMap<>(map1);
-
-        for (String key : map2.keySet()) {
-            HashMapResultante.put(key, map2.get(key));
-        }
-
-        return HashMapResultante;
-    }
-
-    protected void imprimirComprobante(Document comprobante) {
+    public void enviarAImpresion(Document comprobante) {
         comprobante.close();
         try {
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
@@ -89,8 +68,28 @@ public abstract class Comprobante {
             inputStream.close();
 
         } catch (IOException | PrintException | java.io.IOException e) {
-            e.printStackTrace();
         }
+    }
+
+    protected void agregarParrafoTexto(String texto, int fontSize, boolean esNegrita, Color color, float marginBottom, TextAlignment alineacion) {
+        Paragraph parrafo = new Paragraph(texto)
+                .setFontSize(fontSize)
+                .setMarginBottom(marginBottom)
+                .setTextAlignment(alineacion);
+
+        if (esNegrita) {
+            parrafo.setBold();
+        }
+
+        if (color != null) {
+            parrafo.setFontColor(color);
+        }
+
+        this.hojaDocumento.add(parrafo);
+    }
+
+    protected void agregarSaltoDeLinea() {
+        this.hojaDocumento.add(new AreaBreak());
     }
 
 }

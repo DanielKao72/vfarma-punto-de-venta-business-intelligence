@@ -5,6 +5,7 @@ public class InformacionFarmacia {
     private String claveRFCFarmacia;
     private String nombreFarmacia;
     private String domicilioSucursalFarmacia;
+    private Comprobante comprobante;
 
     public InformacionFarmacia() {
         this.claveRFCFarmacia = " XLR8";
@@ -34,6 +35,14 @@ public class InformacionFarmacia {
 
     public void colocarDomicilioSucursalFarmacia(String domicilioSucursalFarmacia) {
         this.domicilioSucursalFarmacia = domicilioSucursalFarmacia;
+    }
+
+    public Comprobante obtenerComprobante() {
+        return this.comprobante;
+    }
+
+    public void colocarComprobante(Comprobante comprobante) {
+        this.comprobante = comprobante;
     }
 
 }

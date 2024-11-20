@@ -1,65 +1,94 @@
 package com.vfarma.BaseDatos;
 
+import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.List;
+import java.util.Date;
 
 import com.vfarma.Modelo.Producto;
 
 public class ConsultasProducto {
+
     private final BaseDeDatos baseDeDatos;
 
-    public ConsultasProducto(){
+    public ConsultasProducto() {
         this.baseDeDatos = BaseDeDatos.obtenerInstancia();
     }
 
-    public List<Producto> obtenerTodaLaInfoDeTodosLosProductos() {
-        String query = "SELECT p.*, c.*, f.*, pr.* "
-                + "FROM Producto p "
-                + "JOIN Categoria c ON p.CategoriaID = c.CategoriaID "
-                + "JOIN Familia f ON p.FamiliaID = f.FamiliaID "
-                + "JOIN Proveedor pr ON p.ProveedorID = pr.ProveedorID";
-        return this.baseDeDatos.consultarTuplas(query, Producto.class);
-    }
+    public int contarExistenciaProducto(int id) {
+        String consultaSQL = "SELECT ExistenciaTotal FROM productos WHERE ClvProducto = ?";
+        int existencia = 0;
 
-    public Producto buscarProductoPorID(int idProducto){
-        String query = "SELECT * FROM Producto WHERE ProductoID = " + idProducto;
-        return this.baseDeDatos.consultarTuplas(query, Producto.class).get(0);  
-    }
+        try (Connection conexion = baseDeDatos.obtenerConexionBaseDatos(); PreparedStatement peticion = conexion.prepareStatement(consultaSQL)) {
 
-    public int existenciaProducto(int idProducto){
-        String query = "SELECT SUM(Cantidad) AS TotalCantidad" + 
-                        "FROM Compra" + 
-                        "WHERE ProductoID = ?; " + idProducto;
-        return this.baseDeDatos.consultarUnValor(query, Integer.class);
-    }
+            peticion.setInt(1, id);
+            ResultSet resultado = peticion.executeQuery();
 
-    public void restarExistenciaProducto(int productoId, int cantidadARestar){
-        String query = "UPDATE Producto SET Existencia = Existencia - ? WHERE ProductoID = ?";
-        try (PreparedStatement declaracion = this.baseDeDatos.obtenerConexionBaseDatos().prepareStatement(query)) {
-            declaracion.setInt(1, cantidadARestar); 
-            declaracion.setInt(2, productoId);
-    
-            int filasAfectadas = declaracion.executeUpdate();
-            if (filasAfectadas > 0) {
-                System.out.println("Existencia del producto actualizada correctamente.");
-            } else {
-                System.out.println("No se encontró el producto con el ID especificado.");
+            if (resultado.next()) {
+                existencia = resultado.getInt("ExistenciaTotal");
             }
         } catch (SQLException e) {
-            System.out.println("Error al actualizar la existencia del producto: " + e.getMessage());
-            e.printStackTrace();
         }
+
+        return existencia;
     }
 
-    public String obtenerFechaCaducidad(int idProducto){
-        String query = "SELECT FechaCaducidad FROM Compra WHERE ProductoID = " + idProducto ;
-        return this.baseDeDatos.consultarUnValor(query, String.class);
+    public Producto buscarProductoPorID(int id) {
+        String consultaSQL = "SELECT p.ClvProducto, p.Nombre, p.Precio, p.ExistenciaTotal, i.FechaCaducidad "
+                + "FROM productos p "
+                + "JOIN inventario i ON p.ClvProducto = i.ClvProducto "
+                + "WHERE p.ClvProducto = ?";
+
+        Producto producto = new Producto();
+
+        try (Connection conexion = baseDeDatos.obtenerConexionBaseDatos(); PreparedStatement statement = conexion.prepareStatement(consultaSQL)) {
+
+            statement.setInt(1, id);
+            ResultSet resultado = statement.executeQuery();
+
+            if (resultado.next()) {
+                int ClvProducto = resultado.getInt("ClvProducto");
+                String nombre = resultado.getString("Nombre");
+                int precio = resultado.getInt("Precio");
+                int existenciaTotal = resultado.getInt("ExistenciaTotal");
+                Date fechaCaducidad = resultado.getDate("FechaCaducidad");
+
+                producto.colocarClaveProducto(ClvProducto);
+                producto.colocarNombreProducto(nombre);
+                producto.colocarPrecioProducto(precio);
+                producto.colocarExistenciaProducto(existenciaTotal);
+                producto.colocarFechaCaducidad(fechaCaducidad);
+            } else {
+                System.out.println("No se encontró ningún producto con ID: " + id);
+            }
+        } catch (SQLException e) {
+        }
+
+        return producto;
     }
 
-    public String obtenerProveedor(int idProducto){
-        String query = "SELECT p.Nombre FROM Proveedor p JOIN Compra c ON p.ProveedorID = c.ProveedorID " + "WHERE c.ProductoID = " + idProducto + ";";
-        return this.baseDeDatos.consultarUnValor(query, String.class);
+    public boolean restarExistenciaProducto(int id, int cantidadARestar) {
+        String consultaSQL = "UPDATE productos SET ExistenciaTotal = ExistenciaTotal - ? WHERE ClvProducto = ? AND ExistenciaTotal >= ?";
+        boolean exito = false;
+
+        try (Connection conexion = baseDeDatos.obtenerConexionBaseDatos(); PreparedStatement statement = conexion.prepareStatement(consultaSQL)) {
+
+            statement.setInt(1, cantidadARestar);
+            statement.setInt(2, id);
+            statement.setInt(3, cantidadARestar);
+
+            int filasActualizadas = statement.executeUpdate();
+            if (filasActualizadas > 0) {
+                exito = true;
+                System.out.println("Existencia restada exitosamente.");
+            } else {
+                System.out.println("No se pudo restar la existencia. Verifica el ID y la cantidad.");
+            }
+        } catch (SQLException e) {
+        }
+
+        return exito;
     }
-    
+
 }

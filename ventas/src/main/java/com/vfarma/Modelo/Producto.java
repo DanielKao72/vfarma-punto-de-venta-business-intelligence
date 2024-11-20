@@ -1,29 +1,24 @@
 package com.vfarma.Modelo;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.util.Date;
 
-import com.vfarma.BaseDatos.ConsultasProducto;
-import com.vfarma.BaseDatos.MapeadorBaseDatos;
-
-public class Producto implements MapeadorBaseDatos {
+public class Producto {
 
     private int claveProducto;
     private String nombreProducto;
-    private int precioProducto;
-    private String fechaCaducidad;
+    private float precioProducto;
+    private Date fechaCaducidad;
     private int existenciaProducto;
 
-    @Override
-    public void mapearDelConjuntoResultado(ResultSet conjuntoResultado) throws SQLException {
-        this.claveProducto = conjuntoResultado.getInt("ProductoID");
-        this.nombreProducto = conjuntoResultado.getString("Nombre");
-        this.precioProducto = conjuntoResultado.getInt("Precio");
+    public Producto() {
+    }
 
-        ConsultasProducto consultasProducto = new ConsultasProducto();
-        this.fechaCaducidad = consultasProducto.obtenerFechaCaducidad(this.claveProducto);
-        this.existenciaProducto = consultasProducto.existenciaProducto(this.claveProducto);
-        // se podria agregar el proveedor
+    public Producto(int claveProducto, String nombreProducto, Date fechaCaducidad, float precioProducto, int existenciaProducto) {
+        this.claveProducto = claveProducto;
+        this.nombreProducto = nombreProducto;
+        this.precioProducto = precioProducto;
+        this.fechaCaducidad = fechaCaducidad;
+        this.existenciaProducto = existenciaProducto;
     }
 
     public int obtenerClaveProducto() {
@@ -34,11 +29,11 @@ public class Producto implements MapeadorBaseDatos {
         return nombreProducto;
     }
 
-    public int obtenerPrecioProducto() {
+    public float obtenerPrecioProducto() {
         return precioProducto;
     }
 
-    public String obtenerFechaCaducidad() {
+    public Date obtenerFechaCaducidad() {
         return fechaCaducidad;
     }
 
@@ -58,7 +53,7 @@ public class Producto implements MapeadorBaseDatos {
         this.precioProducto = precioProducto;
     }
 
-    public void colocarFechaCaducidad(String fechaCaducidad) {
+    public void colocarFechaCaducidad(Date fechaCaducidad) {
         this.fechaCaducidad = fechaCaducidad;
     }
 

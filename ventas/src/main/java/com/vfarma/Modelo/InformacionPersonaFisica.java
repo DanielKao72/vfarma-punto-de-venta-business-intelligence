@@ -1,6 +1,6 @@
 package com.vfarma.Modelo;
 
-public class InformacionPersonaFisica extends InformacionCliente{
+public class InformacionPersonaFisica extends InformacionCliente {
 
     private String nombreCliente;
     private String apellidosCliente;
@@ -20,5 +20,5 @@ public class InformacionPersonaFisica extends InformacionCliente{
     public void colocarApellidosCliente(String apellidosCliente) {
         this.apellidosCliente = apellidosCliente;
     }
-    
+
 }

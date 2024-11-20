@@ -1,9 +1,9 @@
 package com.vfarma.Modelo;
 
-public class InformacionPersonaMoral extends InformacionCliente{
+public class InformacionPersonaMoral extends InformacionCliente {
+
     private String razonSocial;
     private String regimenFiscal;
-
 
     public String obtenerRazonSocial() {
         return this.razonSocial;
