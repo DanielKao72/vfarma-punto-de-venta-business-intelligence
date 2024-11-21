@@ -18,6 +18,8 @@ public class InformacionVenta {
         this.fechaVenta = this.obtenerFechaActual();
         this.montoTotalVenta = 0.0f;
         this.carritoCompras = new CarritoCompras();
+        
+        this.informacionCliente = new InformacionCliente();
     }
 
     public String obtenerClaveVenta() {
@@ -29,7 +31,10 @@ public class InformacionVenta {
     }
 
     public Float obtenerMontoTotalVenta() {
-        return montoTotalVenta;
+        this.carritoCompras.obtenerTodosProductos().forEach((producto) -> {
+            this.montoTotalVenta += producto.obtenerPrecioProducto();
+        });
+        return this.montoTotalVenta;
     }
 
     public void setMontoTotalVenta(Float montoTotalVenta) {

@@ -1,6 +1,6 @@
 package com.vfarma.Modelo;
 
 public interface MetodoPago {
-    void obtenerDetallesPago();
+    float obtenerDetallesPago( );
     boolean estaPagado();
 }

@@ -68,8 +68,8 @@ public class Cajero {
 
     }
 
-    public void efectuarPago() {
-        this.informacionVenta.obtenerInformacionCliente().obtenerPago().obtenerMetodoPago().obtenerDetallesPago();
+    public float efectuarPago( ) {
+        return this.informacionVenta.obtenerInformacionCliente().obtenerPago().obtenerMetodoPago().obtenerDetallesPago();
     }
 
     public void imprimirComprobante() {
@@ -81,15 +81,16 @@ public class Cajero {
     }
 
     public void finalizarVenta() {
-        this.efectuarPago();
+        System.out.println(this.informacionVenta.obtenerCarritoCompras().obtenerTodosProductos());
+        Float cambioDelCliente = this.efectuarPago();
         this.informacionVenta.obtenerCarritoCompras().obtenerTodosProductos().forEach(producto -> {
             this.consultasProducto.restarExistenciaProducto(producto.obtenerClaveProducto(), 1);
         });
         this.imprimirComprobante();
+        System.out.println("Cambio a entregar al cliente: " + cambioDelCliente);
+        System.out.println("Venta finalizada");
     }
 
-    public void establecerBalanceInicial() {
-        ;
-    }
+    
 
 }

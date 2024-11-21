@@ -8,7 +8,7 @@ public class BaseDeDatos {
 
     private static BaseDeDatos instancia;
     private Connection conexionBaseDatos;
-    private final String urlBaseDatos = "jdbc:mysql://localhost:3306/prueba";
+    private final String urlBaseDatos = "jdbc:mysql://localhost:3306/vfarma";
     private final String usuarioBaseDatos = "root";
     private final String contraseniaBaseDatos = "";
 
@@ -30,6 +30,16 @@ public class BaseDeDatos {
 
     public Connection obtenerConexionBaseDatos() {
         return conexionBaseDatos;
+    }
+
+    public void cerrarConexion() {
+        if (conexionBaseDatos != null) {
+            try {
+                conexionBaseDatos.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
 }

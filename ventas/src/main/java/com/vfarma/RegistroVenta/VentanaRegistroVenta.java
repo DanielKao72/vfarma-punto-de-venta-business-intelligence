@@ -19,6 +19,11 @@ import com.vfarma.ComponentesVentana.InformacionCampoFormulario;
 import com.vfarma.ComponentesVentana.InformacionEstilosBoton;
 import com.vfarma.GestoresComponentesVentana.GestorComponentes;
 import com.vfarma.GestoresComponentesVentana.GestorFormulario;
+import com.vfarma.Modelo.Efectivo;
+import com.vfarma.Modelo.InformacionPersonaFisica;
+import com.vfarma.Modelo.Pago;
+import com.vfarma.Modelo.Producto;
+import com.vfarma.Modelo.Recibo;
 import com.vfarma.Ventanas.VentanaFormulario;
 
 public class VentanaRegistroVenta extends VentanaFormulario {
@@ -35,28 +40,24 @@ public class VentanaRegistroVenta extends VentanaFormulario {
     private JButton botonContinuar;
     private JButton botonFinalizar;
     private JButton botonCancelar;
+    private Cajero cajero;
 
     public VentanaRegistroVenta(String titulo) {
         super(titulo);
         this.productosAlmacen = new JComboBox<>();
-        this.productosAlmacen.addItem("Aspirina 500mg");
-        this.productosAlmacen.addItem("Paracetamol 650mg");
-        this.productosAlmacen.addItem("Ibuprofeno 400mg");
-        this.productosAlmacen.addItem("Amoxicilina 500mg");
-        this.productosAlmacen.addItem("Vitamina C 1000mg");
 
-        // Crear la tabla con datos por defecto
-        this.carritoCompras = GestorFormulario.crearTabla(new String[] { "Producto", "Cantidad", "Precio" });
-this.carritoCompras.setFillsViewportHeight(true); 
-this.carritoCompras.setAutoResizeMode(JTable.AUTO_RESIZE_SUBSEQUENT_COLUMNS);
+        this.cajero = Cajero.obtenerInstancia();
 
-// Establecer un tamaño preferido para la tabla dentro del JScrollPane
-this.tablaCarritoCompras = new JScrollPane(this.carritoCompras);
-this.carritoCompras.setPreferredScrollableViewportSize(new java.awt.Dimension(400, 150)); 
+        this.cajero.consultasProducto.obtenerNombreProductosEnExistencia().forEach(producto -> {
+            this.productosAlmacen.addItem(producto.obtenerNombreProducto() + " --- " + producto.obtenerClaveProducto());
+        });
 
-      
+        this.carritoCompras = GestorFormulario.crearTabla(new String[]{"Producto", "Cantidad", "Precio"});
         this.carritoCompras.setFillsViewportHeight(true);
         this.carritoCompras.setAutoResizeMode(JTable.AUTO_RESIZE_SUBSEQUENT_COLUMNS);
+        this.carritoCompras.setPreferredScrollableViewportSize(new java.awt.Dimension(400, 150));
+        this.carritoCompras.setFillsViewportHeight(true);
+
         this.tablaCarritoCompras = new JScrollPane(this.carritoCompras);
     }
 
@@ -125,11 +126,13 @@ this.carritoCompras.setPreferredScrollableViewportSize(new java.awt.Dimension(40
         this.opcionFactura.addActionListener(e -> {
             this.botonFinalizar.setEnabled(false);
             this.botonContinuar.setEnabled(true);
+            this.campoDineroRecibido.setEnabled(false);
         });
 
         this.opcionRecibo.addActionListener(e -> {
             this.botonFinalizar.setEnabled(true);
             this.botonContinuar.setEnabled(false);
+            this.campoDineroRecibido.setEnabled(true);
         });
 
         this.botonContinuar.addActionListener(e -> {
@@ -140,44 +143,66 @@ this.carritoCompras.setPreferredScrollableViewportSize(new java.awt.Dimension(40
         });
 
         this.botonAgregar.addActionListener(e -> {
-            // Recuperar los valores de los campos
+            
             String productoSeleccionado = (String) this.productosAlmacen.getSelectedItem();
-            String cantidadText = (String) this.campoCantidad.getText().trim(); // Agregar trim() para eliminar espacios extra
-            String precio = "10.00"; // Precio de ejemplo
 
-            // Obtener el modelo de la tabla para agregar la fila
+            String[] partes = productoSeleccionado.split("---");
+            String nombreProducto = partes[0].trim();
+            String idProducto = partes[1].trim();
+            String cantidadText = (String) this.campoCantidad.getText().trim(); 
+            float precioProducto = this.cajero.consultasProducto.obtenerPrecioProductoPorId(Integer.parseInt(idProducto));
+            float precioProductos = Float.parseFloat(cantidadText) * precioProducto;
+
             DefaultTableModel modeloCarrito = (DefaultTableModel) this.carritoCompras.getModel();
+            modeloCarrito.addRow(new Object[]{nombreProducto, cantidadText, precioProductos});
+            Producto productoEncontrado = this.cajero.consultasProducto.buscarProductoPorID(Integer.parseInt(idProducto));
+            for (int i = 0; i < Integer.parseInt(cantidadText); i++) {
+                this.cajero.informacionVenta.obtenerCarritoCompras().agregarProducto(productoEncontrado);
+            }
 
-            // Agregar la fila con los datos seleccionados
-            modeloCarrito.addRow(new Object[]{productoSeleccionado, cantidadText, precio});
+            
+            
             this.carritoCompras.revalidate();
             this.carritoCompras.repaint();
         });
 
+        //La venta sera por recibo
         this.botonFinalizar.addActionListener(e -> {
-            if (this.opcionRecibo.isSelected()) {
-                String productoSeleccionado = (String) this.productosAlmacen.getSelectedItem();
-                String cantidad = this.campoCantidad.getText();
-                String dineroRecibido = this.campoDineroRecibido.getText();
-
-                ArrayList<String[]> detallesCarrito = new ArrayList<>();
-                for (int i = 0; i < this.carritoCompras.getRowCount(); i++) {
-                    String producto = (String) this.carritoCompras.getValueAt(i, 0);
-                    String cantidadProducto = (String) this.carritoCompras.getValueAt(i, 1);
-                    String precio = (String) this.carritoCompras.getValueAt(i, 2);
-                    detallesCarrito.add(new String[]{producto, cantidadProducto, precio});
-                }
-
-                System.out.println("Datos para el Recibo:");
-                System.out.println("Producto Seleccionado: " + productoSeleccionado);
-                System.out.println("Cantidad: " + cantidad);
-                System.out.println("Dinero Recibido: " + dineroRecibido);
-                System.out.println("Carrito de Compras:");
-                for (String[] detalle : detallesCarrito) {
-                    System.out.println("Producto: " + detalle[0] + ", Cantidad: " + detalle[1] + ", Precio: " + detalle[2]);
-                }
+            float cantidadDineroRecibida = 0;
+            
+            try {
+                String dineroRecibido = this.campoDineroRecibido.getText().trim();
+                 cantidadDineroRecibida = Float.parseFloat(dineroRecibido);
+                System.out.println("El dinero recibido es: " + cantidadDineroRecibida);
+            } catch (NumberFormatException ex) {
+                System.out.println("Error: La entrada no es un número válido.");
             }
-            this.cerrarVentana();
+            this.cajero.seleccionarTipoCliente(new InformacionPersonaFisica());
+            
+            //this.cajero.informacionVenta.obtenerInformacionCliente().colocarClaveRFCCliente("dddd");
+            //this.cajero.informacionVenta.obtenerInformacionCliente().colocarDomicilioCliente("fd");
+            float cantidadAPagar = this.cajero.informacionVenta.obtenerMontoTotalVenta();
+
+
+
+
+            Efectivo efectivo = new Efectivo();
+            efectivo.colocarCantidadAPagar(cantidadAPagar);
+            efectivo.colocarDineroRecibido(cantidadDineroRecibida);
+
+            Pago pago = new Pago();
+            pago.colocarMetodoPago(efectivo);
+            
+            
+
+            this.cajero.informacionVenta.obtenerInformacionCliente().colocarPago(pago);
+            
+            this.cajero.informacionVenta.colocarComprobante(new Recibo(this.cajero.informacionVenta));
+            this.cajero.finalizarVenta();
+
+
+
+           // Volver al menu inicial TO--DO
         });
     }
 }

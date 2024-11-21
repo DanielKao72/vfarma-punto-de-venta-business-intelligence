@@ -1,23 +1,21 @@
 package com.vfarma.Modelo;
 
-import java.util.Date;
-
 public class Producto {
 
     private int claveProducto;
     private String nombreProducto;
     private float precioProducto;
-    private Date fechaCaducidad;
+   
     private int existenciaProducto;
 
     public Producto() {
     }
 
-    public Producto(int claveProducto, String nombreProducto, Date fechaCaducidad, float precioProducto, int existenciaProducto) {
+    public Producto(int claveProducto, String nombreProducto, float precioProducto, int existenciaProducto) {
         this.claveProducto = claveProducto;
         this.nombreProducto = nombreProducto;
         this.precioProducto = precioProducto;
-        this.fechaCaducidad = fechaCaducidad;
+
         this.existenciaProducto = existenciaProducto;
     }
 
@@ -33,9 +31,7 @@ public class Producto {
         return precioProducto;
     }
 
-    public Date obtenerFechaCaducidad() {
-        return fechaCaducidad;
-    }
+  
 
     public int obtenerExistenciaProducto() {
         return existenciaProducto;
@@ -53,9 +49,7 @@ public class Producto {
         this.precioProducto = precioProducto;
     }
 
-    public void colocarFechaCaducidad(Date fechaCaducidad) {
-        this.fechaCaducidad = fechaCaducidad;
-    }
+   
 
     public void colocarExistenciaProducto(int existenciaProducto) {
         this.existenciaProducto = existenciaProducto;

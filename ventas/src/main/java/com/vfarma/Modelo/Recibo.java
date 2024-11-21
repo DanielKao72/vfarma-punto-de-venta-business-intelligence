@@ -12,8 +12,6 @@ import com.itextpdf.layout.properties.TextAlignment;
 
 public final class Recibo extends Comprobante {
 
-
-
     public Recibo(InformacionVenta informacionVenta) {
         super(informacionVenta);
         super.hojaDocumento = this.crearHojaVacia();
@@ -37,15 +35,20 @@ public final class Recibo extends Comprobante {
     public Document llenarInformacionComprobante() throws FileNotFoundException {
 
         // El siguiente recibo contiene los siguientes campos:
-        String domicilioCliente = informacionVenta.obtenerInformacionCliente().getDomicilioCliente();
+        String domicilioCliente = informacionVenta.obtenerInformacionCliente().obtenerDomicilioCliente();
         String rfcCliente = informacionVenta.obtenerInformacionCliente().obtenerClaveRFCCliente();
         String claveRFCFarmacia = super.informacionFarmacia.obtenerClaveRFCFarmacia();
         String domicilioSucursalFarmacia = super.informacionFarmacia.obtenerDomicilioSucursalFarmacia();
         String nombreFarmacia = super.informacionFarmacia.obtenerNombreFarmacia();
 
-        InformacionPersonaFisica informacionCliente = (InformacionPersonaFisica) informacionVenta.obtenerInformacionCliente();
-        String nombreCliente = informacionCliente.obtenerNombreCliente();
-        String apellidosCliente = informacionCliente.obtenerApellidosCliente();
+        InformacionCliente cliente = informacionVenta.obtenerInformacionCliente();
+        String nombreCliente = "";
+        String apellidosCliente = "";
+
+        if (cliente instanceof InformacionPersonaFisica informacionCliente) {
+            nombreCliente = informacionCliente.obtenerNombreCliente();
+            apellidosCliente = informacionCliente.obtenerApellidosCliente();
+        }
 
         ArrayList<Producto> productos = informacionVenta.obtenerCarritoCompras().obtenerTodosProductos();
         //--------------------------------------------------------------------------------------------------------
@@ -55,16 +58,14 @@ public final class Recibo extends Comprobante {
         super.agregarParrafoTexto(claveRFCFarmacia, 16, true, null, 5, TextAlignment.CENTER);
         super.agregarParrafoTexto(domicilioSucursalFarmacia, 12, false, null, 5, TextAlignment.CENTER);
 
-        agregarSaltoDeLinea();
 
-        agregarParrafoTexto("Datos del Cliente:", 14, true, null, 10, TextAlignment.LEFT);
-        agregarParrafoTexto("Nombre: " + nombreCliente + " " + apellidosCliente, 12, false, null, 0, TextAlignment.LEFT);
-        agregarParrafoTexto("RFC: " + rfcCliente, 12, false, null, 0, TextAlignment.LEFT);
-        agregarParrafoTexto("Domicilio: " + domicilioCliente, 12, false, null, 0, TextAlignment.LEFT);
+        agregarParrafoTexto("Datos del Cliente:", 14, true, null, 10, TextAlignment.CENTER);
+        agregarParrafoTexto("Nombre: " + nombreCliente + " " + apellidosCliente, 12, false, null, 0, TextAlignment.CENTER);
+        agregarParrafoTexto("RFC: " + rfcCliente, 12, false, null, 0, TextAlignment.CENTER);
+        agregarParrafoTexto("Domicilio: " + domicilioCliente, 12, false, null, 0, TextAlignment.CENTER);
 
-        agregarSaltoDeLinea();
 
-        agregarParrafoTexto("Productos Comprados:", 14, true, null, 10, TextAlignment.LEFT);
+        agregarParrafoTexto("Productos Comprados:", 14, true, null, 10, TextAlignment.CENTER);
 
         Table tablaProductos = new Table(2);
         tablaProductos.addHeaderCell("Producto");
@@ -77,10 +78,9 @@ public final class Recibo extends Comprobante {
 
         super.hojaDocumento.add(tablaProductos);
 
-        agregarSaltoDeLinea();
         agregarParrafoTexto("Gracias por su compra!", 14, true, ColorConstants.GREEN, 20, TextAlignment.CENTER);
         agregarParrafoTexto("Fecha: " + java.time.LocalDate.now(), 12, false, null, 5, TextAlignment.CENTER);
-        
+
         return super.hojaDocumento;
     }
 

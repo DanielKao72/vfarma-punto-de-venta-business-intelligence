@@ -15,10 +15,11 @@ import com.vfarma.ComponentesVentana.InformacionCampoFormulario;
 import com.vfarma.ComponentesVentana.InformacionEstilosBoton;
 import com.vfarma.GestoresComponentesVentana.GestorComponentes;
 import com.vfarma.GestoresComponentesVentana.GestorFormulario;
+import com.vfarma.Modelo.Efectivo;
 import com.vfarma.Modelo.Factura;
-import com.vfarma.Modelo.InformacionCliente;
 import com.vfarma.Modelo.InformacionPersonaFisica;
 import com.vfarma.Modelo.InformacionPersonaMoral;
+import com.vfarma.Modelo.Pago;
 import com.vfarma.Ventanas.VentanaFormulario;
 
 public class VentanaFormularioFactura extends VentanaFormulario {
@@ -34,9 +35,11 @@ public class VentanaFormularioFactura extends VentanaFormulario {
     private JTextField campoDomicilio;
     private JButton botonFinalizar;
     private JButton botonCancelar;
+    private Cajero cajero;
 
     public VentanaFormularioFactura(String titulo) {
         super(titulo);
+        this.cajero = Cajero.obtenerInstancia();
     }
 
     @Override
@@ -133,11 +136,11 @@ public class VentanaFormularioFactura extends VentanaFormulario {
 
                 InformacionPersonaFisica cliente = new InformacionPersonaFisica();
                 cliente.colocarClaveRFCCliente(rfc);
-                cliente.setDomicilioCliente(domicilio);
+                cliente.colocarDomicilioCliente(domicilio);
                 cliente.colocarNombreCliente(nombre);
                 cliente.colocarApellidosCliente(apellidos);
 
-                cajero.seleccionarTipoCliente(cliente);
+                this.cajero.seleccionarTipoCliente(cliente);
 
             } else if (this.opcionPersonaMoral.isSelected()) {
                 String razonSocial = this.campoRazonSocial.getText();
@@ -145,12 +148,23 @@ public class VentanaFormularioFactura extends VentanaFormulario {
 
                 InformacionPersonaMoral cliente = new InformacionPersonaMoral();
                 cliente.colocarClaveRFCCliente(rfc);
-                cliente.setDomicilioCliente(domicilio);
+                cliente.colocarDomicilioCliente(domicilio);
                 cliente.colocarRazonSocial(razonSocial);
                 cliente.colocarRegimenFiscal(regimenFiscal);
 
-                cajero.seleccionarTipoCliente(cliente);
+                this.cajero.seleccionarTipoCliente(cliente);
             }
+            Efectivo efectivo = new Efectivo();
+            efectivo.colocarCantidadAPagar(0);
+            efectivo.colocarDineroRecibido(0);
+
+            Pago pago = new Pago();
+            pago.colocarMetodoPago(efectivo);
+            
+            
+
+            this.cajero.informacionVenta.obtenerInformacionCliente().colocarPago(pago);
+            this.cajero.informacionVenta.colocarComprobante(new Factura(this.cajero.informacionVenta));
             cajero.finalizarVenta();
 
             this.cerrarVentana();
