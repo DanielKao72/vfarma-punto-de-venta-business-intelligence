@@ -7,6 +7,7 @@ import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JOptionPane;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -212,6 +213,7 @@ public class VentanaRegistroVenta extends VentanaFormulario {
                 int existenciaDisponible = this.cajero.consultasProducto.obtenerExistenciaProductoPorId(Integer.parseInt(idProducto));
                 if (cantidadDeseada > existenciaDisponible) {
                     System.out.println("No hay suficiente inventario para el producto seleccionado.");
+                    JOptionPane.showMessageDialog( null,"No hay suficiente inventario para el producto seleccionado.", "Error", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
 
