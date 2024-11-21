@@ -10,8 +10,8 @@ import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
+import javax.swing.JSpinner;
 import javax.swing.JTable;
-import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
 
 import com.vfarma.ComponentesVentana.Formulario;
@@ -30,8 +30,8 @@ import com.vfarma.Ventanas.VentanaFormulario;
 public class VentanaRegistroVenta extends VentanaFormulario {
 
     private JComboBox<String> productosAlmacen;
-    private JTextField campoCantidad;
-    private JTextField campoDineroRecibido;
+    private JSpinner campoCantidad;
+    private JSpinner campoDineroRecibido;
     private JTable carritoCompras;
     private JScrollPane tablaCarritoCompras;
     private ButtonGroup tipoComprobante;
@@ -71,7 +71,7 @@ public class VentanaRegistroVenta extends VentanaFormulario {
     private void actualizarEstadoBotones() {
 
         boolean carritoVacio = this.carritoCompras.getRowCount() == 0;
-        boolean campoDineroVacio = this.campoDineroRecibido.getText().trim().isEmpty();
+        boolean campoDineroVacio = this.campoDineroRecibido.getValue().toString().isEmpty();
 
         this.botonFinalizar.setEnabled(!carritoVacio && !campoDineroVacio && this.opcionRecibo.isSelected());
         this.botonContinuar.setEnabled(!carritoVacio && this.opcionFactura.isSelected());
@@ -89,14 +89,16 @@ public class VentanaRegistroVenta extends VentanaFormulario {
 
         this.tipoComprobante = GestorFormulario.crearGrupoBotones(opciones);
 
-        this.campoCantidad = GestorFormulario.crearCampoTexto(2);
-        this.campoDineroRecibido = GestorFormulario.crearCampoTexto(2);
+        this.campoCantidad = GestorFormulario.crearCampoNumerico();
+        this.campoDineroRecibido = GestorFormulario.crearCampoNumerico();
 
         formulario.agregarCampo(new InformacionCampoFormulario("Producto:", this.productosAlmacen));
         formulario.agregarCampo(new InformacionCampoFormulario("Cantidad:", this.campoCantidad));
         formulario.agregarCampo(new InformacionCampoFormulario("Tipo de Comprobante:", this.tipoComprobante));
         formulario.agregarCampo(new InformacionCampoFormulario("Dinero Recibido:", this.campoDineroRecibido));
         formulario.agregarCampo(new InformacionCampoFormulario("Carrito de Compras:", this.tablaCarritoCompras));
+
+        this.campoDineroRecibido.setEnabled(false);
 
         return formulario;
     }
@@ -166,7 +168,7 @@ public class VentanaRegistroVenta extends VentanaFormulario {
         this.botonLimpiar.addActionListener(e -> {
             DefaultTableModel modeloCarrito = (DefaultTableModel) this.carritoCompras.getModel();
             modeloCarrito.setRowCount(0);
-            this.campoDineroRecibido.setText("");
+            this.campoDineroRecibido.setValue(0);
             this.actualizarEstadoBotones();
         });
 
@@ -195,7 +197,7 @@ public class VentanaRegistroVenta extends VentanaFormulario {
             String nombreProducto = partes[0].trim();
             String idProducto = partes[1].trim();
             
-            String cantidadProducto = this.campoCantidad.getText().trim();
+            String cantidadProducto = this.campoCantidad.getValue().toString();
 
             if (cantidadProducto.isEmpty()) {
                 System.out.println("Por favor, ingrese una cantidad.");
@@ -248,7 +250,7 @@ public class VentanaRegistroVenta extends VentanaFormulario {
             float cantidadDineroRecibida = 0;
 
             try {
-                String dineroRecibido = this.campoDineroRecibido.getText().trim();
+                String dineroRecibido = this.campoDineroRecibido.getValue().toString();
                 cantidadDineroRecibida = Float.parseFloat(dineroRecibido);
             } catch (NumberFormatException ex) {
                 System.out.println("Error: La entrada no es un número válido.");
