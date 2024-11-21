@@ -37,15 +37,27 @@ public final class Factura extends Comprobante {
     public Document llenarInformacionComprobante() throws FileNotFoundException {
 
         // La siguiente factura contiene los siguientes campos:
-        String domicilioCliente = informacionVenta.obtenerInformacionCliente().getDomicilioCliente();
+        String domicilioCliente = informacionVenta.obtenerInformacionCliente().obtenerDomicilioCliente();
         String rfcCliente = informacionVenta.obtenerInformacionCliente().obtenerClaveRFCCliente();
         String claveRFCFarmacia = super.informacionFarmacia.obtenerClaveRFCFarmacia();
         String domicilioSucursalFarmacia = super.informacionFarmacia.obtenerDomicilioSucursalFarmacia();
         String nombreFarmacia = super.informacionFarmacia.obtenerNombreFarmacia();
 
-        InformacionPersonaMoral informacionCliente = (InformacionPersonaMoral) informacionVenta.obtenerInformacionCliente();
-        String regimenFiscal = informacionCliente.obtenerRegimenFiscal();
-        String razonSocial = informacionCliente.obtenerRazonSocial();
+        InformacionCliente cliente = informacionVenta.obtenerInformacionCliente();
+        String regimenFiscal = "regimenFiscal DEFECTO";
+        String razonSocial = "razonSocial DEFECTO";
+        String nombreCliente = "nombreCliente DEFECTO";
+        String apellidoCliente = "apellidoCliente DEFECTO";
+
+        if (cliente instanceof InformacionPersonaMoral informacionCliente) {
+            regimenFiscal = informacionCliente.obtenerRegimenFiscal();
+            razonSocial = informacionCliente.obtenerRazonSocial();
+        } else if (cliente instanceof InformacionPersonaFisica informacionCliente) {
+            nombreCliente = informacionCliente.obtenerNombreCliente();
+            apellidoCliente = informacionCliente.obtenerApellidosCliente();
+        } else {
+            System.out.println("El tipo de cliente no es reconocido.");
+        }
 
         ArrayList<Producto> productos = informacionVenta.obtenerCarritoCompras().obtenerTodosProductos();
         //--------------------------------------------------------------------------------------------------------
@@ -55,15 +67,13 @@ public final class Factura extends Comprobante {
         super.agregarParrafoTexto(domicilioSucursalFarmacia, 12, false, null, 5, TextAlignment.CENTER);
         super.agregarParrafoTexto("RFC: " + claveRFCFarmacia, 12, false, null, 15, TextAlignment.CENTER);
 
-        super.agregarSaltoDeLinea();
-
         super.agregarParrafoTexto("Datos del Cliente:", 14, true, null, 10, TextAlignment.LEFT);
         super.agregarParrafoTexto("Razón Social: " + razonSocial, 12, false, null, 0, TextAlignment.LEFT);
         super.agregarParrafoTexto("RFC: " + rfcCliente, 12, false, null, 0, TextAlignment.LEFT);
         super.agregarParrafoTexto("Domicilio: " + domicilioCliente, 12, false, null, 0, TextAlignment.LEFT);
         super.agregarParrafoTexto("Régimen Fiscal: " + regimenFiscal, 12, false, null, 0, TextAlignment.LEFT);
-
-        super.agregarSaltoDeLinea();
+        super.agregarParrafoTexto("nombreCliente: " + nombreCliente, 12, false, null, 0, TextAlignment.LEFT);
+        super.agregarParrafoTexto("apellidoCliente: " + apellidoCliente, 12, false, null, 0, TextAlignment.LEFT);
 
         super.agregarParrafoTexto("Productos Comprados:", 14, true, null, 10, TextAlignment.LEFT);
 
@@ -77,8 +87,6 @@ public final class Factura extends Comprobante {
         });
 
         super.hojaDocumento.add(tablaProductos);
-
-        super.agregarSaltoDeLinea();
 
         super.agregarParrafoTexto("Gracias por su compra!", 16, true, ColorConstants.GREEN, 20, TextAlignment.CENTER);
         super.agregarParrafoTexto("Fecha: " + java.time.LocalDate.now(), 12, false, null, 5, TextAlignment.CENTER);

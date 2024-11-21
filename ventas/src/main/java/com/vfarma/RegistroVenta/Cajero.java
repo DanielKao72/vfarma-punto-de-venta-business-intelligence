@@ -5,21 +5,31 @@ import java.io.FileNotFoundException;
 import com.itextpdf.layout.Document;
 import com.vfarma.BaseDatos.ConsultasProducto;
 import com.vfarma.Modelo.Efectivo;
-import com.vfarma.Modelo.Factura;
-import com.vfarma.Modelo.InformacionPersonaFisica;
-import com.vfarma.Modelo.InformacionPersonaMoral;
+import com.vfarma.Modelo.InformacionCliente;
 import com.vfarma.Modelo.InformacionVenta;
 import com.vfarma.Modelo.Producto;
-import com.vfarma.Modelo.Recibo;
 
 public class Cajero {
 
+    private static Cajero instanciaUnica;
     public InformacionVenta informacionVenta;
     public ConsultasProducto consultasProducto;
+    private String nombreCaja;
 
     public Cajero() {
         this.informacionVenta = new InformacionVenta();
         this.consultasProducto = new ConsultasProducto();
+    }
+
+    public static Cajero obtenerInstancia() {
+        if (instanciaUnica == null) {
+            instanciaUnica = new Cajero();
+        }
+        return instanciaUnica;
+    }
+
+    public void colocarNombreCaja(String nombreCaja) {
+        this.nombreCaja = nombreCaja;
     }
 
     public void agregarProductoACarrito(int idProducto) {
@@ -36,24 +46,8 @@ public class Cajero {
         this.informacionVenta.obtenerCarritoCompras().removerProducto(productoEncontrado);
     }
 
-    public enum TipoCliente {
-        PERSONA_MORAL,
-        PERSONA_FISICA
-    }
-
-    public void seleccionarTipoCliente(TipoCliente tipoCliente) {
-        switch (tipoCliente) {
-            case PERSONA_MORAL -> {
-                this.informacionVenta.colocarInformacionCliente(new InformacionPersonaMoral());
-                this.informacionVenta.colocarComprobante(new Factura(this.informacionVenta));
-            }
-            case PERSONA_FISICA -> {
-                this.informacionVenta.colocarInformacionCliente(new InformacionPersonaFisica());
-                this.informacionVenta.colocarComprobante(new Recibo(this.informacionVenta));
-            }
-            default ->
-                System.out.println("Tipo de cliente no válido");
-        }
+    public void seleccionarTipoCliente(InformacionCliente tipoCliente) {
+        this.informacionVenta.colocarInformacionCliente(tipoCliente);
     }
 
     public enum TipoPago {
@@ -71,8 +65,8 @@ public class Cajero {
 
     }
 
-    public void efectuarPago() {
-        this.informacionVenta.obtenerInformacionCliente().obtenerPago().obtenerMetodoPago().obtenerDetallesPago();
+    public float efectuarPago() {
+        return this.informacionVenta.obtenerInformacionCliente().obtenerPago().obtenerMetodoPago().obtenerDetallesPago();
     }
 
     public void imprimirComprobante() {
@@ -84,23 +78,14 @@ public class Cajero {
     }
 
     public void finalizarVenta() {
-        this.efectuarPago();
+        System.out.println(this.informacionVenta.obtenerCarritoCompras().obtenerTodosProductos());
+        Float cambioDelCliente = this.efectuarPago();
         this.informacionVenta.obtenerCarritoCompras().obtenerTodosProductos().forEach(producto -> {
             this.consultasProducto.restarExistenciaProducto(producto.obtenerClaveProducto(), 1);
         });
         this.imprimirComprobante();
-    }
-
-    public void establecerBalanceInicial() {
-        ;
-    }
-
-    public void abrirCaja() {
-        ;
-    }
-
-    public void cerrarCaja() {
-        ;
+        System.out.println("Cambio a entregar al cliente: " + cambioDelCliente);
+        System.out.println("Venta finalizada");
     }
 
 }

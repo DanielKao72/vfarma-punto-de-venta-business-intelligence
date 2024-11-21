@@ -5,6 +5,12 @@ public class InformacionPersonaFisica extends InformacionCliente {
     private String nombreCliente;
     private String apellidosCliente;
 
+    public InformacionPersonaFisica() {
+        super();
+        this.nombreCliente = "Vfarma";
+        this.apellidosCliente = "S.A. de C.V.";
+    }
+
     public String obtenerNombreCliente() {
         return nombreCliente;
     }

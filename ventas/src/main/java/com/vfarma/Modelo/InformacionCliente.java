@@ -6,15 +6,20 @@ public class InformacionCliente {
     private String claveRFCCliente;
     private Pago pago;
 
+    public InformacionCliente() {
+        this.domicilioCliente = "Domicilio de la farmacia (InformacionCliente)";
+        this.claveRFCCliente = "RFC de la farmacia (InformacionCliente)";
+    }
+
     public InformacionCliente obtenerDatosCliente() {
         return this;
     }
 
-    public String getDomicilioCliente() {
+    public String obtenerDomicilioCliente() {
         return domicilioCliente;
     }
 
-    public void setDomicilioCliente(String domicilioCliente) {
+    public void colocarDomicilioCliente(String domicilioCliente) {
         this.domicilioCliente = domicilioCliente;
     }
 

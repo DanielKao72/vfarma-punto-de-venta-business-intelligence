@@ -2,13 +2,28 @@ package com.vfarma.Modelo;
 
 public class Efectivo implements MetodoPago {
 
-    public void contarCambio() {
-        System.out.println("Contando el cambio...");
+    private float cantidadAPagar;
+    private float dineroRecibido;
+
+    public Efectivo() {
+    }
+
+    public void colocarCantidadAPagar(float cantidadAPagar) {
+        this.cantidadAPagar = cantidadAPagar;
+    }
+
+    public void colocarDineroRecibido(float dineroRecibido) {
+        this.dineroRecibido = dineroRecibido;
+    }
+
+    public float contarCambio() {
+        float cambioAentregarAlCliente = this.dineroRecibido - this.cantidadAPagar;
+        return cambioAentregarAlCliente;
     }
 
     @Override
-    public void obtenerDetallesPago() {
-        this.contarCambio();
+    public float obtenerDetallesPago() {
+        return this.contarCambio();
     }
 
     @Override
