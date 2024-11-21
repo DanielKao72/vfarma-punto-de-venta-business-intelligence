@@ -137,6 +137,7 @@ public class VentanaFormularioFactura extends VentanaFormulario {
                 InformacionPersonaFisica cliente = new InformacionPersonaFisica();
                 cliente.colocarClaveRFCCliente(rfc);
                 cliente.colocarDomicilioCliente(domicilio);
+
                 cliente.colocarNombreCliente(nombre);
                 cliente.colocarApellidosCliente(apellidos);
 
@@ -149,19 +150,20 @@ public class VentanaFormularioFactura extends VentanaFormulario {
                 InformacionPersonaMoral cliente = new InformacionPersonaMoral();
                 cliente.colocarClaveRFCCliente(rfc);
                 cliente.colocarDomicilioCliente(domicilio);
+
                 cliente.colocarRazonSocial(razonSocial);
                 cliente.colocarRegimenFiscal(regimenFiscal);
 
                 this.cajero.seleccionarTipoCliente(cliente);
             }
+
+            //Es factura, como tal no se necesita un pago
             Efectivo efectivo = new Efectivo();
             efectivo.colocarCantidadAPagar(0);
             efectivo.colocarDineroRecibido(0);
 
             Pago pago = new Pago();
             pago.colocarMetodoPago(efectivo);
-            
-            
 
             this.cajero.informacionVenta.obtenerInformacionCliente().colocarPago(pago);
             this.cajero.informacionVenta.colocarComprobante(new Factura(this.cajero.informacionVenta));

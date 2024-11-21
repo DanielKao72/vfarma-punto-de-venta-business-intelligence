@@ -18,7 +18,7 @@ public class InformacionVenta {
         this.fechaVenta = this.obtenerFechaActual();
         this.montoTotalVenta = 0.0f;
         this.carritoCompras = new CarritoCompras();
-        
+
         this.informacionCliente = new InformacionCliente();
     }
 

@@ -16,9 +16,9 @@ import com.vfarma.GestoresComponentesVentana.GestorFormulario;
 import com.vfarma.Ventanas.VentanaFormulario;
 
 public class VentanaSeleccionCaja extends VentanaFormulario {
+
     private JComboBox<String> seleccionCaja;
     private JButton botonContinuar;
-
 
     public VentanaSeleccionCaja(String titulo) {
         super(titulo);
@@ -28,7 +28,7 @@ public class VentanaSeleccionCaja extends VentanaFormulario {
     public Formulario crearCamposFormulario() {
         Formulario formulario = new Formulario();
 
-        this.seleccionCaja = GestorFormulario.creaListaOpciones(new String[] { "Caja 1", "Caja 2", "Caja 3", "Caja 4" });
+        this.seleccionCaja = GestorFormulario.creaListaOpciones(new String[]{"Caja 1", "Caja 2", "Caja 3", "Caja 4"});
 
         formulario.agregarCampo(new InformacionCampoFormulario("Selecciona la caja:", this.seleccionCaja));
 
@@ -65,7 +65,7 @@ public class VentanaSeleccionCaja extends VentanaFormulario {
             Cajero cajero = Cajero.obtenerInstancia();
             String itemSeleccionado = (String) this.seleccionCaja.getSelectedItem();
             cajero.colocarNombreCaja(itemSeleccionado);
-            
+
             VentanaRegistroVenta ventana = new VentanaRegistroVenta("Registro de Venta");
             ventana.iniciarVentana();
             ventana.mostrarVentana();

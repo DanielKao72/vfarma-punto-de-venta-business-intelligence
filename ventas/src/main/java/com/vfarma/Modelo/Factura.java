@@ -75,7 +75,6 @@ public final class Factura extends Comprobante {
         super.agregarParrafoTexto("nombreCliente: " + nombreCliente, 12, false, null, 0, TextAlignment.LEFT);
         super.agregarParrafoTexto("apellidoCliente: " + apellidoCliente, 12, false, null, 0, TextAlignment.LEFT);
 
-
         super.agregarParrafoTexto("Productos Comprados:", 14, true, null, 10, TextAlignment.LEFT);
 
         Table tablaProductos = new Table(2);

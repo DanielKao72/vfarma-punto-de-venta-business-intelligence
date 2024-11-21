@@ -5,7 +5,7 @@ public class Producto {
     private int claveProducto;
     private String nombreProducto;
     private float precioProducto;
-   
+
     private int existenciaProducto;
 
     public Producto() {
@@ -31,8 +31,6 @@ public class Producto {
         return precioProducto;
     }
 
-  
-
     public int obtenerExistenciaProducto() {
         return existenciaProducto;
     }
@@ -48,8 +46,6 @@ public class Producto {
     public void colocarPrecioProducto(int precioProducto) {
         this.precioProducto = precioProducto;
     }
-
-   
 
     public void colocarExistenciaProducto(int existenciaProducto) {
         this.existenciaProducto = existenciaProducto;

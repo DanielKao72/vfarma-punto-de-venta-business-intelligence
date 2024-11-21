@@ -11,7 +11,7 @@ import com.vfarma.Modelo.Producto;
 
 public class Cajero {
 
-    private static Cajero instanciaUnica; 
+    private static Cajero instanciaUnica;
     public InformacionVenta informacionVenta;
     public ConsultasProducto consultasProducto;
     private String nombreCaja;
@@ -28,8 +28,7 @@ public class Cajero {
         return instanciaUnica;
     }
 
-
-    public void colocarNombreCaja(String nombreCaja){
+    public void colocarNombreCaja(String nombreCaja) {
         this.nombreCaja = nombreCaja;
     }
 
@@ -46,8 +45,6 @@ public class Cajero {
         Producto productoEncontrado = this.informacionVenta.obtenerCarritoCompras().buscarProductoPorIdDelProducto(idProducto);
         this.informacionVenta.obtenerCarritoCompras().removerProducto(productoEncontrado);
     }
-
-    
 
     public void seleccionarTipoCliente(InformacionCliente tipoCliente) {
         this.informacionVenta.colocarInformacionCliente(tipoCliente);
@@ -68,7 +65,7 @@ public class Cajero {
 
     }
 
-    public float efectuarPago( ) {
+    public float efectuarPago() {
         return this.informacionVenta.obtenerInformacionCliente().obtenerPago().obtenerMetodoPago().obtenerDetallesPago();
     }
 
@@ -90,7 +87,5 @@ public class Cajero {
         System.out.println("Cambio a entregar al cliente: " + cambioDelCliente);
         System.out.println("Venta finalizada");
     }
-
-    
 
 }

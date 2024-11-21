@@ -16,8 +16,7 @@ public class Pago {
         this.metodoPago = metodoPago;
     }
 
-    public void procesarPago() {
-
-    }
+    // NO USADO???
+    public void procesarPago() {}
 
 }

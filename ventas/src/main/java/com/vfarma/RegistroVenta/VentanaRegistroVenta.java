@@ -44,14 +44,19 @@ public class VentanaRegistroVenta extends VentanaFormulario {
 
     public VentanaRegistroVenta(String titulo) {
         super(titulo);
-        this.productosAlmacen = new JComboBox<>();
-
         this.cajero = Cajero.obtenerInstancia();
+        this.obtenerProductosDisponiblesParaComprar();
+        this.inicializarTablaProductos();
+    }
 
+    private void obtenerProductosDisponiblesParaComprar() {
+        this.productosAlmacen = new JComboBox<>();
         this.cajero.consultasProducto.obtenerNombreProductosEnExistencia().forEach(producto -> {
             this.productosAlmacen.addItem(producto.obtenerNombreProducto() + " --- " + producto.obtenerClaveProducto());
         });
+    }
 
+    private void inicializarTablaProductos() {
         this.carritoCompras = GestorFormulario.crearTabla(new String[]{"Producto", "Cantidad", "Precio"});
         this.carritoCompras.setFillsViewportHeight(true);
         this.carritoCompras.setAutoResizeMode(JTable.AUTO_RESIZE_SUBSEQUENT_COLUMNS);
@@ -59,13 +64,14 @@ public class VentanaRegistroVenta extends VentanaFormulario {
         this.carritoCompras.setFillsViewportHeight(true);
 
         this.tablaCarritoCompras = new JScrollPane(this.carritoCompras);
+
     }
 
     private void actualizarEstadoBotones() {
 
         boolean carritoVacio = this.carritoCompras.getRowCount() == 0;
         boolean campoDineroVacio = this.campoDineroRecibido.getText().trim().isEmpty();
-    
+
         this.botonFinalizar.setEnabled(!carritoVacio && !campoDineroVacio && this.opcionRecibo.isSelected());
         this.botonContinuar.setEnabled(!carritoVacio && this.opcionFactura.isSelected());
     }
@@ -119,6 +125,30 @@ public class VentanaRegistroVenta extends VentanaFormulario {
         return botones;
     }
 
+    private Boolean verificarSiElProductoYaestaEnElCarrito(DefaultTableModel modeloCarrito, int cantidadDeseada, String nombreProducto, int existenciaDisponible, float precioProductos) {
+        boolean productoEncontrado = false;
+
+        // Verificar si el producto ya está en el carrito
+        for (int i = 0; i < modeloCarrito.getRowCount(); i++) {
+            String productoEnTabla = (String) modeloCarrito.getValueAt(i, 0);
+            if (productoEnTabla.equals(nombreProducto)) {
+                // Actualizar la cantidad y el precio total
+                int cantidadActual = Integer.parseInt((String) modeloCarrito.getValueAt(i, 1));
+                if (cantidadActual + cantidadDeseada > existenciaDisponible) {
+                    System.out.println("La cantidad total excede la existencia disponible.");
+                    //return ;
+                }
+                modeloCarrito.setValueAt(String.valueOf(cantidadActual + cantidadDeseada), i, 1);
+                float precioActual = (float) modeloCarrito.getValueAt(i, 2);
+                modeloCarrito.setValueAt(precioActual + precioProductos, i, 2);
+                productoEncontrado = true;
+                break;
+            }
+        }
+        return productoEncontrado;
+
+    }
+
     @Override
     public void configurarEventos() {
         this.gestorVentanaFormulario.obtenerBoton("CerrarSesion").addActionListener(e -> {
@@ -138,8 +168,6 @@ public class VentanaRegistroVenta extends VentanaFormulario {
             this.campoDineroRecibido.setText("");
             this.actualizarEstadoBotones();
         });
-
-
 
         this.opcionFactura.addActionListener(e -> {
             this.botonFinalizar.setEnabled(false);
@@ -165,104 +193,79 @@ public class VentanaRegistroVenta extends VentanaFormulario {
             String[] partes = productoSeleccionado.split("---");
             String nombreProducto = partes[0].trim();
             String idProducto = partes[1].trim();
-            String cantidadText = this.campoCantidad.getText().trim();
-        
-            if (cantidadText.isEmpty()) {
+            
+            String cantidadProducto = this.campoCantidad.getText().trim();
+
+            if (cantidadProducto.isEmpty()) {
                 System.out.println("Por favor, ingrese una cantidad.");
                 return;
             }
-        
+
             try {
-                int cantidadDeseada = Integer.parseInt(cantidadText);
+                int cantidadDeseada = Integer.parseInt(cantidadProducto);
                 if (cantidadDeseada <= 0) {
                     System.out.println("La cantidad debe ser mayor que 0.");
                     return;
                 }
-        
+
                 // Verificar la existencia en el inventario
                 int existenciaDisponible = this.cajero.consultasProducto.obtenerExistenciaProductoPorId(Integer.parseInt(idProducto));
                 if (cantidadDeseada > existenciaDisponible) {
                     System.out.println("No hay suficiente inventario para el producto seleccionado.");
                     return;
                 }
-        
+
                 float precioProducto = this.cajero.consultasProducto.obtenerPrecioProductoPorId(Integer.parseInt(idProducto));
                 float precioProductos = cantidadDeseada * precioProducto;
-        
+
                 DefaultTableModel modeloCarrito = (DefaultTableModel) this.carritoCompras.getModel();
-                boolean productoEncontrado = false;
-        
-                // Verificar si el producto ya está en el carrito
-                for (int i = 0; i < modeloCarrito.getRowCount(); i++) {
-                    String productoEnTabla = (String) modeloCarrito.getValueAt(i, 0);
-                    if (productoEnTabla.equals(nombreProducto)) {
-                        // Actualizar la cantidad y el precio total
-                        int cantidadActual = Integer.parseInt((String) modeloCarrito.getValueAt(i, 1));
-                        if (cantidadActual + cantidadDeseada > existenciaDisponible) {
-                            System.out.println("La cantidad total excede la existencia disponible.");
-                            return;
-                        }
-                        modeloCarrito.setValueAt(String.valueOf(cantidadActual + cantidadDeseada), i, 1);
-                        float precioActual = (float) modeloCarrito.getValueAt(i, 2);
-                        modeloCarrito.setValueAt(precioActual + precioProductos, i, 2);
-                        productoEncontrado = true;
-                        break;
-                    }
-                }
-        
+                Boolean productoEncontrado = this.verificarSiElProductoYaestaEnElCarrito( modeloCarrito,  cantidadDeseada,  nombreProducto,  existenciaDisponible,  precioProductos);
+                
                 // Si no está en el carrito, agregar una nueva fila
                 if (!productoEncontrado) {
-                    modeloCarrito.addRow(new Object[]{nombreProducto, cantidadText, precioProductos});
+                    modeloCarrito.addRow(new Object[]{nombreProducto, cantidadProducto, precioProductos});
                 }
-        
+
                 // Actualizar el carrito de compras en la información de ventas
                 Producto productoEncontradoObj = this.cajero.consultasProducto.buscarProductoPorID(Integer.parseInt(idProducto));
                 for (int i = 0; i < cantidadDeseada; i++) {
                     this.cajero.informacionVenta.obtenerCarritoCompras().agregarProducto(productoEncontradoObj);
                 }
-        
+
                 this.actualizarEstadoBotones();
                 this.carritoCompras.revalidate();
                 this.carritoCompras.repaint();
-        
+
             } catch (NumberFormatException ex) {
                 System.out.println("Error: La cantidad ingresada no es un número válido.");
             }
         });
-        
 
-        //La venta sera por recibo
+        //La venta sera por medio de un recibo
         this.botonFinalizar.addActionListener(e -> {
             float cantidadDineroRecibida = 0;
-            
+
             try {
                 String dineroRecibido = this.campoDineroRecibido.getText().trim();
-                 cantidadDineroRecibida = Float.parseFloat(dineroRecibido);
-                System.out.println("El dinero recibido es: " + cantidadDineroRecibida);
+                cantidadDineroRecibida = Float.parseFloat(dineroRecibido);
             } catch (NumberFormatException ex) {
                 System.out.println("Error: La entrada no es un número válido.");
             }
+
             this.cajero.seleccionarTipoCliente(new InformacionPersonaFisica());
-            
-
             float cantidadAPagar = this.cajero.informacionVenta.obtenerMontoTotalVenta();
-
 
             Efectivo efectivo = new Efectivo();
             efectivo.colocarCantidadAPagar(cantidadAPagar);
             efectivo.colocarDineroRecibido(cantidadDineroRecibida);
-
             Pago pago = new Pago();
             pago.colocarMetodoPago(efectivo);
-            
-            
-
             this.cajero.informacionVenta.obtenerInformacionCliente().colocarPago(pago);
-            
+
             this.cajero.informacionVenta.colocarComprobante(new Recibo(this.cajero.informacionVenta));
             this.cajero.finalizarVenta();
 
-           // Volver al menu inicial TO--DO
+            // Volver al menu inicial TO--DO
         });
     }
 }

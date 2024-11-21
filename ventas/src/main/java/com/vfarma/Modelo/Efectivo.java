@@ -10,22 +10,19 @@ public class Efectivo implements MetodoPago {
 
     public void colocarCantidadAPagar(float cantidadAPagar) {
         this.cantidadAPagar = cantidadAPagar;
-    }   
+    }
 
     public void colocarDineroRecibido(float dineroRecibido) {
         this.dineroRecibido = dineroRecibido;
     }
 
     public float contarCambio() {
-        float cambioAentregarAlCliente =  this.dineroRecibido  - this.cantidadAPagar;
-        //System.out.println("Dinero recibido: " + this.dineroRecibido);
-        //System.out.println("Cantidad a pagar (Cuanto costo la compra): " + this.cantidadAPagar);
-        //System.out.println("Cambio: " + cambio);
+        float cambioAentregarAlCliente = this.dineroRecibido - this.cantidadAPagar;
         return cambioAentregarAlCliente;
     }
 
     @Override
-    public float obtenerDetallesPago( ) {
+    public float obtenerDetallesPago() {
         return this.contarCambio();
     }
 
