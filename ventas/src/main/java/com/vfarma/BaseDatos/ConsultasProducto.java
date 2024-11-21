@@ -166,4 +166,22 @@ public Producto obtenerProductoPorId(int idProducto) {
 
     return producto; // Retorna el producto encontrado, o null si no se encuentra
 }
+
+public int obtenerExistenciaProductoPorId(int idProducto) {
+    String query = "SELECT Cantidad FROM inventario WHERE ClvProducto = ?";
+    try (PreparedStatement stmt = conexion.prepareStatement(query)) {
+        stmt.setInt(1, idProducto);
+        try (ResultSet rs = stmt.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt("Cantidad");
+            } else {
+                System.out.println("Producto no encontrado en el inventario.");
+                return 0; // Producto no encontrado
+            }
+        }
+    } catch (SQLException e) {
+        System.err.println("Error al consultar la existencia del producto: " + e.getMessage());
+        return 0; // Error durante la consulta
+    }
+}
 }

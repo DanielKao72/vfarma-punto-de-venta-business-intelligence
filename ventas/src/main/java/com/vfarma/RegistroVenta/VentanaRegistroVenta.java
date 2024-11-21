@@ -39,7 +39,7 @@ public class VentanaRegistroVenta extends VentanaFormulario {
     private JButton botonAgregar;
     private JButton botonContinuar;
     private JButton botonFinalizar;
-    private JButton botonCancelar;
+    private JButton botonLimpiar;
     private Cajero cajero;
 
     public VentanaRegistroVenta(String titulo) {
@@ -59,6 +59,15 @@ public class VentanaRegistroVenta extends VentanaFormulario {
         this.carritoCompras.setFillsViewportHeight(true);
 
         this.tablaCarritoCompras = new JScrollPane(this.carritoCompras);
+    }
+
+    private void actualizarEstadoBotones() {
+
+        boolean carritoVacio = this.carritoCompras.getRowCount() == 0;
+        boolean campoDineroVacio = this.campoDineroRecibido.getText().trim().isEmpty();
+    
+        this.botonFinalizar.setEnabled(!carritoVacio && !campoDineroVacio && this.opcionRecibo.isSelected());
+        this.botonContinuar.setEnabled(!carritoVacio && this.opcionFactura.isSelected());
     }
 
     @Override
@@ -93,19 +102,19 @@ public class VentanaRegistroVenta extends VentanaFormulario {
         InformacionBoton informacionBotonAgregar = new InformacionBoton("Agregar", BorderFactory.createEmptyBorder(5, 15, 5, 15));
         InformacionBoton informacionBotonContinuar = new InformacionBoton("Continuar", BorderFactory.createEmptyBorder(5, 15, 5, 15));
         InformacionBoton informacionBotonFinalizar = new InformacionBoton("Finalizar", BorderFactory.createEmptyBorder(5, 15, 5, 15));
-        InformacionBoton informacionBotonCancelar = new InformacionBoton("Limpiar", BorderFactory.createEmptyBorder(5, 15, 5, 15));
+        InformacionBoton informacionBotonLimpiar = new InformacionBoton("Limpiar", BorderFactory.createEmptyBorder(5, 15, 5, 15));
 
         this.botonAgregar = GestorComponentes.crearBoton(informacionBotonAgregar, estilosBoton);
         this.botonContinuar = GestorComponentes.crearBoton(informacionBotonContinuar, estilosBoton);
         this.botonFinalizar = GestorComponentes.crearBoton(informacionBotonFinalizar, estilosBoton);
-        this.botonCancelar = GestorComponentes.crearBoton(informacionBotonCancelar, estilosBoton);
+        this.botonLimpiar = GestorComponentes.crearBoton(informacionBotonLimpiar, estilosBoton);
 
         this.botonFinalizar.setEnabled(false);
 
         botones.add(this.botonAgregar);
         botones.add(this.botonContinuar);
         botones.add(this.botonFinalizar);
-        botones.add(this.botonCancelar);
+        botones.add(this.botonLimpiar);
 
         return botones;
     }
@@ -122,6 +131,15 @@ public class VentanaRegistroVenta extends VentanaFormulario {
             ventana.mostrarVentana();
             this.cerrarVentana();
         });
+
+        this.botonLimpiar.addActionListener(e -> {
+            DefaultTableModel modeloCarrito = (DefaultTableModel) this.carritoCompras.getModel();
+            modeloCarrito.setRowCount(0);
+            this.campoDineroRecibido.setText("");
+            this.actualizarEstadoBotones();
+        });
+
+
 
         this.opcionFactura.addActionListener(e -> {
             this.botonFinalizar.setEnabled(false);
@@ -143,28 +161,75 @@ public class VentanaRegistroVenta extends VentanaFormulario {
         });
 
         this.botonAgregar.addActionListener(e -> {
-            
             String productoSeleccionado = (String) this.productosAlmacen.getSelectedItem();
-
             String[] partes = productoSeleccionado.split("---");
             String nombreProducto = partes[0].trim();
             String idProducto = partes[1].trim();
-            String cantidadText = (String) this.campoCantidad.getText().trim(); 
-            float precioProducto = this.cajero.consultasProducto.obtenerPrecioProductoPorId(Integer.parseInt(idProducto));
-            float precioProductos = Float.parseFloat(cantidadText) * precioProducto;
-
-            DefaultTableModel modeloCarrito = (DefaultTableModel) this.carritoCompras.getModel();
-            modeloCarrito.addRow(new Object[]{nombreProducto, cantidadText, precioProductos});
-            Producto productoEncontrado = this.cajero.consultasProducto.buscarProductoPorID(Integer.parseInt(idProducto));
-            for (int i = 0; i < Integer.parseInt(cantidadText); i++) {
-                this.cajero.informacionVenta.obtenerCarritoCompras().agregarProducto(productoEncontrado);
+            String cantidadText = this.campoCantidad.getText().trim();
+        
+            if (cantidadText.isEmpty()) {
+                System.out.println("Por favor, ingrese una cantidad.");
+                return;
             }
-
-            
-            
-            this.carritoCompras.revalidate();
-            this.carritoCompras.repaint();
+        
+            try {
+                int cantidadDeseada = Integer.parseInt(cantidadText);
+                if (cantidadDeseada <= 0) {
+                    System.out.println("La cantidad debe ser mayor que 0.");
+                    return;
+                }
+        
+                // Verificar la existencia en el inventario
+                int existenciaDisponible = this.cajero.consultasProducto.obtenerExistenciaProductoPorId(Integer.parseInt(idProducto));
+                if (cantidadDeseada > existenciaDisponible) {
+                    System.out.println("No hay suficiente inventario para el producto seleccionado.");
+                    return;
+                }
+        
+                float precioProducto = this.cajero.consultasProducto.obtenerPrecioProductoPorId(Integer.parseInt(idProducto));
+                float precioProductos = cantidadDeseada * precioProducto;
+        
+                DefaultTableModel modeloCarrito = (DefaultTableModel) this.carritoCompras.getModel();
+                boolean productoEncontrado = false;
+        
+                // Verificar si el producto ya está en el carrito
+                for (int i = 0; i < modeloCarrito.getRowCount(); i++) {
+                    String productoEnTabla = (String) modeloCarrito.getValueAt(i, 0);
+                    if (productoEnTabla.equals(nombreProducto)) {
+                        // Actualizar la cantidad y el precio total
+                        int cantidadActual = Integer.parseInt((String) modeloCarrito.getValueAt(i, 1));
+                        if (cantidadActual + cantidadDeseada > existenciaDisponible) {
+                            System.out.println("La cantidad total excede la existencia disponible.");
+                            return;
+                        }
+                        modeloCarrito.setValueAt(String.valueOf(cantidadActual + cantidadDeseada), i, 1);
+                        float precioActual = (float) modeloCarrito.getValueAt(i, 2);
+                        modeloCarrito.setValueAt(precioActual + precioProductos, i, 2);
+                        productoEncontrado = true;
+                        break;
+                    }
+                }
+        
+                // Si no está en el carrito, agregar una nueva fila
+                if (!productoEncontrado) {
+                    modeloCarrito.addRow(new Object[]{nombreProducto, cantidadText, precioProductos});
+                }
+        
+                // Actualizar el carrito de compras en la información de ventas
+                Producto productoEncontradoObj = this.cajero.consultasProducto.buscarProductoPorID(Integer.parseInt(idProducto));
+                for (int i = 0; i < cantidadDeseada; i++) {
+                    this.cajero.informacionVenta.obtenerCarritoCompras().agregarProducto(productoEncontradoObj);
+                }
+        
+                this.actualizarEstadoBotones();
+                this.carritoCompras.revalidate();
+                this.carritoCompras.repaint();
+        
+            } catch (NumberFormatException ex) {
+                System.out.println("Error: La cantidad ingresada no es un número válido.");
+            }
         });
+        
 
         //La venta sera por recibo
         this.botonFinalizar.addActionListener(e -> {
@@ -179,11 +244,8 @@ public class VentanaRegistroVenta extends VentanaFormulario {
             }
             this.cajero.seleccionarTipoCliente(new InformacionPersonaFisica());
             
-            //this.cajero.informacionVenta.obtenerInformacionCliente().colocarClaveRFCCliente("dddd");
-            //this.cajero.informacionVenta.obtenerInformacionCliente().colocarDomicilioCliente("fd");
+
             float cantidadAPagar = this.cajero.informacionVenta.obtenerMontoTotalVenta();
-
-
 
 
             Efectivo efectivo = new Efectivo();
@@ -199,8 +261,6 @@ public class VentanaRegistroVenta extends VentanaFormulario {
             
             this.cajero.informacionVenta.colocarComprobante(new Recibo(this.cajero.informacionVenta));
             this.cajero.finalizarVenta();
-
-
 
            // Volver al menu inicial TO--DO
         });
