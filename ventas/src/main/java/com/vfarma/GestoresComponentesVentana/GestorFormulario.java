@@ -5,8 +5,10 @@ import java.util.ArrayList;
 import javax.swing.ButtonGroup;
 import javax.swing.JComboBox;
 import javax.swing.JRadioButton;
+import javax.swing.JSpinner;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.SpinnerModel;
 import javax.swing.table.DefaultTableModel;
 
 public class GestorFormulario {
@@ -16,6 +18,14 @@ public class GestorFormulario {
         campoTexto.setFont(new java.awt.Font("SansSerif", java.awt.Font.PLAIN, 26));
 
         return campoTexto;
+    }
+
+    public static JSpinner crearCampoNumerico() {
+        SpinnerModel modelo = new javax.swing.SpinnerNumberModel(0, 0, Integer.MAX_VALUE, 1);
+        JSpinner campoNumerico = new JSpinner(modelo);
+        campoNumerico.setFont(new java.awt.Font("SansSerif", java.awt.Font.PLAIN, 26));
+
+        return campoNumerico;
     }
 
     public static JComboBox<String> crearListaOpciones() {
