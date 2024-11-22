@@ -43,7 +43,7 @@ public class AdministradorInventario {
         return precioValido;
     }
 
-    private boolean validarCanitdad(String cantidad){
+    private boolean validarCantidad(String cantidad){
         boolean cantidadValida = true;
         try {
             Integer.parseInt(cantidad);
@@ -109,7 +109,7 @@ public class AdministradorInventario {
 
     public boolean registrarLoteProducto(String clave, String numlote, String fechaCaducidad, String cantidad){
         boolean exito = false;
-        if (validarExistenciaDeClave(clave) && validarFecha(fechaCaducidad) && validarCanitdad(cantidad)){
+        if (validarExistenciaDeClave(clave) && validarFecha(fechaCaducidad) && validarCantidad(cantidad)){
             Date fecha = new Date();
             try {
                 fecha = new SimpleDateFormat("yyyy-MM-dd").parse(fechaCaducidad);
@@ -120,7 +120,7 @@ public class AdministradorInventario {
             String fechaSQL = new SimpleDateFormat("yyyy-MM-dd").format(fecha);
             
             InformacionLoteProducto lote = new InformacionLoteProducto(Integer.parseInt(clave), Integer.parseInt(numlote), fechaSQL, Integer.parseInt(cantidad));
-            exito = this.controlInventario.registrarProductoInventarioEnInventario(lote);
+            exito = this.controlInventario.registrarLoteProductoEnInventario(lote);
 
             if (exito){
                 exito = actualizarExistenciaProducto(clave, cantidad);
