@@ -19,86 +19,101 @@ public class GestorEmpleados {
     }
 
     private String generarUsuarioEmpleado(InformacionEmpleado empleado) {
-        String iniciales = empleado.obtenerNombreEmpleado().substring(0, 1).toUpperCase() +
+        String inicialesNombreEmpleado = empleado.obtenerNombreEmpleado().substring(0, 1).toUpperCase() +
                 empleado.obtenerApellidoEmpleado().substring(0, 1).toUpperCase();
         String siglasRol = empleado.obtenerRolEmpleado().substring(0, 3).toUpperCase();
         String sexo = empleado.obtenerSexoEmpleado().substring(0, 1).toUpperCase();
         String telefono = empleado.obtenerTelefonoEmpleado();
         String ultimosDigitosTelefono = telefono.substring(telefono.length() - 2);
 
-        return iniciales + siglasRol + sexo + ultimosDigitosTelefono;
+        return inicialesNombreEmpleado + siglasRol + sexo + ultimosDigitosTelefono;
     }
 
     private String generarContraseniaEmpleado(InformacionEmpleado empleado) {
-        String iniciales = empleado.obtenerNombreEmpleado().substring(0, 1).toLowerCase() +
+        String inicialesNombreEmpleado = empleado.obtenerNombreEmpleado().substring(0, 1).toLowerCase() +
                 empleado.obtenerApellidoEmpleado().substring(0, 1).toLowerCase();
         String sexo = empleado.obtenerSexoEmpleado().substring(0, 1).toLowerCase();
         String telefono = empleado.obtenerTelefonoEmpleado();
         String ultimosDigitosTelefono = telefono.substring(telefono.length() - 2);
 
-        return iniciales + sexo + ultimosDigitosTelefono;
+        return inicialesNombreEmpleado + sexo + ultimosDigitosTelefono;
     }
 
     public ArrayList<String> agregarNuevoEmpleadoABaseDeDatos(InformacionEmpleado empleado) {
-        String queryInsertEmpleado = "INSERT INTO empleados (Nombre, Apellido, Correo, Telefono, Sexo, Turno, Rol) VALUES (?, ?, ?, ?, ?, ?, ?)";
-        String queryInsertCredenciales = "INSERT INTO credenciales (Usuario, Contrasenia, ClvEmpleado) VALUES (?, ?, ?)";
-
         ArrayList<String> credenciales = new ArrayList<>();
-        credenciales.add(""); credenciales.add("");
-
-        try (PreparedStatement psEmpleado = conexion.prepareStatement(queryInsertEmpleado, PreparedStatement.RETURN_GENERATED_KEYS);
-             PreparedStatement psCredenciales = conexion.prepareStatement(queryInsertCredenciales)) {
-
-            psEmpleado.setString(1, empleado.obtenerNombreEmpleado());
-            psEmpleado.setString(2, empleado.obtenerApellidoEmpleado());
-            psEmpleado.setString(3, empleado.obtenerCorreoEmpleado());
-            psEmpleado.setString(4, empleado.obtenerTelefonoEmpleado());
-            psEmpleado.setString(5, empleado.obtenerSexoEmpleado());
-            psEmpleado.setString(6, empleado.obtenerTurnoEmpleado());
-            psEmpleado.setString(7, empleado.obtenerRolEmpleado());
-            psEmpleado.executeUpdate();
-
-            ResultSet rs = psEmpleado.getGeneratedKeys();
-            if (rs.next()) {
-                int claveEmpleado = rs.getInt(1);
-
-                String usuario = generarUsuarioEmpleado(empleado);
-                credenciales.set(0, usuario);
-
-                String contrasenia = generarContraseniaEmpleado(empleado);
-                credenciales.set(1, contrasenia);
-
-                psCredenciales.setString(1, usuario);
-                psCredenciales.setString(2, contrasenia);
-                psCredenciales.setInt(3, claveEmpleado);
-                psCredenciales.executeUpdate();
+        credenciales.add(""); 
+        credenciales.add("");
+    
+        try {
+            int claveEmpleado = agregarInformacionEmpleado(empleado);
+            if (claveEmpleado > 0) {
+                credenciales = generarCredencialesEmpleado(empleado, claveEmpleado);
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return credenciales;
     }
-
+    
+    private int agregarInformacionEmpleado(InformacionEmpleado empleado) throws SQLException {
+        String consultaSQL = "INSERT INTO empleados (Nombre, Apellido, Correo, Telefono, Sexo, Turno, Rol) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        int claveEmpleado = -1;
+    
+        try (PreparedStatement peticion = conexion.prepareStatement(consultaSQL, PreparedStatement.RETURN_GENERATED_KEYS)) {
+            peticion.setString(1, empleado.obtenerNombreEmpleado());
+            peticion.setString(2, empleado.obtenerApellidoEmpleado());
+            peticion.setString(3, empleado.obtenerCorreoEmpleado());
+            peticion.setString(4, empleado.obtenerTelefonoEmpleado());
+            peticion.setString(5, empleado.obtenerSexoEmpleado());
+            peticion.setString(6, empleado.obtenerTurnoEmpleado());
+            peticion.setString(7, empleado.obtenerRolEmpleado());
+            peticion.executeUpdate();
+    
+            ResultSet resultado = peticion.getGeneratedKeys();
+            if (resultado.next()) {
+                claveEmpleado = resultado.getInt(1);
+            }
+        }
+        return claveEmpleado;
+    }
+    
+    private ArrayList<String> generarCredencialesEmpleado(InformacionEmpleado empleado, int claveEmpleado) throws SQLException {
+        String consultaSQL = "INSERT INTO credenciales (Usuario, Contrasenia, ClvEmpleado) VALUES (?, ?, ?)";
+        ArrayList<String> credenciales = new ArrayList<>();
+    
+        String usuario = generarUsuarioEmpleado(empleado);
+        String contrasenia = generarContraseniaEmpleado(empleado);
+        credenciales.add(usuario);
+        credenciales.add(contrasenia);
+    
+        try (PreparedStatement peticion = conexion.prepareStatement(consultaSQL)) {
+            peticion.setString(1, usuario);
+            peticion.setString(2, contrasenia);
+            peticion.setInt(3, claveEmpleado);
+            peticion.executeUpdate();
+        }
+        return credenciales;
+    }
+    
     public InformacionEmpleado consultarInformacionEmpleadoEnBaseDeDatos(String usuarioEmpleado) {
-        String query = "SELECT c.*, e.* " +
+        String consultaSQL = "SELECT c.*, e.* " +
                    "FROM credenciales c " +
                    "JOIN empleados e ON c.ClvEmpleado = e.ClvEmpleado " +
                    "WHERE c.Usuario = ?";
 
-        try (PreparedStatement ps = conexion.prepareStatement(query)) {
-            ps.setString(1, usuarioEmpleado);
-            ResultSet rs = ps.executeQuery();
-            //JPADMM67
-            if (rs.next()) {
+        try (PreparedStatement peticion = conexion.prepareStatement(consultaSQL)) {
+            peticion.setString(1, usuarioEmpleado);
+            ResultSet resultado = peticion.executeQuery();
+            if (resultado.next()) {
                 return new InformacionEmpleado(
-                        rs.getString("ClvEmpleado"),
-                        rs.getString("Nombre"),
-                        rs.getString("Apellido"),
-                        rs.getString("Correo"),
-                        rs.getString("Telefono"),
-                        rs.getString("Sexo"),
-                        rs.getString("Turno"),
-                        rs.getString("Rol")
+                        resultado.getString("ClvEmpleado"),
+                        resultado.getString("Nombre"),
+                        resultado.getString("Apellido"),
+                        resultado.getString("Correo"),
+                        resultado.getString("Telefono"),
+                        resultado.getString("Sexo"),
+                        resultado.getString("Turno"),
+                        resultado.getString("Rol")
                 );
             }
         } catch (SQLException e) {
@@ -108,18 +123,18 @@ public class GestorEmpleados {
     }
 
     public boolean editarInformacionEmpleadoEnBaseDeDatos(InformacionEmpleado empleado) {
-        String query = "UPDATE empleados SET Nombre = ?, Apellido = ?, Correo = ?, Telefono = ?, Sexo = ?, Turno = ?, Rol = ? WHERE ClvEmpleado = ?";
-        try (PreparedStatement ps = conexion.prepareStatement(query)) {
-            ps.setString(1, empleado.obtenerNombreEmpleado());
-            ps.setString(2, empleado.obtenerApellidoEmpleado());
-            ps.setString(3, empleado.obtenerCorreoEmpleado());
-            ps.setString(4, empleado.obtenerTelefonoEmpleado());
-            ps.setString(5, empleado.obtenerSexoEmpleado());
-            ps.setString(6, empleado.obtenerTurnoEmpleado());
-            ps.setString(7, empleado.obtenerRolEmpleado());
-            ps.setString(8, empleado.obtenerClaveEmpleado());
+        String consultaSQL = "UPDATE empleados SET Nombre = ?, Apellido = ?, Correo = ?, Telefono = ?, Sexo = ?, Turno = ?, Rol = ? WHERE ClvEmpleado = ?";
+        try (PreparedStatement peticion = conexion.prepareStatement(consultaSQL)) {
+            peticion.setString(1, empleado.obtenerNombreEmpleado());
+            peticion.setString(2, empleado.obtenerApellidoEmpleado());
+            peticion.setString(3, empleado.obtenerCorreoEmpleado());
+            peticion.setString(4, empleado.obtenerTelefonoEmpleado());
+            peticion.setString(5, empleado.obtenerSexoEmpleado());
+            peticion.setString(6, empleado.obtenerTurnoEmpleado());
+            peticion.setString(7, empleado.obtenerRolEmpleado());
+            peticion.setString(8, empleado.obtenerClaveEmpleado());
             
-            int registrosActualizados = ps.executeUpdate();
+            int registrosActualizados = peticion.executeUpdate();
             if(registrosActualizados > 0) return true;
             else return false;
 
@@ -131,39 +146,41 @@ public class GestorEmpleados {
     }
 
     public boolean eliminarEmpleadoDeBaseDeDatos(String usuarioEmpleado) {
-
-        String consultaExistencia = "SELECT * FROM credenciales WHERE Usuario = ?";
-        String consultaEliminacion = "DELETE FROM empleados WHERE ClvEmpleado = ?";
-
-        try (PreparedStatement ps1 = conexion.prepareStatement(consultaExistencia);
-        PreparedStatement ps2 = conexion.prepareStatement(consultaEliminacion)){
-
-            ps1.setString(1, usuarioEmpleado);
-            ResultSet rs = ps1.executeQuery();
-
-            if(rs.next()){
-                String claveEmpleado = rs.getString("ClvEmpleado");
-                ps2.setString(1, claveEmpleado);
-                int registrosEliminados = ps2.executeUpdate();
+        String consultaSQL = "DELETE FROM empleados WHERE ClvEmpleado = ?";
+        try (PreparedStatement peticion = conexion.prepareStatement(consultaSQL)) {
+            String claveEmpleado = buscarEmpleadoPorUsuarioEnBaseDeDatos(usuarioEmpleado);
+            if (claveEmpleado != null) {
+                peticion.setString(1, claveEmpleado);
+                int registrosEliminados = peticion.executeUpdate();
                 if(registrosEliminados > 0) return true;
             }
-
-            return false;
-
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        
         return false;
     }
+    
+    private String buscarEmpleadoPorUsuarioEnBaseDeDatos(String usuarioEmpleado) throws SQLException {
+        String consultaSQL = "SELECT ClvEmpleado FROM credenciales WHERE Usuario = ?";
+        try (PreparedStatement peticion = conexion.prepareStatement(consultaSQL)) {
+            peticion.setString(1, usuarioEmpleado);
+            try (ResultSet resultado = peticion.executeQuery()) {
+                if (resultado.next()) {
+                    return resultado.getString("ClvEmpleado");
+                }
+            }
+        }
+        return null;
+    }
+    
 
     public boolean buscarEmpleadoEnBaseDeDatos(String usuario, String contrasenia) {
-        String query = "SELECT * FROM credenciales WHERE Usuario = ? AND Contrasenia = ?";
-        try (PreparedStatement ps = conexion.prepareStatement(query)) {
-            ps.setString(1, usuario);
-            ps.setString(2, contrasenia);
-            ResultSet rs = ps.executeQuery();
-            return rs.next();
+        String consultaSQL = "SELECT * FROM credenciales WHERE Usuario = ? AND Contrasenia = ?";
+        try (PreparedStatement peticion = conexion.prepareStatement(consultaSQL)) {
+            peticion.setString(1, usuario);
+            peticion.setString(2, contrasenia);
+            ResultSet resultado = peticion.executeQuery();
+            return resultado.next();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -171,16 +188,16 @@ public class GestorEmpleados {
     }
 
     public String obtenerRolEmpleadoEnBaseDeDatos(String usuario, String contrasenia) {
-        String query = "SELECT e.Rol FROM empleados e " +
+        String consultaSQL = "SELECT e.Rol FROM empleados e " +
                        "JOIN credenciales c ON e.ClvEmpleado = c.ClvEmpleado " +
                        "WHERE c.Usuario = ? AND c.Contrasenia = ?";
         String rol = "";
-        try (PreparedStatement ps = conexion.prepareStatement(query)) {
-            ps.setString(1, usuario);
-            ps.setString(2, contrasenia);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    rol = rs.getString("Rol");
+        try (PreparedStatement peticion = conexion.prepareStatement(consultaSQL)) {
+            peticion.setString(1, usuario);
+            peticion.setString(2, contrasenia);
+            try (ResultSet resultado = peticion.executeQuery()) {
+                if (resultado.next()) {
+                    rol = resultado.getString("Rol");
                 }
             }
         } catch (SQLException e) {
