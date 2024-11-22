@@ -4,12 +4,16 @@ import java.util.ArrayList;
 
 import javax.swing.ButtonGroup;
 import javax.swing.JComboBox;
+import javax.swing.JPasswordField;
 import javax.swing.JRadioButton;
 import javax.swing.JSpinner;
 import javax.swing.JTable;
 import javax.swing.JTextField;
-import javax.swing.SpinnerModel;
+import javax.swing.SpinnerNumberModel;
 import javax.swing.table.DefaultTableModel;
+
+import com.vfarma.ComponentesVentana.Formulario;
+import com.vfarma.ComponentesVentana.InformacionCampoFormulario;
 
 public class GestorFormulario {
     
@@ -20,12 +24,19 @@ public class GestorFormulario {
         return campoTexto;
     }
 
-    public static JSpinner crearCampoNumerico() {
-        SpinnerModel modelo = new javax.swing.SpinnerNumberModel(0, 0, Integer.MAX_VALUE, 1);
-        JSpinner campoNumerico = new JSpinner(modelo);
-        campoNumerico.setFont(new java.awt.Font("SansSerif", java.awt.Font.PLAIN, 26));
+    public static JSpinner crearCampoNumero() {
+        SpinnerNumberModel modelo = new SpinnerNumberModel(0, 0, Integer.MAX_VALUE, 1);
+        JSpinner campoNumero = new JSpinner(modelo);
+        campoNumero.setFont(new java.awt.Font("SansSerif", java.awt.Font.PLAIN, 26));
 
-        return campoNumerico;
+        return campoNumero;
+    }
+
+    public static JPasswordField crearCampoContrasena(int longitud) {
+        JPasswordField campoContrasena = new JPasswordField(longitud);
+        campoContrasena.setFont(new java.awt.Font("SansSerif", java.awt.Font.PLAIN, 26));
+
+        return campoContrasena;
     }
 
     public static JComboBox<String> crearListaOpciones() {
@@ -45,7 +56,11 @@ public class GestorFormulario {
     public static JTable crearTabla(String[] encabezado) {
         DefaultTableModel modelo = new DefaultTableModel(encabezado, 0);
         JTable tabla = new JTable(modelo);
-        tabla.setFont(new java.awt.Font("SansSerif", java.awt.Font.PLAIN, 26));
+        tabla.setFont(new java.awt.Font("SansSerif", java.awt.Font.PLAIN, 14));
+        tabla.setFillsViewportHeight(true);
+        tabla.setAutoResizeMode(JTable.AUTO_RESIZE_SUBSEQUENT_COLUMNS);
+        tabla.setPreferredScrollableViewportSize(new java.awt.Dimension(400, 150));
+        tabla.setFillsViewportHeight(true);
 
         return tabla;
     }
@@ -68,4 +83,55 @@ public class GestorFormulario {
 
         return grupoBotones;
     }
+
+    public static boolean esFormularioCorrecto(Formulario formulario) {
+        for (InformacionCampoFormulario campo : formulario.obtenerCampos()) {
+            Object componente = campo.obtenerComponenteCampo();
+    
+            if (componente instanceof JTextField) {
+                if (((JTextField) componente).getText().isEmpty()) {
+                    return false; // Campo de texto vacío
+                }
+            }
+    
+            if (componente instanceof JSpinner) {
+                if (((JSpinner) componente).getValue().equals(0)) {
+                    return false; // Campo numérico no válido
+                }
+            }
+    
+            if (componente instanceof JComboBox) {
+                if (((JComboBox<?>) componente).getSelectedItem() == null) {
+                    return false; // Lista de opciones sin eleccion
+                }
+            }
+    
+            if (componente instanceof JPasswordField) {
+                if (((JPasswordField) componente).getPassword().length == 0) {
+                    return false; // Contraseña vacía
+                }
+            }
+    
+            if (componente instanceof JTable) {
+                if (((JTable) componente).getRowCount() == 0) {
+                    return false; // Tabla sin filas
+                }
+            }
+        }
+    
+        return true; // Todos los campos son válidos
+    }
+
+    public static boolean esNumeroEntero(String cadena) {
+        if (cadena == null || cadena.isEmpty()) {
+            return false; // Cadena vacía o nula
+        }
+        try {
+            Integer.parseInt(cadena);
+            return true; // Es un entero
+        } catch (NumberFormatException e) {
+            return false; // No es un número entero
+        }
+    }
+    
 }

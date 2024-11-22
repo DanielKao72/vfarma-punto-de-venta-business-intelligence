@@ -89,8 +89,8 @@ public class VentanaRegistroVenta extends VentanaFormulario {
 
         this.tipoComprobante = GestorFormulario.crearGrupoBotones(opciones);
 
-        this.campoCantidad = GestorFormulario.crearCampoNumerico();
-        this.campoDineroRecibido = GestorFormulario.crearCampoNumerico();
+        // this.campoCantidad = GestorFormulario.crearCampoNumerico();
+        // this.campoDineroRecibido = GestorFormulario.crearCampoNumerico();
 
         formulario.agregarCampo(new InformacionCampoFormulario("Producto:", this.productosAlmacen));
         formulario.agregarCampo(new InformacionCampoFormulario("Cantidad:", this.campoCantidad));

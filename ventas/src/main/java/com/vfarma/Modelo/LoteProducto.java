@@ -1,17 +1,18 @@
 package com.vfarma.Modelo;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class ProductoInventario {
+public class LoteProducto {
     private int claveProducto;
     private int lote;
-    private Date fechaCaducidad;
+    private String fechaCaducidad;
     private int cantidad;
 
-    public ProductoInventario() {
+    public LoteProducto() {
     }
 
-    public ProductoInventario(int claveProducto, int lote, Date fechaCaducidad, int cantidad) {
+    public LoteProducto(int claveProducto, int lote, String fechaCaducidad, int cantidad) {
         this.claveProducto = claveProducto;
         this.lote = lote;
         this.fechaCaducidad = fechaCaducidad;
@@ -26,7 +27,7 @@ public class ProductoInventario {
         return lote;
     }
 
-    public Date obtenerFechaCaducidad() {
+    public String obtenerFechaCaducidad() {
         return fechaCaducidad;
     }
 
@@ -42,7 +43,7 @@ public class ProductoInventario {
         this.lote = lote;
     }
 
-    public void colocarFechaCaducidad(Date fechaCaducidad) {
+    public void colocarFechaCaducidad(String fechaCaducidad) {
         this.fechaCaducidad = fechaCaducidad;
     }
 

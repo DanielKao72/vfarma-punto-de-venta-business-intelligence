@@ -6,7 +6,7 @@ import java.text.SimpleDateFormat;
 import java.util.List;
 import com.vfarma.BaseDatos.ControlInventario;
 import com.vfarma.Modelo.Producto;
-import com.vfarma.Modelo.ProductoInventario;
+import com.vfarma.Modelo.LoteProducto;
 
 public class AdmistradorInventario {
     private final ControlInventario controlInventario;
@@ -67,7 +67,12 @@ public class AdmistradorInventario {
         boolean fechaValida = false;
         try {
             sdf.parse(fecha);
-            fechaValida = true;
+            SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy-MM-dd");
+            Date fechaActual = new Date();
+            Date fechaIngresada = sdf2.parse(fecha);
+            if (fechaIngresada.after(fechaActual)){
+                fechaValida = true;
+            }
         } catch (ParseException e) {
             e.printStackTrace();
         }
@@ -75,10 +80,16 @@ public class AdmistradorInventario {
         return fechaValida;
     }
 
-    public boolean registrarNuevoProducto(String clave, String nombre, String precio, String existencia){
+    private boolean actualizarExistenciaProducto(String clave, String cantidad){
         boolean exito = false;
-        if (!validarExistenciaDeClave(clave) && validarPrecio(precio) && validarExistencia(existencia)){
-            Producto producto = new Producto(Integer.parseInt(clave), nombre, (float)Double.parseDouble(precio), Integer.parseInt(existencia));
+        exito = this.controlInventario.actualizarExistenciaProductoEnInventario(clave, cantidad);
+        return exito;
+    }
+
+    public boolean registrarNuevoProducto(String clave, String nombre, String precio){
+        boolean exito = false;
+        if (!validarExistenciaDeClave(clave) && validarPrecio(precio)){
+            Producto producto = new Producto(Integer.parseInt(clave), nombre, (float)Double.parseDouble(precio), 0);
             exito = this.controlInventario.registrarNuevoProductoEnInventario(producto); 
         }
         return exito;
@@ -89,6 +100,9 @@ public class AdmistradorInventario {
         if (validarExistenciaDeClave(clave)){
             producto = this.controlInventario.buscarProductoPorClaveEnInventario(clave);
         }
+        else{
+            producto = null;
+        }
         return producto;
     }
 
@@ -98,7 +112,7 @@ public class AdmistradorInventario {
         return productos;
     }
 
-    public boolean registrarProductoEnInventario(String clave, String lote, String fechaCaducidad, String cantidad){
+    public boolean registrarLoteProducto(String clave, String numlote, String fechaCaducidad, String cantidad){
         boolean exito = false;
         if (validarExistenciaDeClave(clave) && validarFecha(fechaCaducidad) && validarCanitdad(cantidad)){
             Date fecha = new Date();
@@ -107,8 +121,15 @@ public class AdmistradorInventario {
             } catch (ParseException e) {
                 e.printStackTrace();
             }
-            ProductoInventario inventario = new ProductoInventario(Integer.parseInt(clave), Integer.parseInt(lote), fecha, Integer.parseInt(cantidad));
-            exito = this.controlInventario.registrarProductoInventarioEnInventario(inventario);
+
+            String fechaSQL = new SimpleDateFormat("yyyy-MM-dd").format(fecha);
+            
+            LoteProducto lote = new LoteProducto(Integer.parseInt(clave), Integer.parseInt(numlote), fechaSQL, Integer.parseInt(cantidad));
+            exito = this.controlInventario.registrarProductoInventarioEnInventario(lote);
+
+            if (exito){
+                exito = actualizarExistenciaProducto(clave, cantidad);
+            }
         }
         return exito;
     }

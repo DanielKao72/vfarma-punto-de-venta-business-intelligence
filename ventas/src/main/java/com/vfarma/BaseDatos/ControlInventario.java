@@ -5,8 +5,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.vfarma.Modelo.LoteProducto;
 import com.vfarma.Modelo.Producto;
-import com.vfarma.Modelo.ProductoInventario;
+import com.vfarma.Modelo.LoteProducto;
 
 public class ControlInventario {
     private final BaseDeDatos baseDeDatos;
@@ -18,7 +20,7 @@ public class ControlInventario {
     }
 
     public boolean validarExistenciaClaveProductoEnInventario(String clave){
-        String consultaSQL = "SELECT * FROM Producto WHERE Clave = '" + clave + "'";
+        String consultaSQL = "SELECT * FROM Productos WHERE ClvProducto = '" + clave + "'";
         boolean existe = false;
 
         try (PreparedStatement peticion = conexion.prepareStatement(consultaSQL)) {
@@ -35,7 +37,7 @@ public class ControlInventario {
     }  
     
     public Producto buscarProductoPorClaveEnInventario(String clave){
-        String consultaSQL = "SELECT * FROM Producto WHERE Clave = '" + clave + "'";
+        String consultaSQL = "SELECT * FROM Productos WHERE ClvProducto = '" + clave + "'";
         Producto producto = new Producto();
 
         try (PreparedStatement peticion = conexion.prepareStatement(consultaSQL)) {
@@ -60,7 +62,7 @@ public class ControlInventario {
     }   
 
     public boolean registrarNuevoProductoEnInventario(Producto producto){
-        String consultaSQL = "INSERT INTO Producto (ClvProducto, Nombre, Precio, ExistenciaTotal) VALUES ('" + 
+        String consultaSQL = "INSERT INTO Productos (ClvProducto, Nombre, Precio, ExistenciaTotal) VALUES ('" + 
         producto.obtenerClaveProducto() + "', '" + producto.obtenerNombreProducto() + "', " + producto.obtenerPrecioProducto() + ", " + producto.obtenerExistenciaProducto() + ")";
         boolean exito = false;
 
@@ -74,7 +76,7 @@ public class ControlInventario {
     }
 
     public List<Producto> obtenerTodosLosProductosEnInventario(){
-        String consultaSQL = "SELECT * FROM Producto";
+        String consultaSQL = "SELECT * FROM Productos";
         List<Producto> productos = new ArrayList<>();
 
         try (PreparedStatement peticion = conexion.prepareStatement(consultaSQL)) {
@@ -96,9 +98,23 @@ public class ControlInventario {
         return productos;
     }
 
-    public boolean registrarProductoInventarioEnInventario(ProductoInventario productoInventario){
+    public boolean registrarProductoInventarioEnInventario(LoteProducto productoInventario){
         String consultaSQL = "INSERT INTO Inventario (ClvProducto, Lote, FechaCaducidad, Cantidad) VALUES ('" +
         productoInventario.obtenerClaveProducto() + "', '" + productoInventario.obtenerLote() + "', '" + productoInventario.obtenerFechaCaducidad() + "', " + productoInventario.obtenerCantidad() + ")";
+        boolean exito = false;
+
+        try (PreparedStatement peticion = conexion.prepareStatement(consultaSQL)) {
+            peticion.executeUpdate();
+            exito = true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return exito;
+    }
+
+    public boolean actualizarExistenciaProductoEnInventario(String clave, String cantidad) {
+        String consultaSQL = "UPDATE Productos SET ExistenciaTotal = ExistenciaTotal + " + cantidad + " WHERE ClvProducto = " + clave;
         boolean exito = false;
 
         try (PreparedStatement peticion = conexion.prepareStatement(consultaSQL)) {

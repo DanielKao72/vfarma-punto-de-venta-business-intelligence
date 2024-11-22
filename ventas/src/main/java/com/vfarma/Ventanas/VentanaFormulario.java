@@ -1,8 +1,13 @@
 package com.vfarma.Ventanas;
 
+import java.util.ArrayList;
+
+import javax.swing.JButton;
+
+import com.vfarma.ComponentesVentana.Formulario;
 import com.vfarma.GestoresVentanas.GestorVentanaFormulario;
 
-public abstract class VentanaFormulario extends Ventana implements IFormulario {
+public abstract class VentanaFormulario extends Ventana {
     protected GestorVentanaFormulario gestorVentanaFormulario;
 
     public VentanaFormulario(String tituloVentana) {
@@ -19,5 +24,10 @@ public abstract class VentanaFormulario extends Ventana implements IFormulario {
 
         this.configurarEventos();
     }
-    
+
+    public abstract Formulario crearCamposFormulario();
+
+    public abstract ArrayList<JButton> crearBotones();
+
+    public abstract void configurarEventos();   
 }
