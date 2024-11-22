@@ -2,6 +2,7 @@ package com.vfarma.VentanasPDV.Inventario;
 
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -16,6 +17,8 @@ import com.ventanas_pdv.ComponentesVentana.InformacionEstilosBoton;
 import com.ventanas_pdv.GestoresComponentesVentana.GestorComponentes;
 import com.ventanas_pdv.GestoresComponentesVentana.GestorFormulario;
 import com.ventanas_pdv.Ventanas.VentanaFormulario;
+import com.vfarma.Farmacia.DatosFarmacia.InformacionProducto;
+import com.vfarma.Farmacia.Inventario.AdministradorInventario;
 import com.vfarma.VentanasPDV.ControlAcceso.VentanaControlAcceso;
 
 public class VentanaConsultaInventario extends VentanaFormulario {
@@ -32,8 +35,9 @@ public class VentanaConsultaInventario extends VentanaFormulario {
 
     @Override
     public Formulario crearCamposFormulario() {
+        this.formulario = new Formulario();
         this.campoClaveProducto = GestorFormulario.crearCampoTexto(20);
-        this.informacionProducto = GestorFormulario.crearTabla(new String[] { "Clave de Producto", "Nombre", "Categoria", "Precio", "Existencia" });
+        this.informacionProducto = GestorFormulario.crearTabla(new String[] { "Clave de Producto", "Nombre", "Precio", "Existencia" });
         this.tablaInformacionProducto = new JScrollPane(this.informacionProducto);
 
         this.formulario.agregarCampo(new InformacionCampoFormulario("Clave de Producto:", this.campoClaveProducto));
@@ -75,12 +79,47 @@ public class VentanaConsultaInventario extends VentanaFormulario {
             this.cerrarVentana();
         });
 
-        this.botonConsultarProducto.addActionListener(e -> {
-            // Consultar producto
+         this.botonConsultarProducto.addActionListener(e -> {
+            String clave = this.campoClaveProducto.getText();
+
+            AdministradorInventario admistradorInventario = AdministradorInventario.obtenerAdministradorInventario();
+            InformacionProducto producto = admistradorInventario.obtenerProductoPorClave(clave);
+
+            javax.swing.table.DefaultTableModel modelo = (javax.swing.table.DefaultTableModel) this.informacionProducto.getModel();
+            modelo.setRowCount(0);
+
+            if (producto == null){
+                javax.swing.JOptionPane.showMessageDialog(
+                    null,
+                    "Producto no encontrado.",
+                    "Error",
+                    javax.swing.JOptionPane.ERROR_MESSAGE
+                );
+            } else {
+                modelo.addRow(new Object[] { producto.obtenerClaveProducto(), producto.obtenerNombreProducto(), producto.obtenerPrecioProducto(), producto.obtenerExistenciaProducto() });
+            }
         });
 
         this.botonConsultarTodo.addActionListener(e -> {
-            // Consultar todos los productos
+            AdministradorInventario admistradorInventario = AdministradorInventario.obtenerAdministradorInventario();
+            List<InformacionProducto> productos = admistradorInventario.obtenerTodosLosProductos();
+
+            javax.swing.table.DefaultTableModel modelo = (javax.swing.table.DefaultTableModel) this.informacionProducto.getModel();
+            modelo.setRowCount(0);
+
+            if (productos.isEmpty()){
+                javax.swing.JOptionPane.showMessageDialog(
+                    null,
+                    "No hay productos registrados.",
+                    "Error",
+                    javax.swing.JOptionPane.ERROR_MESSAGE
+                );
+            }
+            else{
+                for (InformacionProducto producto : productos){
+                    modelo.addRow(new Object[] { producto.obtenerClaveProducto(), producto.obtenerNombreProducto(), producto.obtenerPrecioProducto(), producto.obtenerExistenciaProducto() });
+                }
+            }
         });
     } 
 }

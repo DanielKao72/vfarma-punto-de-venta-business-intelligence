@@ -163,12 +163,12 @@ public class GestorProductos {
     }
 
     public int obtenerExistenciaProductoPorId(int idProducto) {
-        String query = "SELECT ExistenciaTotal FROM productos WHERE ClvProducto = ?";
+        String query = "SELECT Cantidad FROM inventario WHERE ClvProducto = ?";
         try (PreparedStatement peticion = conexion.prepareStatement(query)) {
             peticion.setInt(1, idProducto);
             try (ResultSet resultado = peticion.executeQuery()) {
                 if (resultado.next()) {
-                    return resultado.getInt("ExistenciaTotal");
+                    return resultado.getInt("Cantidad");
                 } else {
                     System.out.println("Producto no encontrado en el inventario.");
                     return 0; // Producto no encontrado

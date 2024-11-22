@@ -6,6 +6,7 @@ import java.awt.Color;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JOptionPane;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 
@@ -16,6 +17,10 @@ import com.ventanas_pdv.ComponentesVentana.InformacionEstilosBoton;
 import com.ventanas_pdv.GestoresComponentesVentana.GestorComponentes;
 import com.ventanas_pdv.GestoresComponentesVentana.GestorFormulario;
 import com.ventanas_pdv.Ventanas.VentanaFormulario;
+import com.vfarma.Farmacia.ControlAcceso.Empleado;
+import com.vfarma.VentanasPDV.Inventario.VentanaMenuInventario;
+import com.vfarma.VentanasPDV.RecursosHumanos.VentanaMenuRH;
+import com.vfarma.VentanasPDV.Ventas.VentanaMenuVenta;
 
 public class VentanaControlAcceso extends VentanaFormulario {
     private JTextField campoUsuario;
@@ -60,5 +65,33 @@ public class VentanaControlAcceso extends VentanaFormulario {
         });
 
         this.gestorVentanaFormulario.obtenerBoton("CerrarSesion").setVisible(false);
+
+        this.botonIniciarSesion.addActionListener(e -> {
+            Empleado empleado = Empleado.obtenerEmpleado();
+
+            String rolEmpleado = empleado.iniciarSesion(this.campoUsuario.getText(), this.campoContrasena.getText());
+
+            switch (rolEmpleado) {
+                case "Cajero":
+                    VentanaMenuVenta ventanaVenta = new VentanaMenuVenta("Menú Ventas");
+                    ventanaVenta.iniciarVentana();
+                    ventanaVenta.mostrarVentana();
+                    break;
+                case "Almacén":
+                    VentanaMenuInventario ventanaInventario = new VentanaMenuInventario("Menú Inventario");
+                    ventanaInventario.iniciarVentana();
+                    ventanaInventario.mostrarVentana();
+                    break;
+                case "Recursos Humanos":
+                    VentanaMenuRH ventanaRH = new VentanaMenuRH("Menú Recursos Humanos");
+                    ventanaRH.iniciarVentana();
+                    ventanaRH.mostrarVentana();
+                    this.cerrarVentana();
+                    break;
+                default:
+                    JOptionPane.showMessageDialog(null, "Usuario o contraseña incorrectos", "Error", JOptionPane.ERROR_MESSAGE);
+                    break;
+            }
+        });
     }
 }

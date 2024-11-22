@@ -5,7 +5,6 @@ public class InformacionProducto {
     private int claveProducto;
     private String nombreProducto;
     private float precioProducto;
-
     private int existenciaProducto;
 
     public InformacionProducto() {
@@ -42,7 +41,7 @@ public class InformacionProducto {
         this.nombreProducto = nombreProducto;
     }
 
-    public void colocarPrecioProducto(int precioProducto) {
+    public void colocarPrecioProducto(float precioProducto) {
         this.precioProducto = precioProducto;
     }
 

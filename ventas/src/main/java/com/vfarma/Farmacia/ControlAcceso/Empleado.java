@@ -1,5 +1,7 @@
 package com.vfarma.Farmacia.ControlAcceso;
 
+import com.vfarma.Farmacia.RecursosHumanos.FuncionarioRecursosHumanos;
+
 public class Empleado {
     private static Empleado empleado;
 
@@ -10,19 +12,17 @@ public class Empleado {
         return empleado;
     }
 
-    public boolean iniciarSesion(String usuario, String contrasena) {
-        if (usuario.equals("admin") && contrasena.equals("admin")) {
-            System.out.println("Sesión iniciada correctamente.");
-            return true;
-        } else {
-            System.out.println("Error: Usuario o contraseña incorrectos.");
-            return false;
-        }
-    }
+    public String iniciarSesion(String usuario, String contrasena) {
+        FuncionarioRecursosHumanos funcionarioRecursosHumanos = FuncionarioRecursosHumanos.obtenerFuncionarioRH();
 
-    public boolean cerrarSesion() {
-        System.out.println("Sesión cerrada correctamente.");
-        return true;
+        boolean esUnEmpleado = funcionarioRecursosHumanos.verificarExistenciaEmpleado(usuario, contrasena);
+
+        if(esUnEmpleado) {
+            return funcionarioRecursosHumanos.obtenerRolEmpleado(usuario, contrasena);
+        }
+        else{
+            return "";
+        }
     }
     
 }
