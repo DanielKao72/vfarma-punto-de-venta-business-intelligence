@@ -33,22 +33,22 @@ public class GestorCaja {
         return nombresCajas;
     }
 
-    public void desOcuparCaja(String numCaja) {
+    public void desOcuparCaja(String nombreCaja) {
         String consultaSQL = "UPDATE cajas SET Estado = 1 WHERE NumCaja = ?";
 
         try (PreparedStatement declaracion = this.conexion.prepareStatement(consultaSQL)) {
-            declaracion.setString(1, numCaja);
+            declaracion.setString(1, nombreCaja);
             declaracion.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
-    public void ocuparCaja(String numCaja) {
+    public void ocuparCaja(String nombreCaja) {
         String consultaSQL = "UPDATE cajas SET Estado = 0 WHERE NumCaja = ?";
 
         try (PreparedStatement declaracion = this.conexion.prepareStatement(consultaSQL)) {
-            declaracion.setString(1, numCaja);
+            declaracion.setString(1, nombreCaja);
             declaracion.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
