@@ -99,9 +99,9 @@ public class GestorInventario {
         return productos;
     }
 
-    public boolean registrarProductoInventarioEnInventario(InformacionLoteProducto productoInventario){
+    public boolean registrarLoteProductoEnInventario(InformacionLoteProducto loteProducto){
         String consultaSQL = "INSERT INTO Inventario (ClvProducto, Lote, FechaCaducidad, Cantidad) VALUES ('" +
-        productoInventario.obtenerClaveProducto() + "', '" + productoInventario.obtenerLote() + "', '" + productoInventario.obtenerFechaCaducidad() + "', " + productoInventario.obtenerCantidad() + ")";
+        loteProducto.obtenerClaveProducto() + "', '" + loteProducto.obtenerLote() + "', '" + loteProducto.obtenerFechaCaducidad() + "', " + loteProducto.obtenerCantidad() + ")";
         boolean exito = false;
 
         try (PreparedStatement peticion = conexion.prepareStatement(consultaSQL)) {
