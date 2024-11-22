@@ -17,7 +17,7 @@ import com.ventanas_pdv.ComponentesVentana.InformacionEstilosBoton;
 import com.ventanas_pdv.GestoresComponentesVentana.GestorComponentes;
 import com.ventanas_pdv.GestoresComponentesVentana.GestorFormulario;
 import com.ventanas_pdv.Ventanas.VentanaFormulario;
-import com.vfarma.Farmacia.Modelo.InformacionEmpleado;
+import com.vfarma.Farmacia.DatosFarmacia.InformacionEmpleado;
 import com.vfarma.Farmacia.RecursosHumanos.FuncionarioRecursosHumanos;
 import com.vfarma.VentanasPDV.ControlAcceso.VentanaControlAcceso;
 

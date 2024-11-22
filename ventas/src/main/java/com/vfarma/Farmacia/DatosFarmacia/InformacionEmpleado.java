@@ -1,4 +1,4 @@
-package com.vfarma.Farmacia.Modelo;
+package com.vfarma.Farmacia.DatosFarmacia;
 
 public class InformacionEmpleado {
 

@@ -1,6 +1,6 @@
 package com.vfarma.Farmacia.RecursosHumanos;
 
-import com.vfarma.Farmacia.Modelo.InformacionEmpleado;
+import com.vfarma.Farmacia.DatosFarmacia.InformacionEmpleado;
 import com.vfarma.RegistroDatos.GestorEmpleados;
 
 public class FuncionarioRecursosHumanos {

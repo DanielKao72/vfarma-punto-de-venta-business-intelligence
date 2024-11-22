@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
+import javax.swing.JOptionPane;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 
@@ -16,6 +17,9 @@ import com.ventanas_pdv.ComponentesVentana.InformacionEstilosBoton;
 import com.ventanas_pdv.GestoresComponentesVentana.GestorComponentes;
 import com.ventanas_pdv.GestoresComponentesVentana.GestorFormulario;
 import com.ventanas_pdv.Ventanas.VentanaFormulario;
+import com.vfarma.Farmacia.DatosFarmacia.InformacionPersonaFisica;
+import com.vfarma.Farmacia.DatosFarmacia.InformacionPersonaMoral;
+import com.vfarma.Farmacia.Ventas.Cajero;
 import com.vfarma.VentanasPDV.ControlAcceso.VentanaControlAcceso;
 
 public class VentanaFormularioFactura extends VentanaFormulario {
@@ -37,6 +41,7 @@ public class VentanaFormularioFactura extends VentanaFormulario {
 
     @Override
     public Formulario crearCamposFormulario() {
+        this.formulario = new Formulario();
         ArrayList<JRadioButton> opciones = new ArrayList<>();
 
         this.opcionPersonaFisica = GestorFormulario.crearOpcionMultiple("Persona Física");
@@ -132,5 +137,68 @@ public class VentanaFormularioFactura extends VentanaFormulario {
             this.campoRFC.setText("");
             this.campoDomicilio.setText("");
         });
+
+        this.botonFinalizar.addActionListener(e -> {
+            Cajero cajero = Cajero.obtenerCajero();
+
+            if (!this.todosLosCamposLlenos()) {
+                JOptionPane.showMessageDialog(null, "Por favor, llena todos los campos", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            String rfc = this.campoRFC.getText();
+            String domicilio = this.campoDomicilio.getText();
+
+            if (this.opcionPersonaFisica.isSelected()) {
+                String nombre = this.campoNombre.getText();
+                String apellidos = this.campoApellidos.getText();
+
+                InformacionPersonaFisica cliente = new InformacionPersonaFisica(nombre, apellidos, domicilio, rfc);
+                cajero.seleccionarTipoCliente(cliente);
+
+            } else if (this.opcionPersonaMoral.isSelected()) {
+                String razonSocial = this.campoRazonSocial.getText();
+                String regimenFiscal = this.campoRegimenFiscal.getText();
+
+                InformacionPersonaMoral cliente = new InformacionPersonaMoral(razonSocial, regimenFiscal, domicilio, rfc);
+                cajero.seleccionarTipoCliente(cliente);
+            }
+
+            cajero.realizarVentaConFactura();
+
+            cajero.imprimirComprobante();
+
+            JOptionPane.showMessageDialog(null, "La factura se ha generado exitosamente ", "Factura", JOptionPane.INFORMATION_MESSAGE);
+
+            cajero.terminarVenta();
+
+            // Redireccion a la ventana de ventas
+            this.cerrarVentana();
+            VentanaMenuVenta ventana = new VentanaMenuVenta("Menú Ventas");
+            ventana.iniciarVentana();
+            ventana.mostrarVentana();
+        });
+    }
+
+    private Boolean todosLosCamposLlenos() {
+        Boolean estanLlenosTodosLosCampos = true;
+        if (this.opcionPersonaFisica.isSelected()) {
+            if (this.campoNombre.getText().isEmpty()
+                    || this.campoApellidos.getText().isEmpty()
+                    || this.campoRFC.getText().isEmpty()
+                    || this.campoDomicilio.getText().isEmpty()) {
+
+                estanLlenosTodosLosCampos = false;
+            }
+        } else if (this.opcionPersonaMoral.isSelected()) {
+            if (this.campoRazonSocial.getText().isEmpty()
+                    || this.campoRegimenFiscal.getText().isEmpty()
+                    || this.campoRFC.getText().isEmpty()
+                    || this.campoDomicilio.getText().isEmpty()) {
+
+                estanLlenosTodosLosCampos = false;
+            }
+        }
+        return estanLlenosTodosLosCampos;
     }
 }

@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JOptionPane;
 
 import com.ventanas_pdv.ComponentesVentana.Formulario;
 import com.ventanas_pdv.ComponentesVentana.InformacionBoton;
@@ -14,6 +15,7 @@ import com.ventanas_pdv.ComponentesVentana.InformacionEstilosBoton;
 import com.ventanas_pdv.GestoresComponentesVentana.GestorComponentes;
 import com.ventanas_pdv.GestoresComponentesVentana.GestorFormulario;
 import com.ventanas_pdv.Ventanas.VentanaFormulario;
+import com.vfarma.Farmacia.Ventas.Cajero;
 import com.vfarma.VentanasPDV.ControlAcceso.VentanaControlAcceso;
 
 public class VentanaSeleccionCaja extends VentanaFormulario {
@@ -26,7 +28,16 @@ public class VentanaSeleccionCaja extends VentanaFormulario {
 
     @Override
     public Formulario crearCamposFormulario() {
-        this.seleccionCaja = GestorFormulario.creaListaOpciones(new String[] { "Caja 1", "Caja 2", "Caja 3", "Caja 4" });
+        this.formulario = new Formulario();
+        Cajero cajero = Cajero.obtenerCajero();
+        ArrayList<String> cajasDisponibles = cajero.consultasCaja.obtenerNombresCajasDisponibles();
+
+        if (cajasDisponibles.isEmpty()) {
+            JOptionPane.showMessageDialog(null, "No hay cajas disponibles", "Error", JOptionPane.ERROR_MESSAGE);
+            return null;
+        }
+
+        this.seleccionCaja = GestorFormulario.creaListaOpciones(cajasDisponibles.toArray(String[]::new));
 
         this.formulario.agregarCampo(new InformacionCampoFormulario("Selecciona la caja:", this.seleccionCaja));
 
@@ -63,10 +74,17 @@ public class VentanaSeleccionCaja extends VentanaFormulario {
         });
 
         this.botonContinuar.addActionListener(e -> {
+            String cajaSeleccionada = (String) this.seleccionCaja.getSelectedItem();
+            Cajero cajero = Cajero.obtenerCajero();
+            cajero.colocarNombreCaja(cajaSeleccionada);
+            cajero.consultasCaja.ocuparCaja(cajaSeleccionada);
+
+            // Avanzar a la ventana de registro de venta
             VentanaRegistroVenta ventana = new VentanaRegistroVenta("Registro de Venta");
             ventana.iniciarVentana();
             ventana.mostrarVentana();
             this.cerrarVentana();
+
         });
     }
 }

@@ -6,11 +6,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import com.vfarma.Almacenamiento.ConexionBaseDeDatos;
-import com.vfarma.Farmacia.Modelo.InformacionEmpleado;
+import com.vfarma.Farmacia.DatosFarmacia.InformacionEmpleado;
 
 public class GestorEmpleados {
-    private ConexionBaseDeDatos baseDeDatos;
-    private Connection conexion;
+    private final ConexionBaseDeDatos baseDeDatos;
+    private final Connection conexion;
 
     public GestorEmpleados() {
         this.baseDeDatos = ConexionBaseDeDatos.obtenerBaseDeDatos();
