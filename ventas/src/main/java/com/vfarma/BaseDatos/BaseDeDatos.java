@@ -21,7 +21,7 @@ public class BaseDeDatos {
         }
     }
 
-    public static BaseDeDatos obtenerInstancia() {
+    public static BaseDeDatos obtenerBaseDeDatos() {
         if (instancia == null) {
             instancia = new BaseDeDatos();
         }

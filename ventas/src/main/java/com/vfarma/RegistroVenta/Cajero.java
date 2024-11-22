@@ -3,8 +3,8 @@ package com.vfarma.RegistroVenta;
 import java.io.FileNotFoundException;
 
 import com.itextpdf.layout.Document;
-import com.vfarma.BaseDatos.ConsultasCaja;
-import com.vfarma.BaseDatos.ConsultasProducto;
+import com.vfarma.BaseDatos.GestorCaja;
+import com.vfarma.BaseDatos.InventarioProductos;
 import com.vfarma.Modelo.Efectivo;
 import com.vfarma.Modelo.InformacionCliente;
 import com.vfarma.Modelo.InformacionVenta;
@@ -12,28 +12,29 @@ import com.vfarma.Modelo.Producto;
 
 public class Cajero {
 
-    private static Cajero instanciaUnica;
+    private static Cajero cajero;
     public InformacionVenta informacionVenta;
-    public ConsultasProducto consultasProducto;
-    public ConsultasCaja consultasCaja;
+    public InventarioProductos consultasProducto;
+    public GestorCaja consultasCaja;
     private String nombreCaja;
 
     public Cajero() {
         this.informacionVenta = new InformacionVenta();
-        this.consultasProducto = new ConsultasProducto();
-        this.consultasCaja = new ConsultasCaja();
+        this.consultasProducto = new InventarioProductos();
+        this.consultasCaja = new GestorCaja();
     }
 
-    public static Cajero obtenerInstancia() {
-        if (instanciaUnica == null) {
-            instanciaUnica = new Cajero();
+    public static Cajero obtenerCajero() {
+        if (cajero == null) {
+            cajero = new Cajero();
         }
-        return instanciaUnica;
+        return cajero;
     }
 
     public String obtenerNombreCaja() {
         return this.nombreCaja;
     }
+
     public void colocarNombreCaja(String nombreCaja) {
         this.nombreCaja = nombreCaja;
     }
@@ -72,7 +73,7 @@ public class Cajero {
     }
 
     public float efectuarPago() {
-        return this.informacionVenta.obtenerInformacionCliente().obtenerPago().obtenerMetodoPago().obtenerDetallesPago();
+        return this.informacionVenta.obtenerInformacionCliente().obtenerPago().obtenerMetodoPago().realizarPago();
     }
 
     public void imprimirComprobante() {
@@ -83,14 +84,18 @@ public class Cajero {
         }
     }
 
-    public float finalizarVenta() {
+    public float calcularCambioVenta() {
 
         float cambioDelCliente = this.efectuarPago();
         this.informacionVenta.obtenerCarritoCompras().obtenerTodosProductos().forEach(producto -> {
             this.consultasProducto.restarExistenciaProducto(producto.obtenerClaveProducto(), 1);
         });
-        this.imprimirComprobante();
+
         return cambioDelCliente;
+    }
+
+    public void terminarVenta() {
+        Cajero.cajero = null;
     }
 
 }

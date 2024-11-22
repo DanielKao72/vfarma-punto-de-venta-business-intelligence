@@ -15,7 +15,6 @@ public class Producto {
         this.claveProducto = claveProducto;
         this.nombreProducto = nombreProducto;
         this.precioProducto = precioProducto;
-
         this.existenciaProducto = existenciaProducto;
     }
 

@@ -36,16 +36,16 @@ public class VentanaFormularioFactura extends VentanaFormulario {
     private JTextField campoDomicilio;
     private JButton botonFinalizar;
     private JButton botonCancelar;
-    private Cajero cajero;
+    private final Formulario formulario;
 
     public VentanaFormularioFactura(String titulo) {
         super(titulo);
-        this.cajero = Cajero.obtenerInstancia();
+        this.formulario = new Formulario();
     }
 
     @Override
     public Formulario crearCamposFormulario() {
-        Formulario formulario = new Formulario();
+
         ArrayList<JRadioButton> opciones = new ArrayList<>();
 
         this.opcionPersonaFisica = GestorFormulario.crearOpcionMultiple("Persona Física");
@@ -61,18 +61,18 @@ public class VentanaFormularioFactura extends VentanaFormulario {
         this.campoRFC = GestorFormulario.crearCampoTexto(13);
         this.campoDomicilio = GestorFormulario.crearCampoTexto(60);
 
-        formulario.agregarCampo(new InformacionCampoFormulario("Tipo de Persona:", this.tipoPersona));
-        formulario.agregarCampo(new InformacionCampoFormulario("Nombre:", this.campoNombre));
-        formulario.agregarCampo(new InformacionCampoFormulario("Apellidos:", this.campoApellidos));
-        formulario.agregarCampo(new InformacionCampoFormulario("Razón Social:", this.campoRazonSocial));
-        formulario.agregarCampo(new InformacionCampoFormulario("Regimen Fiscal:", this.campoRegimenFiscal));
-        formulario.agregarCampo(new InformacionCampoFormulario("RFC:", this.campoRFC));
-        formulario.agregarCampo(new InformacionCampoFormulario("Domicilio:", this.campoDomicilio));
+        this.formulario.agregarCampo(new InformacionCampoFormulario("Tipo de Persona:", this.tipoPersona));
+        this.formulario.agregarCampo(new InformacionCampoFormulario("Nombre:", this.campoNombre));
+        this.formulario.agregarCampo(new InformacionCampoFormulario("Apellidos:", this.campoApellidos));
+        this.formulario.agregarCampo(new InformacionCampoFormulario("Razón Social:", this.campoRazonSocial));
+        this.formulario.agregarCampo(new InformacionCampoFormulario("Regimen Fiscal:", this.campoRegimenFiscal));
+        this.formulario.agregarCampo(new InformacionCampoFormulario("RFC:", this.campoRFC));
+        this.formulario.agregarCampo(new InformacionCampoFormulario("Domicilio:", this.campoDomicilio));
 
         this.campoRazonSocial.setEditable(false);
         this.campoRegimenFiscal.setEditable(false);
 
-        return formulario;
+        return this.formulario;
     }
 
     @Override
@@ -92,11 +92,34 @@ public class VentanaFormularioFactura extends VentanaFormulario {
         return botones;
     }
 
+    private Boolean todosLosCamposLlenos() {
+        Boolean estanLlenosTodosLosCampos = true;
+        if (this.opcionPersonaFisica.isSelected()) {
+            if (this.campoNombre.getText().isEmpty()
+                    || this.campoApellidos.getText().isEmpty()
+                    || this.campoRFC.getText().isEmpty()
+                    || this.campoDomicilio.getText().isEmpty()) {
+
+                estanLlenosTodosLosCampos = false;
+            }
+        } else if (this.opcionPersonaMoral.isSelected()) {
+            if (this.campoRazonSocial.getText().isEmpty()
+                    || this.campoRegimenFiscal.getText().isEmpty()
+                    || this.campoRFC.getText().isEmpty()
+                    || this.campoDomicilio.getText().isEmpty()) {
+
+                estanLlenosTodosLosCampos = false;
+            }
+        }
+        return estanLlenosTodosLosCampos;
+    }
+
     @Override
     public void configurarEventos() {
+        Cajero cajero = Cajero.obtenerCajero();
         this.gestorVentanaFormulario.obtenerBoton("CerrarSesion").addActionListener(e -> {
-            String nombreCaja = cajero.obtenerNombreCaja();
-            this.cajero.consultasCaja.desOcuparCaja(nombreCaja);
+            String nombreActualCaja = cajero.obtenerNombreCaja();
+            cajero.consultasCaja.desOcuparCaja(nombreActualCaja);
             this.cerrarVentana();
         });
 
@@ -129,33 +152,13 @@ public class VentanaFormularioFactura extends VentanaFormulario {
 
         this.botonFinalizar.addActionListener(e -> {
 
-             // Verificar que los campos requeridos no estén vacíos
-    if (this.opcionPersonaFisica.isSelected()) {
-        if (this.campoNombre.getText().isEmpty() || 
-            this.campoApellidos.getText().isEmpty() || 
-            this.campoRFC.getText().isEmpty() || 
-            this.campoDomicilio.getText().isEmpty()) {
-           JOptionPane.showMessageDialog( null,"Todos los campos son obligatorios", "Error", JOptionPane.ERROR_MESSAGE);
-           return;
-        }
-    } else if (this.opcionPersonaMoral.isSelected()) {
-        if (this.campoRazonSocial.getText().isEmpty() || 
-            this.campoRegimenFiscal.getText().isEmpty() || 
-            this.campoRFC.getText().isEmpty() || 
-            this.campoDomicilio.getText().isEmpty()) {
-                JOptionPane.showMessageDialog( null,"Todos los campos son obligatorios", "Error", JOptionPane.ERROR_MESSAGE);
+            if (!todosLosCamposLlenos()) {
+                JOptionPane.showMessageDialog(null, "Por favor, llena todos los campos", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
-        }
-    } 
-
-
-
-
+            }
 
             String rfc = this.campoRFC.getText();
             String domicilio = this.campoDomicilio.getText();
-
-            Cajero cajero = Cajero.obtenerInstancia();
 
             if (this.opcionPersonaFisica.isSelected()) {
                 String nombre = this.campoNombre.getText();
@@ -168,7 +171,7 @@ public class VentanaFormularioFactura extends VentanaFormulario {
                 cliente.colocarNombreCliente(nombre);
                 cliente.colocarApellidosCliente(apellidos);
 
-                this.cajero.seleccionarTipoCliente(cliente);
+                cajero.seleccionarTipoCliente(cliente);
 
             } else if (this.opcionPersonaMoral.isSelected()) {
                 String razonSocial = this.campoRazonSocial.getText();
@@ -181,35 +184,31 @@ public class VentanaFormularioFactura extends VentanaFormulario {
                 cliente.colocarRazonSocial(razonSocial);
                 cliente.colocarRegimenFiscal(regimenFiscal);
 
-                this.cajero.seleccionarTipoCliente(cliente);
+                cajero.seleccionarTipoCliente(cliente);
             }
 
             //Es factura, como tal no se necesita un pago
-            Efectivo efectivo = new Efectivo();
-            efectivo.colocarCantidadAPagar(0);
-            efectivo.colocarDineroRecibido(0);
-
             Pago pago = new Pago();
-            pago.colocarMetodoPago(efectivo);
+            pago.colocarMetodoPago(new Efectivo());
+            cajero.informacionVenta.obtenerInformacionCliente().colocarPago(pago);
 
-            this.cajero.informacionVenta.obtenerInformacionCliente().colocarPago(pago);
-            this.cajero.informacionVenta.colocarComprobante(new Factura(this.cajero.informacionVenta));
-            cajero.finalizarVenta();
-            JOptionPane.showMessageDialog(null, "La factura se ha generado exitosamente ", "Factura", JOptionPane.INFORMATION_MESSAGE);
+            cajero.informacionVenta.colocarComprobante(new Factura(cajero.informacionVenta));
+            cajero.calcularCambioVenta();
 
             String nombreCaja = cajero.obtenerNombreCaja();
             cajero.consultasCaja.desOcuparCaja(nombreCaja);
-            
+
+            cajero.imprimirComprobante();
+
+            JOptionPane.showMessageDialog(null, "La factura se ha generado exitosamente ", "Factura", JOptionPane.INFORMATION_MESSAGE);
+
+            cajero.terminarVenta();
+
+            // Redireccion a la ventana de ventas
             this.cerrarVentana();
             VentanaMenuVentas ventana = new VentanaMenuVentas("Menú Ventas");
             ventana.iniciarVentana();
             ventana.mostrarVentana();
-
-            
-
-            //cajero.finalizarVenta();
-            
-            cajero = null;
         });
     }
 

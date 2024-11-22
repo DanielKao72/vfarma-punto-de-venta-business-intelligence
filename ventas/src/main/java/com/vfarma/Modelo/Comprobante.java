@@ -88,7 +88,7 @@ public abstract class Comprobante {
         this.hojaDocumento.add(parrafo);
     }
 
-    protected void agregarSaltoDeLinea() {
+    protected void agregarSaltoDePagina() {
         this.hojaDocumento.add(new AreaBreak());
     }
 

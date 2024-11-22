@@ -5,8 +5,7 @@ public class Efectivo implements MetodoPago {
     private float cantidadAPagar;
     private float dineroRecibido;
 
-    public Efectivo() {
-    }
+    public Efectivo() {}
 
     public void colocarCantidadAPagar(float cantidadAPagar) {
         this.cantidadAPagar = cantidadAPagar;
@@ -22,12 +21,7 @@ public class Efectivo implements MetodoPago {
     }
 
     @Override
-    public float obtenerDetallesPago() {
+    public float realizarPago() {
         return this.contarCambio();
-    }
-
-    @Override
-    public boolean estaPagado() {
-        throw new UnsupportedOperationException("Not supported yet.");
     }
 }

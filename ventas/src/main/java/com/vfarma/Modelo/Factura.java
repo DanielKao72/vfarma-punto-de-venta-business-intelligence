@@ -44,36 +44,32 @@ public final class Factura extends Comprobante {
         String nombreFarmacia = super.informacionFarmacia.obtenerNombreFarmacia();
 
         InformacionCliente cliente = informacionVenta.obtenerInformacionCliente();
-        String regimenFiscal = "regimenFiscal DEFECTO";
-        String razonSocial = "razonSocial DEFECTO";
-        String nombreCliente = "nombreCliente DEFECTO";
-        String apellidoCliente = "apellidoCliente DEFECTO";
-
-        if (cliente instanceof InformacionPersonaMoral informacionCliente) {
-            regimenFiscal = informacionCliente.obtenerRegimenFiscal();
-            razonSocial = informacionCliente.obtenerRazonSocial();
-        } else if (cliente instanceof InformacionPersonaFisica informacionCliente) {
-            nombreCliente = informacionCliente.obtenerNombreCliente();
-            apellidoCliente = informacionCliente.obtenerApellidosCliente();
-        } else {
-            System.out.println("El tipo de cliente no es reconocido.");
-        }
-
         ArrayList<Producto> productos = informacionVenta.obtenerCarritoCompras().obtenerTodosProductos();
-        //--------------------------------------------------------------------------------------------------------
 
+        //--------------------------------------------------------------------------------------------------------
         super.agregarParrafoTexto("Factura de Compra", 24, true, ColorConstants.BLUE, 20, TextAlignment.CENTER);
         super.agregarParrafoTexto(nombreFarmacia, 18, true, null, 5, TextAlignment.CENTER);
         super.agregarParrafoTexto(domicilioSucursalFarmacia, 12, false, null, 5, TextAlignment.CENTER);
         super.agregarParrafoTexto("RFC: " + claveRFCFarmacia, 12, false, null, 15, TextAlignment.CENTER);
 
         super.agregarParrafoTexto("Datos del Cliente:", 14, true, null, 10, TextAlignment.LEFT);
-        super.agregarParrafoTexto("Razón Social: " + razonSocial, 12, false, null, 0, TextAlignment.LEFT);
         super.agregarParrafoTexto("RFC: " + rfcCliente, 12, false, null, 0, TextAlignment.LEFT);
         super.agregarParrafoTexto("Domicilio: " + domicilioCliente, 12, false, null, 0, TextAlignment.LEFT);
-        super.agregarParrafoTexto("Régimen Fiscal: " + regimenFiscal, 12, false, null, 0, TextAlignment.LEFT);
-        super.agregarParrafoTexto("nombreCliente: " + nombreCliente, 12, false, null, 0, TextAlignment.LEFT);
-        super.agregarParrafoTexto("apellidoCliente: " + apellidoCliente, 12, false, null, 0, TextAlignment.LEFT);
+
+        if (cliente instanceof InformacionPersonaMoral informacionCliente) {
+
+            String regimenFiscal = informacionCliente.obtenerRegimenFiscal();
+            String razonSocial = informacionCliente.obtenerRazonSocial();
+            super.agregarParrafoTexto("Régimen Fiscal: " + regimenFiscal, 12, false, null, 0, TextAlignment.LEFT);
+            super.agregarParrafoTexto("Razón Social: " + razonSocial, 12, false, null, 0, TextAlignment.LEFT);
+
+        } else if (cliente instanceof InformacionPersonaFisica informacionCliente) {
+
+            String nombreCliente = informacionCliente.obtenerNombreCliente();
+            String apellidoCliente = informacionCliente.obtenerApellidosCliente();
+            super.agregarParrafoTexto("nombreCliente: " + nombreCliente, 12, false, null, 0, TextAlignment.LEFT);
+            super.agregarParrafoTexto("apellidoCliente: " + apellidoCliente, 12, false, null, 0, TextAlignment.LEFT);
+        }
 
         super.agregarParrafoTexto("Productos Comprados:", 14, true, null, 10, TextAlignment.LEFT);
 

@@ -21,23 +21,23 @@ public class Venta {
         return montoTotalVenta;
     }
 
-    public Comprobante getComprobante() {
+    public Comprobante obtenerComprobante() {
         return comprobante;
     }
 
-    public void setComprobante(Comprobante comprobante) {
+    public void colocarComprobante(Comprobante comprobante) {
         this.comprobante = comprobante;
     }
 
-    public CarritoCompras getCarritoCompras() {
+    public CarritoCompras colocarCarritoCompras() {
         return carritoCompras;
     }
 
-    public InformacionCliente getInformacionCliente() {
+    public InformacionCliente obtenerInformacionCliente() {
         return informacionCliente;
     }
 
-    public void setInformacionCliente(InformacionCliente informacionCliente) {
+    public void colocarInformacionCliente(InformacionCliente informacionCliente) {
         this.informacionCliente = informacionCliente;
     }
 }

@@ -12,16 +12,17 @@ import com.vfarma.ComponentesVentana.InformacionEstilosBoton;
 import com.vfarma.GestoresComponentesVentana.GestorComponentes;
 import com.vfarma.Ventanas.VentanaMenu;
 
-public class VentanaMenuVentas extends VentanaMenu{
+public class VentanaMenuVentas extends VentanaMenu {
+
     private JButton botonIniciarVenta;
-    
+
     public VentanaMenuVentas(String tituloVentana) {
         super(tituloVentana);
     }
 
     @Override
     public ArrayList<JButton> crearOpcionesMenu() {
-        ArrayList<JButton> opcionesMenu = new ArrayList<JButton>();
+        ArrayList<JButton> opcionesMenu = new ArrayList<>();
         Color colorFondoBoton = new Color(0, 44, 240);
         ImageIcon icono = new ImageIcon("src/main/resources/iconos/ventas.png");
 
@@ -41,6 +42,7 @@ public class VentanaMenuVentas extends VentanaMenu{
         });
 
         this.botonIniciarVenta.addActionListener(e -> {
+            // Redirigir a la ventana de seleccion de caja
             VentanaSeleccionCaja ventana = new VentanaSeleccionCaja("Seleccionar Caja");
             ventana.iniciarVentana();
             ventana.mostrarVentana();

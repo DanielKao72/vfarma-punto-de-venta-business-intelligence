@@ -41,19 +41,20 @@ public class VentanaRegistroVenta extends VentanaFormulario {
     private JButton botonContinuar;
     private JButton botonFinalizar;
     private JButton botonLimpiar;
-    private Cajero cajero;
+    private Formulario formulario;
 
     public VentanaRegistroVenta(String titulo) {
         super(titulo);
-        this.cajero = Cajero.obtenerInstancia();
         this.obtenerProductosDisponiblesParaComprar();
         this.inicializarTablaProductos();
-
+        this.formulario = new Formulario();
     }
 
     private void obtenerProductosDisponiblesParaComprar() {
         this.productosAlmacen = new JComboBox<>();
-        this.cajero.consultasProducto.obtenerNombreProductosEnExistencia().forEach(producto -> {
+
+        Cajero cajero = Cajero.obtenerCajero();
+        cajero.consultasProducto.obtenerNombreProductosEnExistencia().forEach(producto -> {
             this.productosAlmacen.addItem(producto.obtenerNombreProducto() + " --- " + producto.obtenerClaveProducto());
         });
     }
@@ -70,8 +71,12 @@ public class VentanaRegistroVenta extends VentanaFormulario {
     }
 
     private void actualizarEstadoBotones() {
+        boolean carritoVacio = true;
 
-        boolean carritoVacio = this.carritoCompras.getRowCount() == 0;
+        if (this.carritoCompras.getRowCount() > 0) {
+            carritoVacio = false;
+        }
+
         boolean campoDineroVacio = this.campoDineroRecibido.getValue().toString().isEmpty();
 
         this.botonFinalizar.setEnabled(!carritoVacio && !campoDineroVacio && this.opcionRecibo.isSelected());
@@ -80,7 +85,7 @@ public class VentanaRegistroVenta extends VentanaFormulario {
 
     @Override
     public Formulario crearCamposFormulario() {
-        Formulario formulario = new Formulario();
+
         ArrayList<JRadioButton> opciones = new ArrayList<>();
 
         this.opcionFactura = GestorFormulario.crearOpcionMultiple("Factura");
@@ -93,15 +98,15 @@ public class VentanaRegistroVenta extends VentanaFormulario {
         this.campoCantidad = GestorFormulario.crearCampoNumerico();
         this.campoDineroRecibido = GestorFormulario.crearCampoNumerico();
 
-        formulario.agregarCampo(new InformacionCampoFormulario("Producto:", this.productosAlmacen));
-        formulario.agregarCampo(new InformacionCampoFormulario("Cantidad:", this.campoCantidad));
-        formulario.agregarCampo(new InformacionCampoFormulario("Tipo de Comprobante:", this.tipoComprobante));
-        formulario.agregarCampo(new InformacionCampoFormulario("Dinero Recibido:", this.campoDineroRecibido));
-        formulario.agregarCampo(new InformacionCampoFormulario("Carrito de Compras:", this.tablaCarritoCompras));
+        this.formulario.agregarCampo(new InformacionCampoFormulario("Producto:", this.productosAlmacen));
+        this.formulario.agregarCampo(new InformacionCampoFormulario("Cantidad:", this.campoCantidad));
+        this.formulario.agregarCampo(new InformacionCampoFormulario("Tipo de Comprobante:", this.tipoComprobante));
+        this.formulario.agregarCampo(new InformacionCampoFormulario("Dinero Recibido:", this.campoDineroRecibido));
+        this.formulario.agregarCampo(new InformacionCampoFormulario("Carrito de Compras:", this.tablaCarritoCompras));
 
         this.campoDineroRecibido.setEnabled(false);
 
-        return formulario;
+        return this.formulario;
     }
 
     @Override
@@ -130,23 +135,25 @@ public class VentanaRegistroVenta extends VentanaFormulario {
         return botones;
     }
 
-    private Boolean verificarSiElProductoYaestaEnElCarrito(DefaultTableModel modeloCarrito, int cantidadDeseada, String nombreProducto, int existenciaDisponible, float precioProductos) {
+    private Boolean verificarSiElProductoYaEstaEnElCarrito(DefaultTableModel modeloCarrito, int cantidadDeseada, String nombreProducto, int existenciaDisponible, float precioProductos) {
         boolean productoEncontrado = false;
 
         // Verificar si el producto ya está en el carrito
         for (int i = 0; i < modeloCarrito.getRowCount(); i++) {
             String productoEnTabla = (String) modeloCarrito.getValueAt(i, 0);
             if (productoEnTabla.equals(nombreProducto)) {
-                // Actualizar la cantidad y el precio total
+
                 int cantidadActual = Integer.parseInt((String) modeloCarrito.getValueAt(i, 1));
                 if (cantidadActual + cantidadDeseada > existenciaDisponible) {
-                    System.out.println("La cantidad total excede la existencia disponible.");
-                    //return ;
+                    JOptionPane.showMessageDialog(null, "La cantidad total excede la existencia disponible", "Error", JOptionPane.ERROR_MESSAGE);
+                    return false;
                 }
+
                 modeloCarrito.setValueAt(String.valueOf(cantidadActual + cantidadDeseada), i, 1);
                 float precioActual = (float) modeloCarrito.getValueAt(i, 2);
                 modeloCarrito.setValueAt(precioActual + precioProductos, i, 2);
                 productoEncontrado = true;
+
                 break;
             }
         }
@@ -156,16 +163,19 @@ public class VentanaRegistroVenta extends VentanaFormulario {
 
     @Override
     public void configurarEventos() {
+        Cajero cajero = Cajero.obtenerCajero();
+
         this.gestorVentanaFormulario.obtenerBoton("CerrarSesion").addActionListener(e -> {
-            String nombreCaja = cajero.obtenerNombreCaja();
-            this.cajero.consultasCaja.desOcuparCaja(nombreCaja);
+            String nombreCajaActual = cajero.obtenerNombreCaja();
+            cajero.consultasCaja.desOcuparCaja(nombreCajaActual);
             this.cerrarVentana();
         });
 
         this.gestorVentanaFormulario.obtenerBoton("Volver").addActionListener(e -> {
-            Cajero cajero = Cajero.obtenerInstancia();
-            cajero.consultasCaja.desOcuparCaja(cajero.obtenerNombreCaja());
+            String nombreCajaActual = cajero.obtenerNombreCaja();
+            cajero.consultasCaja.desOcuparCaja(nombreCajaActual);
 
+            // Redireccion a la selección de caja
             VentanaSeleccionCaja ventana = new VentanaSeleccionCaja("Seleccionar Caja");
             ventana.iniciarVentana();
             ventana.mostrarVentana();
@@ -175,8 +185,10 @@ public class VentanaRegistroVenta extends VentanaFormulario {
         this.botonLimpiar.addActionListener(e -> {
             DefaultTableModel modeloCarrito = (DefaultTableModel) this.carritoCompras.getModel();
             modeloCarrito.setRowCount(0);
-            this.cajero.informacionVenta.obtenerCarritoCompras().vaciarCarrito();
+
+            cajero.informacionVenta.obtenerCarritoCompras().vaciarCarrito();
             this.campoDineroRecibido.setValue(0);
+
             this.actualizarEstadoBotones();
         });
 
@@ -195,6 +207,7 @@ public class VentanaRegistroVenta extends VentanaFormulario {
         });
 
         this.botonContinuar.addActionListener(e -> {
+            // Redireccion a la ventana de facturación
             VentanaFormularioFactura ventanaFactura = new VentanaFormularioFactura("Factura");
             ventanaFactura.iniciarVentana();
             ventanaFactura.mostrarVentana();
@@ -203,54 +216,54 @@ public class VentanaRegistroVenta extends VentanaFormulario {
 
         this.botonAgregar.addActionListener(e -> {
             String productoSeleccionado = (String) this.productosAlmacen.getSelectedItem();
-            String[] partes = productoSeleccionado.split("---");
-            String nombreProducto = partes[0].trim();
-            String idProducto = partes[1].trim();
 
-            String cantidadProducto = this.campoCantidad.getValue().toString();
+            String[] caracteristicasProducto = productoSeleccionado.split("---");
+            String nombreProducto = caracteristicasProducto[0].trim();
+            String idProducto = caracteristicasProducto[1].trim();
 
-            if (cantidadProducto.isEmpty()) {
-                System.out.println("Por favor, ingrese una cantidad.");
+            String cantidadElementosProducto = this.campoCantidad.getValue().toString();
+
+            if (cantidadElementosProducto.isEmpty()) {
+                JOptionPane.showMessageDialog(null, "Por favor, ingrese una cantidad.", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
-            int cantidadDeseada = Integer.parseInt(cantidadProducto);
-            if (cantidadDeseada <= 0) {
+            int cantidadDeseadaDelProducto = Integer.parseInt(cantidadElementosProducto);
+            if (cantidadDeseadaDelProducto <= 0) {
                 JOptionPane.showMessageDialog(null, "La cantidad debe ser mayor que 0.", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
-            int existenciaDisponible = this.cajero.consultasProducto.obtenerExistenciaProductoPorId(Integer.parseInt(idProducto));
-            if (cantidadDeseada > existenciaDisponible) {
+            int existenciaDisponible = cajero.consultasProducto.obtenerExistenciaProductoPorId(Integer.parseInt(idProducto));
+            if (cantidadDeseadaDelProducto > existenciaDisponible) {
                 JOptionPane.showMessageDialog(null, "No hay suficiente inventario para el producto seleccionado.", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
-            float precioProducto = this.cajero.consultasProducto.obtenerPrecioProductoPorId(Integer.parseInt(idProducto));
-            float precioProductos = cantidadDeseada * precioProducto;
+            float precioProducto = cajero.consultasProducto.obtenerPrecioProductoPorId(Integer.parseInt(idProducto));
+            float precioProductos = cantidadDeseadaDelProducto * precioProducto;
 
             DefaultTableModel modeloCarrito = (DefaultTableModel) this.carritoCompras.getModel();
-            Boolean productoEncontrado = this.verificarSiElProductoYaestaEnElCarrito(modeloCarrito, cantidadDeseada, nombreProducto, existenciaDisponible, precioProductos);
+            Boolean productoEncontrado = this.verificarSiElProductoYaEstaEnElCarrito(modeloCarrito, cantidadDeseadaDelProducto, nombreProducto, existenciaDisponible, precioProductos);
 
-            // Si no está en el carrito, agregar una nueva fila
             if (!productoEncontrado) {
-                modeloCarrito.addRow(new Object[]{nombreProducto, cantidadProducto, precioProductos});
+                modeloCarrito.addRow(new Object[]{nombreProducto, cantidadElementosProducto, precioProductos});
             }
 
             // Actualizar el carrito de compras en la información de ventas
-            Producto productoEncontradoObj = this.cajero.consultasProducto.buscarProductoPorID(Integer.parseInt(idProducto));
-            for (int i = 0; i < cantidadDeseada; i++) {
-                this.cajero.informacionVenta.obtenerCarritoCompras().agregarProducto(productoEncontradoObj);
+            Producto productoEncontradoObj = cajero.consultasProducto.buscarProductoPorID(Integer.parseInt(idProducto));
+            for (int i = 0; i < cantidadDeseadaDelProducto; i++) {
+                cajero.informacionVenta.obtenerCarritoCompras().agregarProducto(productoEncontradoObj);
             }
 
             this.actualizarEstadoBotones();
             this.carritoCompras.revalidate();
             this.carritoCompras.repaint();
-
         });
 
         //La venta sera por medio de un recibo
         this.botonFinalizar.addActionListener(e -> {
+
             float cantidadDineroRecibida = 0;
 
             try {
@@ -261,36 +274,39 @@ public class VentanaRegistroVenta extends VentanaFormulario {
                 return;
             }
 
-            if (cantidadDineroRecibida < this.cajero.informacionVenta.obtenerMontoTotalVenta()) {
-                JOptionPane.showMessageDialog(null, "El dinero recibido es menor que el monto total de la venta. Venta = " + this.cajero.informacionVenta.obtenerMontoTotalVenta(), "Error", JOptionPane.ERROR_MESSAGE);
+            if (cantidadDineroRecibida < cajero.informacionVenta.obtenerMontoTotalVenta()) {
+                JOptionPane.showMessageDialog(null, "El dinero recibido es menor que el monto total de la venta. Monto Total Venta = $ " + cajero.informacionVenta.obtenerMontoTotalVenta(), "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
-            this.cajero.seleccionarTipoCliente(new InformacionPersonaFisica());
-            float cantidadAPagar = this.cajero.informacionVenta.obtenerMontoTotalVenta();
+            cajero.seleccionarTipoCliente(new InformacionPersonaFisica());
+            float cantidadAPagar = cajero.informacionVenta.obtenerMontoTotalVenta();
 
             Efectivo efectivo = new Efectivo();
             efectivo.colocarCantidadAPagar(cantidadAPagar);
             efectivo.colocarDineroRecibido(cantidadDineroRecibida);
             Pago pago = new Pago();
             pago.colocarMetodoPago(efectivo);
-            this.cajero.informacionVenta.obtenerInformacionCliente().colocarPago(pago);
 
-            this.cajero.informacionVenta.colocarComprobante(new Recibo(this.cajero.informacionVenta));
+            cajero.informacionVenta.obtenerInformacionCliente().colocarPago(pago);
 
-            String nombreCaja = this.cajero.obtenerNombreCaja();
-            cajero.consultasCaja.desOcuparCaja(nombreCaja);
-            float cambioAEntregarAlCliente = cajero.finalizarVenta();
+            cajero.informacionVenta.colocarComprobante(new Recibo(cajero.informacionVenta));
+
+            String nombreActualCaja = cajero.obtenerNombreCaja();
+            cajero.consultasCaja.desOcuparCaja(nombreActualCaja);
+
+            float cambioAEntregarAlCliente = cajero.calcularCambioVenta();
+            cajero.imprimirComprobante();
             JOptionPane.showMessageDialog(null, "Cambio a entregar al cliente: " + cambioAEntregarAlCliente, "Cambio", JOptionPane.INFORMATION_MESSAGE);
 
-            //checar
+            cajero.terminarVenta();
+
+            // Redireccion a la ventana de ventas
             this.cerrarVentana();
             VentanaMenuVentas ventana = new VentanaMenuVentas("Menú Ventas");
             ventana.iniciarVentana();
             ventana.mostrarVentana();
 
-            
-            cajero = null;
         });
     }
 }
