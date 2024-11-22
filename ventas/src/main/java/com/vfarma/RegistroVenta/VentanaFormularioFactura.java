@@ -195,14 +195,20 @@ public class VentanaFormularioFactura extends VentanaFormulario {
             this.cajero.informacionVenta.obtenerInformacionCliente().colocarPago(pago);
             this.cajero.informacionVenta.colocarComprobante(new Factura(this.cajero.informacionVenta));
             cajero.finalizarVenta();
+            JOptionPane.showMessageDialog(null, "La factura se ha generado exitosamente ", "Factura", JOptionPane.INFORMATION_MESSAGE);
 
+            String nombreCaja = cajero.obtenerNombreCaja();
+            cajero.consultasCaja.desOcuparCaja(nombreCaja);
+            
             this.cerrarVentana();
             VentanaMenuVentas ventana = new VentanaMenuVentas("Menú Ventas");
             ventana.iniciarVentana();
             ventana.mostrarVentana();
 
-            String nombreCaja = cajero.obtenerNombreCaja();
-            cajero.consultasCaja.desOcuparCaja(nombreCaja);
+            
+
+            //cajero.finalizarVenta();
+            
             cajero = null;
         });
     }

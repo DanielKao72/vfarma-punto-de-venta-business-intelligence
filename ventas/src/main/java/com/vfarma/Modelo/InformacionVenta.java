@@ -7,7 +7,7 @@ public class InformacionVenta {
 
     private final String claveVenta;
     private final String fechaVenta;
-    private float montoTotalVenta;
+    //private float montoTotalVenta;
     private InformacionCliente informacionCliente;
     private Comprobante comprobante;
     private CarritoCompras carritoCompras;
@@ -16,7 +16,7 @@ public class InformacionVenta {
     public InformacionVenta() {
         this.claveVenta = this.generarClaveVenta();
         this.fechaVenta = this.obtenerFechaActual();
-        this.montoTotalVenta = 0.0f;
+        //this.montoTotalVenta = 0.0f;
         this.carritoCompras = new CarritoCompras();
 
         this.informacionCliente = new InformacionCliente();
@@ -30,17 +30,25 @@ public class InformacionVenta {
         return fechaVenta;
     }
 
-    public Float obtenerMontoTotalVenta() {
-        this.carritoCompras.obtenerTodosProductos().forEach((producto) -> {
-            this.montoTotalVenta += producto.obtenerPrecioProducto();
-        });
-        return this.montoTotalVenta;
+    public float obtenerMontoTotalVenta() {
+        float montoTotalVenta = 0.0f;
+
+        // Verifica que carritoCompras no sea nulo
+        if (this.carritoCompras != null) {
+            // Obtén la lista de productos y suma sus precios
+            for (Producto producto : this.carritoCompras.obtenerTodosProductos()) {
+                if (producto != null) { // Evita NullPointerException si algún producto es nulo
+                    montoTotalVenta += producto.obtenerPrecioProducto();
+                }
+            }
+        }
+
+        return montoTotalVenta;
     }
 
-    public void setMontoTotalVenta(Float montoTotalVenta) {
-        this.montoTotalVenta = montoTotalVenta;
-    }
-
+    //public void setMontoTotalVenta(Float montoTotalVenta) {
+    //this.montoTotalVenta = montoTotalVenta;
+    //}
     private String generarClaveVenta() {
         String CARACTERES = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
         Random RANDOM = new Random();

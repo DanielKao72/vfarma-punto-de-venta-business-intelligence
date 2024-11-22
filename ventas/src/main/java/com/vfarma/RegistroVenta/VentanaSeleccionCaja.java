@@ -62,6 +62,9 @@ public class VentanaSeleccionCaja extends VentanaFormulario {
         });
 
         this.gestorVentanaFormulario.obtenerBoton("Volver").addActionListener(e -> {
+            Cajero cajero = Cajero.obtenerInstancia();
+            cajero.consultasCaja.desOcuparCaja(cajero.obtenerNombreCaja());
+
             VentanaMenuVentas ventanaMenuVentas = new VentanaMenuVentas("Menú Ventas");
             ventanaMenuVentas.iniciarVentana();
             ventanaMenuVentas.mostrarVentana();

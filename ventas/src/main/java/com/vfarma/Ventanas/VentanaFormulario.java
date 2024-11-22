@@ -3,6 +3,7 @@ package com.vfarma.Ventanas;
 import com.vfarma.GestoresVentanas.GestorVentanaFormulario;
 
 public abstract class VentanaFormulario extends Ventana implements IFormulario {
+
     protected GestorVentanaFormulario gestorVentanaFormulario;
 
     public VentanaFormulario(String tituloVentana) {
@@ -19,5 +20,5 @@ public abstract class VentanaFormulario extends Ventana implements IFormulario {
 
         this.configurarEventos();
     }
-    
+
 }

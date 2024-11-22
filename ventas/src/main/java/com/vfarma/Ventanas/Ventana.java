@@ -3,6 +3,7 @@ package com.vfarma.Ventanas;
 import javax.swing.JFrame;
 
 public abstract class Ventana {
+
     protected JFrame ventana;
     protected String tituloVentana;
 

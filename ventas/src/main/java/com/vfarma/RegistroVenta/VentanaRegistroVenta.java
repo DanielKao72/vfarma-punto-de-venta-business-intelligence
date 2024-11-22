@@ -48,7 +48,7 @@ public class VentanaRegistroVenta extends VentanaFormulario {
         this.cajero = Cajero.obtenerInstancia();
         this.obtenerProductosDisponiblesParaComprar();
         this.inicializarTablaProductos();
-  
+
     }
 
     private void obtenerProductosDisponiblesParaComprar() {
@@ -163,6 +163,9 @@ public class VentanaRegistroVenta extends VentanaFormulario {
         });
 
         this.gestorVentanaFormulario.obtenerBoton("Volver").addActionListener(e -> {
+            Cajero cajero = Cajero.obtenerInstancia();
+            cajero.consultasCaja.desOcuparCaja(cajero.obtenerNombreCaja());
+
             VentanaSeleccionCaja ventana = new VentanaSeleccionCaja("Seleccionar Caja");
             ventana.iniciarVentana();
             ventana.mostrarVentana();
@@ -203,7 +206,7 @@ public class VentanaRegistroVenta extends VentanaFormulario {
             String[] partes = productoSeleccionado.split("---");
             String nombreProducto = partes[0].trim();
             String idProducto = partes[1].trim();
-            
+
             String cantidadProducto = this.campoCantidad.getValue().toString();
 
             if (cantidadProducto.isEmpty()) {
@@ -211,45 +214,39 @@ public class VentanaRegistroVenta extends VentanaFormulario {
                 return;
             }
 
-            try {
-                int cantidadDeseada = Integer.parseInt(cantidadProducto);
-                if (cantidadDeseada <= 0) {
-                    JOptionPane.showMessageDialog( null,"La cantidad debe ser mayor que 0.", "Error", JOptionPane.ERROR_MESSAGE);
-               
-                }
-
-                // Verificar la existencia en el inventario
-                int existenciaDisponible = this.cajero.consultasProducto.obtenerExistenciaProductoPorId(Integer.parseInt(idProducto));
-                if (cantidadDeseada > existenciaDisponible) {
-                    JOptionPane.showMessageDialog( null,"No hay suficiente inventario para el producto seleccionado.", "Error", JOptionPane.ERROR_MESSAGE);
-                
-                }
-
-                float precioProducto = this.cajero.consultasProducto.obtenerPrecioProductoPorId(Integer.parseInt(idProducto));
-                float precioProductos = cantidadDeseada * precioProducto;
-
-                DefaultTableModel modeloCarrito = (DefaultTableModel) this.carritoCompras.getModel();
-                Boolean productoEncontrado = this.verificarSiElProductoYaestaEnElCarrito( modeloCarrito,  cantidadDeseada,  nombreProducto,  existenciaDisponible,  precioProductos);
-                
-                // Si no está en el carrito, agregar una nueva fila
-                if (!productoEncontrado) {
-                    modeloCarrito.addRow(new Object[]{nombreProducto, cantidadProducto, precioProductos});
-                }
-
-                // Actualizar el carrito de compras en la información de ventas
-                Producto productoEncontradoObj = this.cajero.consultasProducto.buscarProductoPorID(Integer.parseInt(idProducto));
-                for (int i = 0; i < cantidadDeseada; i++) {
-                    this.cajero.informacionVenta.obtenerCarritoCompras().agregarProducto(productoEncontradoObj);
-                }
-
-                this.actualizarEstadoBotones();
-                this.carritoCompras.revalidate();
-                this.carritoCompras.repaint();
-
-            } catch (NumberFormatException ex) {
-                JOptionPane.showMessageDialog( null,"Error: La cantidad ingresada no es un número válido.", "Error", JOptionPane.ERROR_MESSAGE);
+            int cantidadDeseada = Integer.parseInt(cantidadProducto);
+            if (cantidadDeseada <= 0) {
+                JOptionPane.showMessageDialog(null, "La cantidad debe ser mayor que 0.", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
+
+            int existenciaDisponible = this.cajero.consultasProducto.obtenerExistenciaProductoPorId(Integer.parseInt(idProducto));
+            if (cantidadDeseada > existenciaDisponible) {
+                JOptionPane.showMessageDialog(null, "No hay suficiente inventario para el producto seleccionado.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            float precioProducto = this.cajero.consultasProducto.obtenerPrecioProductoPorId(Integer.parseInt(idProducto));
+            float precioProductos = cantidadDeseada * precioProducto;
+
+            DefaultTableModel modeloCarrito = (DefaultTableModel) this.carritoCompras.getModel();
+            Boolean productoEncontrado = this.verificarSiElProductoYaestaEnElCarrito(modeloCarrito, cantidadDeseada, nombreProducto, existenciaDisponible, precioProductos);
+
+            // Si no está en el carrito, agregar una nueva fila
+            if (!productoEncontrado) {
+                modeloCarrito.addRow(new Object[]{nombreProducto, cantidadProducto, precioProductos});
+            }
+
+            // Actualizar el carrito de compras en la información de ventas
+            Producto productoEncontradoObj = this.cajero.consultasProducto.buscarProductoPorID(Integer.parseInt(idProducto));
+            for (int i = 0; i < cantidadDeseada; i++) {
+                this.cajero.informacionVenta.obtenerCarritoCompras().agregarProducto(productoEncontradoObj);
+            }
+
+            this.actualizarEstadoBotones();
+            this.carritoCompras.revalidate();
+            this.carritoCompras.repaint();
+
         });
 
         //La venta sera por medio de un recibo
@@ -260,12 +257,12 @@ public class VentanaRegistroVenta extends VentanaFormulario {
                 String dineroRecibido = this.campoDineroRecibido.getValue().toString();
                 cantidadDineroRecibida = Float.parseFloat(dineroRecibido);
             } catch (NumberFormatException ex) {
-                JOptionPane.showMessageDialog( null,"Error: La entrada no es un número válido.", "Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, "Error: La entrada no es un número válido.", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
             if (cantidadDineroRecibida < this.cajero.informacionVenta.obtenerMontoTotalVenta()) {
-                JOptionPane.showMessageDialog( null,"El dinero recibido es menor que el monto total de la venta.", "Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, "El dinero recibido es menor que el monto total de la venta. Venta = " + this.cajero.informacionVenta.obtenerMontoTotalVenta(), "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
@@ -281,17 +278,18 @@ public class VentanaRegistroVenta extends VentanaFormulario {
 
             this.cajero.informacionVenta.colocarComprobante(new Recibo(this.cajero.informacionVenta));
 
+            String nombreCaja = this.cajero.obtenerNombreCaja();
+            cajero.consultasCaja.desOcuparCaja(nombreCaja);
+            float cambioAEntregarAlCliente = cajero.finalizarVenta();
+            JOptionPane.showMessageDialog(null, "Cambio a entregar al cliente: " + cambioAEntregarAlCliente, "Cambio", JOptionPane.INFORMATION_MESSAGE);
+
             //checar
             this.cerrarVentana();
             VentanaMenuVentas ventana = new VentanaMenuVentas("Menú Ventas");
             ventana.iniciarVentana();
             ventana.mostrarVentana();
-          
 
-            String nombreCaja = this.cajero.obtenerNombreCaja();
-            System.out.println("Nombre de la caja: " + nombreCaja);
-            cajero.consultasCaja.desOcuparCaja(nombreCaja);
-
+            
             cajero = null;
         });
     }
