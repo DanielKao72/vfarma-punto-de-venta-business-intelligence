@@ -16,11 +16,8 @@ import com.vfarma.ComponentesVentana.InformacionCampoFormulario;
 import com.vfarma.ComponentesVentana.InformacionEstilosBoton;
 import com.vfarma.GestoresComponentesVentana.GestorComponentes;
 import com.vfarma.GestoresComponentesVentana.GestorFormulario;
-import com.vfarma.Modelo.Efectivo;
-import com.vfarma.Modelo.Factura;
 import com.vfarma.Modelo.InformacionPersonaFisica;
 import com.vfarma.Modelo.InformacionPersonaMoral;
-import com.vfarma.Modelo.Pago;
 import com.vfarma.Ventanas.VentanaFormulario;
 
 public class VentanaFormularioFactura extends VentanaFormulario {
@@ -164,39 +161,18 @@ public class VentanaFormularioFactura extends VentanaFormulario {
                 String nombre = this.campoNombre.getText();
                 String apellidos = this.campoApellidos.getText();
 
-                InformacionPersonaFisica cliente = new InformacionPersonaFisica();
-                cliente.colocarClaveRFCCliente(rfc);
-                cliente.colocarDomicilioCliente(domicilio);
-
-                cliente.colocarNombreCliente(nombre);
-                cliente.colocarApellidosCliente(apellidos);
-
+                InformacionPersonaFisica cliente = new InformacionPersonaFisica(nombre, apellidos, domicilio, rfc);
                 cajero.seleccionarTipoCliente(cliente);
 
             } else if (this.opcionPersonaMoral.isSelected()) {
                 String razonSocial = this.campoRazonSocial.getText();
                 String regimenFiscal = this.campoRegimenFiscal.getText();
 
-                InformacionPersonaMoral cliente = new InformacionPersonaMoral();
-                cliente.colocarClaveRFCCliente(rfc);
-                cliente.colocarDomicilioCliente(domicilio);
-
-                cliente.colocarRazonSocial(razonSocial);
-                cliente.colocarRegimenFiscal(regimenFiscal);
-
+                InformacionPersonaMoral cliente = new InformacionPersonaMoral(razonSocial, regimenFiscal, domicilio, rfc);
                 cajero.seleccionarTipoCliente(cliente);
             }
 
-            //Es factura, como tal no se necesita un pago
-            Pago pago = new Pago();
-            pago.colocarMetodoPago(new Efectivo());
-            cajero.informacionVenta.obtenerInformacionCliente().colocarPago(pago);
-
-            cajero.informacionVenta.colocarComprobante(new Factura(cajero.informacionVenta));
-            cajero.calcularCambioVenta();
-
-            String nombreCaja = cajero.obtenerNombreCaja();
-            cajero.consultasCaja.desOcuparCaja(nombreCaja);
+            cajero.realizarVentaConFactura();
 
             cajero.imprimirComprobante();
 

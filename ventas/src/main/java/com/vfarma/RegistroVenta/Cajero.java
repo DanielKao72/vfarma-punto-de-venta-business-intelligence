@@ -6,9 +6,13 @@ import com.itextpdf.layout.Document;
 import com.vfarma.BaseDatos.GestorCaja;
 import com.vfarma.BaseDatos.InventarioProductos;
 import com.vfarma.Modelo.Efectivo;
+import com.vfarma.Modelo.Factura;
 import com.vfarma.Modelo.InformacionCliente;
+import com.vfarma.Modelo.InformacionPersonaFisica;
 import com.vfarma.Modelo.InformacionVenta;
+import com.vfarma.Modelo.Pago;
 import com.vfarma.Modelo.Producto;
+import com.vfarma.Modelo.Recibo;
 
 public class Cajero {
 
@@ -96,6 +100,38 @@ public class Cajero {
 
     public void terminarVenta() {
         Cajero.cajero = null;
+    }
+
+    public void realizarVentaConRecibo(float cantidadDineroRecibida) {
+        cajero.seleccionarTipoCliente(new InformacionPersonaFisica());
+        float cantidadAPagar = cajero.informacionVenta.obtenerMontoTotalVenta();
+
+        Efectivo efectivo = new Efectivo();
+        efectivo.colocarCantidadAPagar(cantidadAPagar);
+        efectivo.colocarDineroRecibido(cantidadDineroRecibida);
+        Pago pago = new Pago();
+        pago.colocarMetodoPago(efectivo);
+
+        cajero.informacionVenta.obtenerInformacionCliente().colocarPago(pago);
+
+        cajero.informacionVenta.colocarComprobante(new Recibo(cajero.informacionVenta));
+
+        String nombreActualCaja = cajero.obtenerNombreCaja();
+        cajero.consultasCaja.desOcuparCaja(nombreActualCaja);
+
+    }
+
+    public void realizarVentaConFactura() {
+        //Es factura, como tal no se necesita un pago
+        Pago pago = new Pago();
+        pago.colocarMetodoPago(new Efectivo());
+        cajero.informacionVenta.obtenerInformacionCliente().colocarPago(pago);
+
+        cajero.informacionVenta.colocarComprobante(new Factura(cajero.informacionVenta));
+        cajero.calcularCambioVenta();
+
+        String nombreCaja = cajero.obtenerNombreCaja();
+        cajero.consultasCaja.desOcuparCaja(nombreCaja);
     }
 
 }

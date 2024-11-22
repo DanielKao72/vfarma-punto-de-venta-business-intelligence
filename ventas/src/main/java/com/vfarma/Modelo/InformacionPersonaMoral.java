@@ -5,6 +5,12 @@ public class InformacionPersonaMoral extends InformacionCliente {
     private String razonSocial;
     private String regimenFiscal;
 
+    public InformacionPersonaMoral(String razonSocial, String regimenFiscal, String domicilioCliente, String claveRFCCliente) {
+        super(domicilioCliente, claveRFCCliente);
+        this.razonSocial = razonSocial;
+        this.regimenFiscal = regimenFiscal;
+    }
+
     public String obtenerRazonSocial() {
         return this.razonSocial;
     }

@@ -11,6 +11,11 @@ public class InformacionCliente {
         this.claveRFCCliente = "RFC de la farmacia (InformacionCliente)";
     }
 
+    public InformacionCliente(String domicilioCliente, String claveRFCCliente) {
+        this.domicilioCliente = domicilioCliente;
+        this.claveRFCCliente = claveRFCCliente;
+    }
+
     public InformacionCliente obtenerDatosCliente() {
         return this;
     }

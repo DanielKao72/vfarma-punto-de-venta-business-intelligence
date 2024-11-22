@@ -20,11 +20,7 @@ import com.vfarma.ComponentesVentana.InformacionCampoFormulario;
 import com.vfarma.ComponentesVentana.InformacionEstilosBoton;
 import com.vfarma.GestoresComponentesVentana.GestorComponentes;
 import com.vfarma.GestoresComponentesVentana.GestorFormulario;
-import com.vfarma.Modelo.Efectivo;
-import com.vfarma.Modelo.InformacionPersonaFisica;
-import com.vfarma.Modelo.Pago;
 import com.vfarma.Modelo.Producto;
-import com.vfarma.Modelo.Recibo;
 import com.vfarma.Ventanas.VentanaFormulario;
 
 public class VentanaRegistroVenta extends VentanaFormulario {
@@ -138,15 +134,14 @@ public class VentanaRegistroVenta extends VentanaFormulario {
     private Boolean verificarSiElProductoYaEstaEnElCarrito(DefaultTableModel modeloCarrito, int cantidadDeseada, String nombreProducto, int existenciaDisponible, float precioProductos) {
         boolean productoEncontrado = false;
 
-        // Verificar si el producto ya está en el carrito
         for (int i = 0; i < modeloCarrito.getRowCount(); i++) {
             String productoEnTabla = (String) modeloCarrito.getValueAt(i, 0);
             if (productoEnTabla.equals(nombreProducto)) {
 
                 int cantidadActual = Integer.parseInt((String) modeloCarrito.getValueAt(i, 1));
                 if (cantidadActual + cantidadDeseada > existenciaDisponible) {
-                    JOptionPane.showMessageDialog(null, "La cantidad total excede la existencia disponible", "Error", JOptionPane.ERROR_MESSAGE);
-                    return false;
+                   
+                    return null;
                 }
 
                 modeloCarrito.setValueAt(String.valueOf(cantidadActual + cantidadDeseada), i, 1);
@@ -188,6 +183,7 @@ public class VentanaRegistroVenta extends VentanaFormulario {
 
             cajero.informacionVenta.obtenerCarritoCompras().vaciarCarrito();
             this.campoDineroRecibido.setValue(0);
+            this.campoCantidad.setValue(0);
 
             this.actualizarEstadoBotones();
         });
@@ -245,6 +241,11 @@ public class VentanaRegistroVenta extends VentanaFormulario {
 
             DefaultTableModel modeloCarrito = (DefaultTableModel) this.carritoCompras.getModel();
             Boolean productoEncontrado = this.verificarSiElProductoYaEstaEnElCarrito(modeloCarrito, cantidadDeseadaDelProducto, nombreProducto, existenciaDisponible, precioProductos);
+            
+            if (productoEncontrado == null) {
+                JOptionPane.showMessageDialog(null, "La cantidad total excede la existencia disponible", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
 
             if (!productoEncontrado) {
                 modeloCarrito.addRow(new Object[]{nombreProducto, cantidadElementosProducto, precioProductos});
@@ -279,24 +280,10 @@ public class VentanaRegistroVenta extends VentanaFormulario {
                 return;
             }
 
-            cajero.seleccionarTipoCliente(new InformacionPersonaFisica());
-            float cantidadAPagar = cajero.informacionVenta.obtenerMontoTotalVenta();
-
-            Efectivo efectivo = new Efectivo();
-            efectivo.colocarCantidadAPagar(cantidadAPagar);
-            efectivo.colocarDineroRecibido(cantidadDineroRecibida);
-            Pago pago = new Pago();
-            pago.colocarMetodoPago(efectivo);
-
-            cajero.informacionVenta.obtenerInformacionCliente().colocarPago(pago);
-
-            cajero.informacionVenta.colocarComprobante(new Recibo(cajero.informacionVenta));
-
-            String nombreActualCaja = cajero.obtenerNombreCaja();
-            cajero.consultasCaja.desOcuparCaja(nombreActualCaja);
-
+            cajero.realizarVentaConRecibo(cantidadDineroRecibida);
             float cambioAEntregarAlCliente = cajero.calcularCambioVenta();
             cajero.imprimirComprobante();
+
             JOptionPane.showMessageDialog(null, "Cambio a entregar al cliente: " + cambioAEntregarAlCliente, "Cambio", JOptionPane.INFORMATION_MESSAGE);
 
             cajero.terminarVenta();
