@@ -6,16 +6,17 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
-public class EmpleadoConsultasBaseDatos {
+public class GestorEmpleados {
 
     private final Connection conexion;
 
-    public EmpleadoConsultasBaseDatos() {
+    public GestorEmpleados() {
         this.conexion = BaseDeDatos.obtenerInstancia().obtenerConexionBaseDatos();
     }
 
-    private String generarUsuario(InformacionEmpleado empleado) {
+    private String generarUsuarioEmpleado(InformacionEmpleado empleado) {
         String iniciales = empleado.obtenerNombreEmpleado().substring(0, 1).toUpperCase() +
                 empleado.obtenerApellidoEmpleado().substring(0, 1).toUpperCase();
         String siglasRol = empleado.obtenerRolEmpleado().substring(0, 3).toUpperCase();
@@ -26,7 +27,7 @@ public class EmpleadoConsultasBaseDatos {
         return iniciales + siglasRol + sexo + ultimosDigitosTelefono;
     }
 
-    private String generarContrasenia(InformacionEmpleado empleado) {
+    private String generarContraseniaEmpleado(InformacionEmpleado empleado) {
         String iniciales = empleado.obtenerNombreEmpleado().substring(0, 1).toLowerCase() +
                 empleado.obtenerApellidoEmpleado().substring(0, 1).toLowerCase();
         String sexo = empleado.obtenerSexoEmpleado().substring(0, 1).toLowerCase();
@@ -36,9 +37,12 @@ public class EmpleadoConsultasBaseDatos {
         return iniciales + sexo + ultimosDigitosTelefono;
     }
 
-    public boolean agregarNuevoEmpleadoABaseDeDatos(InformacionEmpleado empleado) {
+    public ArrayList<String> agregarNuevoEmpleadoABaseDeDatos(InformacionEmpleado empleado) {
         String queryInsertEmpleado = "INSERT INTO empleados (Nombre, Apellido, Correo, Telefono, Sexo, Turno, Rol) VALUES (?, ?, ?, ?, ?, ?, ?)";
         String queryInsertCredenciales = "INSERT INTO credenciales (Usuario, Contrasenia, ClvEmpleado) VALUES (?, ?, ?)";
+
+        ArrayList<String> credenciales = new ArrayList<>();
+        credenciales.add(""); credenciales.add("");
 
         try (PreparedStatement psEmpleado = conexion.prepareStatement(queryInsertEmpleado, PreparedStatement.RETURN_GENERATED_KEYS);
              PreparedStatement psCredenciales = conexion.prepareStatement(queryInsertCredenciales)) {
@@ -55,19 +59,22 @@ public class EmpleadoConsultasBaseDatos {
             ResultSet rs = psEmpleado.getGeneratedKeys();
             if (rs.next()) {
                 int claveEmpleado = rs.getInt(1);
-                String usuario = generarUsuario(empleado);
-                String contrasenia = generarContrasenia(empleado);
+
+                String usuario = generarUsuarioEmpleado(empleado);
+                credenciales.set(0, usuario);
+
+                String contrasenia = generarContraseniaEmpleado(empleado);
+                credenciales.set(1, contrasenia);
 
                 psCredenciales.setString(1, usuario);
                 psCredenciales.setString(2, contrasenia);
                 psCredenciales.setInt(3, claveEmpleado);
                 psCredenciales.executeUpdate();
-                return true;
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return false;
+        return credenciales;
     }
 
     public InformacionEmpleado consultarInformacionEmpleadoEnBaseDeDatos(String usuarioEmpleado) {
@@ -148,7 +155,7 @@ public class EmpleadoConsultasBaseDatos {
         return false;
     }
 
-    public boolean validarCredencialEmpleado(String usuario, String contrasenia) {
+    public boolean buscarEmpleadoEnBaseDeDatos(String usuario, String contrasenia) {
         String query = "SELECT * FROM credenciales WHERE Usuario = ? AND Contrasenia = ?";
         try (PreparedStatement ps = conexion.prepareStatement(query)) {
             ps.setString(1, usuario);
@@ -159,5 +166,24 @@ public class EmpleadoConsultasBaseDatos {
             e.printStackTrace();
         }
         return false;
+    }
+
+    public String obtenerRolEmpleadoEnBaseDeDatos(String usuario, String contrasenia) {
+        String query = "SELECT e.Rol FROM empleados e " +
+                       "JOIN credenciales c ON e.ClvEmpleado = c.ClvEmpleado " +
+                       "WHERE c.Usuario = ? AND c.Contrasenia = ?";
+        String rol = "";
+        try (PreparedStatement ps = conexion.prepareStatement(query)) {
+            ps.setString(1, usuario);
+            ps.setString(2, contrasenia);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    rol = rs.getString("Rol");
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return rol;
     }
 }

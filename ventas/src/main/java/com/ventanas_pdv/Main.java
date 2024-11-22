@@ -11,11 +11,12 @@ import com.ventanas_pdv.Ventanas.VentanaMenu;
 import com.ventanas_pdv.Ventas.VentanaFormularioFactura;
 import com.ventanas_pdv.Ventas.VentanaMenuVentas;
 import com.ventanas_pdv.Ventas.VentanaSeleccionCaja;
+import com.vfarma.RegistroEmpleados.Controlador.FuncionarioRecursosHumanos;
 
 public class Main {
     public static void main(String[] args) {
         //VentanaFormularioFactura ventana = new VentanaFormularioFactura("Factura");
-        VentanaEditarEmpleado ventana = new VentanaEditarEmpleado("Ventas");
+        VentanaAgregarEmpleado ventana = new VentanaAgregarEmpleado("Ventas");
         //VentanaSeleccionCaja ventana = new VentanaSeleccionCaja("Seleccionar Caja");
         //VentanaRegistroVenta ventana = new VentanaRegistroVenta("Registro de Venta");
         //VentanaMenuRH ventana = new VentanaMenuRH("Recursos Humanos");

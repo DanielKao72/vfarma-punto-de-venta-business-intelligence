@@ -119,13 +119,14 @@ public class VentanaAgregarEmpleado extends VentanaFormulario {
             String rol = tipoRol.getSelectedItem().toString();
 
             FuncionarioRecursosHumanos funcionarioRH = FuncionarioRecursosHumanos.llamarFuncionarioRH();
-            boolean empleadoAgregadoCorrectamente = funcionarioRH.agregarNuevoEmpleado(nombre, apellido, correo, telefono, sexo, turno, rol);
+            ArrayList<String> credenciales = funcionarioRH.agregarNuevoEmpleado(nombre, apellido, correo, telefono, sexo, turno, rol);
             limpiarCamposFormulario();
 
-            if(empleadoAgregadoCorrectamente){
+            if(credenciales.get(0).equals("") == false){
                 javax.swing.JOptionPane.showMessageDialog(
                 null,
-                "Empleado registrado correctamente",
+                "Empleado registrado con éxito \n" 
+                + "Usuario: " + credenciales.get(0) + "\nContraseña: " + credenciales.get(1),
                 "Éxito",
                 javax.swing.JOptionPane.INFORMATION_MESSAGE
                 );
@@ -150,11 +151,13 @@ public class VentanaAgregarEmpleado extends VentanaFormulario {
         });
     }
 
-    public void limpiarCamposFormulario(){
+    private void limpiarCamposFormulario(){
         this.campoNombre.setText("");
         this.campoApellido.setText("");
         this.campoCorreo.setText("");
         this.campoTelefono.setText("");
+        this.sexo.clearSelection();
+        this.turno.clearSelection();
     }
     
 }

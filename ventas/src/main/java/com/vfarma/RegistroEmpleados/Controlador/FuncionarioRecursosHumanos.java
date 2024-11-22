@@ -1,12 +1,14 @@
 package com.vfarma.RegistroEmpleados.Controlador;
 
-import com.vfarma.BaseDatos.EmpleadoConsultasBaseDatos;
+import java.util.ArrayList;
+
+import com.vfarma.BaseDatos.GestorEmpleados;
 import com.vfarma.Modelo.InformacionEmpleado;
 
 public class FuncionarioRecursosHumanos {
 
     private static FuncionarioRecursosHumanos funcionarioRH;
-    private EmpleadoConsultasBaseDatos consultasBD = new EmpleadoConsultasBaseDatos();
+    private GestorEmpleados gestorEmpleados = new GestorEmpleados();
 
     private FuncionarioRecursosHumanos(){};
 
@@ -24,7 +26,7 @@ public class FuncionarioRecursosHumanos {
         return false;
     }
 
-    public boolean agregarNuevoEmpleado(
+    public ArrayList<String> agregarNuevoEmpleado(
         String nombre, 
         String apellido, 
         String correo, 
@@ -33,17 +35,18 @@ public class FuncionarioRecursosHumanos {
         String turno, 
         String rol
     ) {
+        ArrayList<String> credenciales = new ArrayList<>();
+        credenciales.add(""); credenciales.add("");
+
         if (existeCampoVacio(nombre, apellido, correo, telefono, sexo, turno, rol)) {
             System.out.println("Error: Algunos campos están vacíos o son inválidos.");
-            return false;
         } else {
             InformacionEmpleado nuevoEmpleado = new InformacionEmpleado(
                 "", nombre, apellido, correo, telefono, sexo, turno, rol
             );
-            boolean empleadoAgregado = consultasBD.agregarNuevoEmpleadoABaseDeDatos(nuevoEmpleado);
-            if(empleadoAgregado) return true;
-            else return false;
+            credenciales = gestorEmpleados.agregarNuevoEmpleadoABaseDeDatos(nuevoEmpleado);
         } 
+        return credenciales;
     }
 
     public InformacionEmpleado consultarInformacionEmpleado(String usuarioEmpleado) {
@@ -53,25 +56,36 @@ public class FuncionarioRecursosHumanos {
             System.out.println("Error: El ID de empleado no puede estar vacío.");
         }
         else{
-            informacionEmpleado = consultasBD.consultarInformacionEmpleadoEnBaseDeDatos(usuarioEmpleado);
+            informacionEmpleado = gestorEmpleados.consultarInformacionEmpleadoEnBaseDeDatos(usuarioEmpleado);
         }
 
         return informacionEmpleado;
     }
 
     public boolean editarInformacionEmpleado(InformacionEmpleado informacionEmpleadoEditado) {
-        boolean empleadoActualizado = consultasBD.editarInformacionEmpleadoEnBaseDeDatos(informacionEmpleadoEditado);
+        boolean empleadoActualizado = gestorEmpleados.editarInformacionEmpleadoEnBaseDeDatos(informacionEmpleadoEditado);
         if(empleadoActualizado) return true;
         else return false;
     }
 
-    public boolean eliminarEmpleado(String idEmpleado) {
-        if (existeCampoVacio(idEmpleado)) {
+    //cambiar id por usuario
+    public boolean eliminarEmpleado(String usuarioEmpleado) {
+        if (existeCampoVacio(usuarioEmpleado)) {
             return false;
         } else {
-            boolean empleadoEliminado = consultasBD.eliminarEmpleadoDeBaseDeDatos(idEmpleado);
+            boolean empleadoEliminado = gestorEmpleados.eliminarEmpleadoDeBaseDeDatos(usuarioEmpleado);
             if(empleadoEliminado) return true;
             else return false;
         }
+    }
+
+    public boolean verificarExistenciaEmpleado(String usuario, String contrasenia){
+        boolean empleadoExistente = gestorEmpleados.buscarEmpleadoEnBaseDeDatos(usuario, contrasenia);
+        return empleadoExistente;
+    }
+
+    public String obtenerRolEmpleado(String usuario, String contrasenia){
+        String rol = gestorEmpleados.obtenerRolEmpleadoEnBaseDeDatos(usuario, contrasenia);
+        return rol;
     }
 }
