@@ -5,72 +5,73 @@ import com.vfarma.Modelo.InformacionEmpleado;
 
 public class FuncionarioRecursosHumanos {
 
+    private static FuncionarioRecursosHumanos funcionarioRH;
     private EmpleadoConsultasBaseDatos consultasBD = new EmpleadoConsultasBaseDatos();
+
+    private FuncionarioRecursosHumanos(){};
+
+    public static FuncionarioRecursosHumanos llamarFuncionarioRH(){
+        if(funcionarioRH == null) funcionarioRH = new FuncionarioRecursosHumanos();
+        return funcionarioRH;
+    }
 
     private boolean existeCampoVacio(String... campos) {
         for (String campo : campos) {
             if (campo == null || campo.trim().isEmpty()) {
-                return false;
+                return true;
             }
         }
-        return true;
+        return false;
     }
 
-    public void agregarNuevoEmpleado(
+    public boolean agregarNuevoEmpleado(
         String nombre, 
         String apellido, 
         String correo, 
         String telefono, 
         String sexo, 
         String turno, 
-        String rol, 
-        String sucursalEmpleado
+        String rol
     ) {
-        if (existeCampoVacio(nombre, apellido, correo, telefono, sexo, turno, rol, sucursalEmpleado)) {
+        if (existeCampoVacio(nombre, apellido, correo, telefono, sexo, turno, rol)) {
             System.out.println("Error: Algunos campos están vacíos o son inválidos.");
+            return false;
         } else {
             InformacionEmpleado nuevoEmpleado = new InformacionEmpleado(
-                nombre, apellido, correo, telefono, sexo, turno, rol, sucursalEmpleado
+                "", nombre, apellido, correo, telefono, sexo, turno, rol
             );
-            consultasBD.agregarNuevoEmpleadoABaseDeDatos(nuevoEmpleado);
-        }
+            boolean empleadoAgregado = consultasBD.agregarNuevoEmpleadoABaseDeDatos(nuevoEmpleado);
+            if(empleadoAgregado) return true;
+            else return false;
+        } 
     }
 
-    public void consultarInformacionEmpleado(String idEmpleado) {
-        if (existeCampoVacio(idEmpleado)){
+    public InformacionEmpleado consultarInformacionEmpleado(String usuarioEmpleado) {
+        InformacionEmpleado informacionEmpleado = null;
+
+        if (existeCampoVacio(usuarioEmpleado)){
             System.out.println("Error: El ID de empleado no puede estar vacío.");
         }
         else{
-            consultasBD.consultarInformacionEmpleadoEnBaseDeDatos(idEmpleado);
+            informacionEmpleado = consultasBD.consultarInformacionEmpleadoEnBaseDeDatos(usuarioEmpleado);
         }
+
+        return informacionEmpleado;
     }
 
-    public void editarInformacionEmpleado(
-        String idEmpleado,
-        String nombre, 
-        String apellido, 
-        String correo, 
-        String telefono, 
-        String sexo, 
-        String turno, 
-        String rol, 
-        String sucursalEmpleado
-    ) {
-        if (existeCampoVacio(idEmpleado, nombre, apellido, correo, telefono, sexo, turno, rol, sucursalEmpleado)) {
-            System.out.println("Error: Algunos campos están vacíos o son inválidos.");
-        } else {
-            InformacionEmpleado informacionEmpleadoEditado = new InformacionEmpleado(
-                nombre, apellido, correo, telefono, sexo, turno, rol, sucursalEmpleado
-            );
-            consultasBD.editarInformacionEmpleadoEnBaseDeDatos(idEmpleado, informacionEmpleadoEditado);
-        }
+    public boolean editarInformacionEmpleado(InformacionEmpleado informacionEmpleadoEditado) {
+        boolean empleadoActualizado = consultasBD.editarInformacionEmpleadoEnBaseDeDatos(informacionEmpleadoEditado);
+        if(empleadoActualizado) return true;
+        else return false;
     }
 
-    public void eliminarEmpleado(String idEmpleado) {
+    public boolean eliminarEmpleado(String idEmpleado) {
         if (existeCampoVacio(idEmpleado)) {
-            System.out.println("Error: El ID de empleado no puede estar vacío.");
+            return false;
         } else {
-            consultasBD.eliminarEmpleadoDeBaseDeDatos(idEmpleado);
+            boolean empleadoEliminado = consultasBD.eliminarEmpleadoDeBaseDeDatos(idEmpleado);
+            if(empleadoEliminado) return true;
+            else return false;
         }
     }
 }

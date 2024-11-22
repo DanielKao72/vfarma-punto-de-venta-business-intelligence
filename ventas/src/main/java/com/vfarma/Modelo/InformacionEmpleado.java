@@ -2,6 +2,7 @@ package com.vfarma.Modelo;
 
 public class InformacionEmpleado {
 
+    private String claveEmpleado;
     private String nombreEmpleado;
     private String apellidoEmpleado;
     private String correoEmpleado;
@@ -9,18 +10,18 @@ public class InformacionEmpleado {
     private String sexoEmpleado;
     private String turnoEmpleado;
     private String rolEmpleado;
-    private String sucursalEmpleado;
 
     public InformacionEmpleado(
+        String clave,
         String nombre, 
         String apellido, 
         String correo, 
         String telefono, 
         String sexo, 
         String turno, 
-        String rol, 
-        String sucursalEmpleado
+        String rol
     ) {
+        this.claveEmpleado = clave;
         this.nombreEmpleado = nombre;
         this.apellidoEmpleado = apellido;
         this.correoEmpleado = correo;
@@ -28,9 +29,15 @@ public class InformacionEmpleado {
         this.sexoEmpleado = sexo;
         this.turnoEmpleado = turno;
         this.rolEmpleado = rol;
-        this.sucursalEmpleado = sucursalEmpleado;
     }
-    
+
+    public String obtenerClaveEmpleado(){
+        return this.claveEmpleado;
+    }
+
+    public void colocarClaveEmpleado(String clave){
+        this.claveEmpleado = clave;
+    }
     
     public String obtenerNombreEmpleado(){
         return this.nombreEmpleado;
@@ -86,13 +93,5 @@ public class InformacionEmpleado {
 
     public void colocarRolEmpleado(String rol){
         this.rolEmpleado = rol;
-    }
-
-    public String obtenerSucursalEmpleado(){
-        return this.sucursalEmpleado;
-    }   
-
-    public void colocarSucursalEmpleado(String sucursal){
-        this.sucursalEmpleado = sucursal;
     }
 }
