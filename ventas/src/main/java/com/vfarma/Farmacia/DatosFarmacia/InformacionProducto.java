@@ -15,6 +15,7 @@ public class InformacionProducto {
         this.claveProducto = claveProducto;
         this.nombreProducto = nombreProducto;
         this.precioProducto = precioProducto;
+
         this.existenciaProducto = existenciaProducto;
     }
 
@@ -42,7 +43,7 @@ public class InformacionProducto {
         this.nombreProducto = nombreProducto;
     }
 
-    public void colocarPrecioProducto(int precioProducto) {
+    public void colocarPrecioProducto(float precioProducto) {
         this.precioProducto = precioProducto;
     }
 
