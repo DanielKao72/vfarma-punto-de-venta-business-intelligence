@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
+import javax.swing.JOptionPane;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 
@@ -94,6 +95,8 @@ public class VentanaFormularioFactura extends VentanaFormulario {
     @Override
     public void configurarEventos() {
         this.gestorVentanaFormulario.obtenerBoton("CerrarSesion").addActionListener(e -> {
+            String nombreCaja = cajero.obtenerNombreCaja();
+            this.cajero.consultasCaja.desOcuparCaja(nombreCaja);
             this.cerrarVentana();
         });
 
@@ -125,6 +128,30 @@ public class VentanaFormularioFactura extends VentanaFormulario {
         );
 
         this.botonFinalizar.addActionListener(e -> {
+
+             // Verificar que los campos requeridos no estén vacíos
+    if (this.opcionPersonaFisica.isSelected()) {
+        if (this.campoNombre.getText().isEmpty() || 
+            this.campoApellidos.getText().isEmpty() || 
+            this.campoRFC.getText().isEmpty() || 
+            this.campoDomicilio.getText().isEmpty()) {
+           JOptionPane.showMessageDialog( null,"Todos los campos son obligatorios", "Error", JOptionPane.ERROR_MESSAGE);
+           return;
+        }
+    } else if (this.opcionPersonaMoral.isSelected()) {
+        if (this.campoRazonSocial.getText().isEmpty() || 
+            this.campoRegimenFiscal.getText().isEmpty() || 
+            this.campoRFC.getText().isEmpty() || 
+            this.campoDomicilio.getText().isEmpty()) {
+                JOptionPane.showMessageDialog( null,"Todos los campos son obligatorios", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+        }
+    } 
+
+
+
+
+
             String rfc = this.campoRFC.getText();
             String domicilio = this.campoDomicilio.getText();
 
@@ -173,6 +200,10 @@ public class VentanaFormularioFactura extends VentanaFormulario {
             VentanaMenuVentas ventana = new VentanaMenuVentas("Menú Ventas");
             ventana.iniciarVentana();
             ventana.mostrarVentana();
+
+            String nombreCaja = cajero.obtenerNombreCaja();
+            cajero.consultasCaja.desOcuparCaja(nombreCaja);
+            cajero = null;
         });
     }
 

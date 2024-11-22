@@ -28,7 +28,14 @@ public class VentanaSeleccionCaja extends VentanaFormulario {
     public Formulario crearCamposFormulario() {
         Formulario formulario = new Formulario();
 
-        this.seleccionCaja = GestorFormulario.creaListaOpciones(new String[]{"Caja 1", "Caja 2", "Caja 3", "Caja 4"});
+        Cajero cajero = Cajero.obtenerInstancia();
+        ArrayList<String> cajasDisponibles = cajero.consultasCaja.obtenerNombresCajasDisponibles();
+
+        if (cajasDisponibles.isEmpty()) {
+            System.out.println("No hay cajas disponibles.");
+        }
+
+        this.seleccionCaja = GestorFormulario.creaListaOpciones(cajasDisponibles.toArray(new String[0]));
 
         formulario.agregarCampo(new InformacionCampoFormulario("Selecciona la caja:", this.seleccionCaja));
 
@@ -62,14 +69,17 @@ public class VentanaSeleccionCaja extends VentanaFormulario {
         });
 
         this.botonContinuar.addActionListener(e -> {
+
             Cajero cajero = Cajero.obtenerInstancia();
-            String itemSeleccionado = (String) this.seleccionCaja.getSelectedItem();
-            cajero.colocarNombreCaja(itemSeleccionado);
+            String cajaSeleccionada = (String) this.seleccionCaja.getSelectedItem();
+            cajero.colocarNombreCaja(cajaSeleccionada);
+            cajero.consultasCaja.ocuparCaja(cajaSeleccionada);
 
             VentanaRegistroVenta ventana = new VentanaRegistroVenta("Registro de Venta");
             ventana.iniciarVentana();
             ventana.mostrarVentana();
             this.cerrarVentana();
+
         });
     }
 }

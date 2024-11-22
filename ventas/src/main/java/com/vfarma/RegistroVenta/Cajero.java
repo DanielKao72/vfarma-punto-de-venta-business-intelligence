@@ -3,6 +3,7 @@ package com.vfarma.RegistroVenta;
 import java.io.FileNotFoundException;
 
 import com.itextpdf.layout.Document;
+import com.vfarma.BaseDatos.ConsultasCaja;
 import com.vfarma.BaseDatos.ConsultasProducto;
 import com.vfarma.Modelo.Efectivo;
 import com.vfarma.Modelo.InformacionCliente;
@@ -14,11 +15,13 @@ public class Cajero {
     private static Cajero instanciaUnica;
     public InformacionVenta informacionVenta;
     public ConsultasProducto consultasProducto;
+    public ConsultasCaja consultasCaja;
     private String nombreCaja;
 
     public Cajero() {
         this.informacionVenta = new InformacionVenta();
         this.consultasProducto = new ConsultasProducto();
+        this.consultasCaja = new ConsultasCaja();
     }
 
     public static Cajero obtenerInstancia() {
@@ -28,6 +31,9 @@ public class Cajero {
         return instanciaUnica;
     }
 
+    public String obtenerNombreCaja() {
+        return this.nombreCaja;
+    }
     public void colocarNombreCaja(String nombreCaja) {
         this.nombreCaja = nombreCaja;
     }

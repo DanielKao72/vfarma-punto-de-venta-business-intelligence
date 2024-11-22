@@ -1,7 +1,6 @@
 package com.vfarma;
 
 import com.vfarma.RegistroVenta.VentanaMenuVentas;
-import com.vfarma.RegistroVenta.VentanaRegistroVenta;
 
 public class Main {
     

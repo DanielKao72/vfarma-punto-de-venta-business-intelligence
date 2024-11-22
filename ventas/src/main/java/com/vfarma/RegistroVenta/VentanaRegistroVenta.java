@@ -48,6 +48,7 @@ public class VentanaRegistroVenta extends VentanaFormulario {
         this.cajero = Cajero.obtenerInstancia();
         this.obtenerProductosDisponiblesParaComprar();
         this.inicializarTablaProductos();
+  
     }
 
     private void obtenerProductosDisponiblesParaComprar() {
@@ -119,6 +120,7 @@ public class VentanaRegistroVenta extends VentanaFormulario {
         this.botonLimpiar = GestorComponentes.crearBoton(informacionBotonLimpiar, estilosBoton);
 
         this.botonFinalizar.setEnabled(false);
+        this.botonContinuar.setEnabled(false);
 
         botones.add(this.botonAgregar);
         botones.add(this.botonContinuar);
@@ -155,6 +157,8 @@ public class VentanaRegistroVenta extends VentanaFormulario {
     @Override
     public void configurarEventos() {
         this.gestorVentanaFormulario.obtenerBoton("CerrarSesion").addActionListener(e -> {
+            String nombreCaja = cajero.obtenerNombreCaja();
+            this.cajero.consultasCaja.desOcuparCaja(nombreCaja);
             this.cerrarVentana();
         });
 
@@ -168,6 +172,7 @@ public class VentanaRegistroVenta extends VentanaFormulario {
         this.botonLimpiar.addActionListener(e -> {
             DefaultTableModel modeloCarrito = (DefaultTableModel) this.carritoCompras.getModel();
             modeloCarrito.setRowCount(0);
+            this.cajero.informacionVenta.obtenerCarritoCompras().vaciarCarrito();
             this.campoDineroRecibido.setValue(0);
             this.actualizarEstadoBotones();
         });
@@ -176,12 +181,14 @@ public class VentanaRegistroVenta extends VentanaFormulario {
             this.botonFinalizar.setEnabled(false);
             this.botonContinuar.setEnabled(true);
             this.campoDineroRecibido.setEnabled(false);
+            this.actualizarEstadoBotones();
         });
 
         this.opcionRecibo.addActionListener(e -> {
             this.botonFinalizar.setEnabled(true);
             this.botonContinuar.setEnabled(false);
             this.campoDineroRecibido.setEnabled(true);
+            this.actualizarEstadoBotones();
         });
 
         this.botonContinuar.addActionListener(e -> {
@@ -207,16 +214,15 @@ public class VentanaRegistroVenta extends VentanaFormulario {
             try {
                 int cantidadDeseada = Integer.parseInt(cantidadProducto);
                 if (cantidadDeseada <= 0) {
-                    System.out.println("La cantidad debe ser mayor que 0.");
-                    return;
+                    JOptionPane.showMessageDialog( null,"La cantidad debe ser mayor que 0.", "Error", JOptionPane.ERROR_MESSAGE);
+               
                 }
 
                 // Verificar la existencia en el inventario
                 int existenciaDisponible = this.cajero.consultasProducto.obtenerExistenciaProductoPorId(Integer.parseInt(idProducto));
                 if (cantidadDeseada > existenciaDisponible) {
-                    System.out.println("No hay suficiente inventario para el producto seleccionado.");
                     JOptionPane.showMessageDialog( null,"No hay suficiente inventario para el producto seleccionado.", "Error", JOptionPane.ERROR_MESSAGE);
-                    return;
+                
                 }
 
                 float precioProducto = this.cajero.consultasProducto.obtenerPrecioProductoPorId(Integer.parseInt(idProducto));
@@ -241,7 +247,8 @@ public class VentanaRegistroVenta extends VentanaFormulario {
                 this.carritoCompras.repaint();
 
             } catch (NumberFormatException ex) {
-                System.out.println("Error: La cantidad ingresada no es un número válido.");
+                JOptionPane.showMessageDialog( null,"Error: La cantidad ingresada no es un número válido.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
             }
         });
 
@@ -253,7 +260,13 @@ public class VentanaRegistroVenta extends VentanaFormulario {
                 String dineroRecibido = this.campoDineroRecibido.getValue().toString();
                 cantidadDineroRecibida = Float.parseFloat(dineroRecibido);
             } catch (NumberFormatException ex) {
-                System.out.println("Error: La entrada no es un número válido.");
+                JOptionPane.showMessageDialog( null,"Error: La entrada no es un número válido.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            if (cantidadDineroRecibida < this.cajero.informacionVenta.obtenerMontoTotalVenta()) {
+                JOptionPane.showMessageDialog( null,"El dinero recibido es menor que el monto total de la venta.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
             }
 
             this.cajero.seleccionarTipoCliente(new InformacionPersonaFisica());
@@ -267,9 +280,19 @@ public class VentanaRegistroVenta extends VentanaFormulario {
             this.cajero.informacionVenta.obtenerInformacionCliente().colocarPago(pago);
 
             this.cajero.informacionVenta.colocarComprobante(new Recibo(this.cajero.informacionVenta));
-            this.cajero.finalizarVenta();
 
-            // Volver al menu inicial TO--DO
+            //checar
+            this.cerrarVentana();
+            VentanaMenuVentas ventana = new VentanaMenuVentas("Menú Ventas");
+            ventana.iniciarVentana();
+            ventana.mostrarVentana();
+          
+
+            String nombreCaja = this.cajero.obtenerNombreCaja();
+            System.out.println("Nombre de la caja: " + nombreCaja);
+            cajero.consultasCaja.desOcuparCaja(nombreCaja);
+
+            cajero = null;
         });
     }
 }
