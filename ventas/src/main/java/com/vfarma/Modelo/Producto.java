@@ -43,7 +43,7 @@ public class Producto {
         this.nombreProducto = nombreProducto;
     }
 
-    public void colocarPrecioProducto(int precioProducto) {
+    public void colocarPrecioProducto(float precioProducto) {
         this.precioProducto = precioProducto;
     }
 
