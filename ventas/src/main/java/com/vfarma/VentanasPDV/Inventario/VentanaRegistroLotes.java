@@ -65,6 +65,13 @@ public class VentanaRegistroLotes extends VentanaFormulario{
 
     @Override
     public void configurarEventos() {
+        this.gestorVentanaFormulario.obtenerBoton("Volver").addActionListener(e -> {
+            VentanaMenuInventario ventana = new VentanaMenuInventario("Inventario Local");
+            ventana.iniciarVentana();
+            ventana.mostrarVentana();
+            this.cerrarVentana();
+        });
+
         this.gestorVentanaFormulario.obtenerBoton("CerrarSesion").addActionListener(e -> {
             VentanaControlAcceso ventana = new VentanaControlAcceso("Control de Acceso");
             ventana.iniciarVentana();
@@ -72,15 +79,44 @@ public class VentanaRegistroLotes extends VentanaFormulario{
             this.cerrarVentana();
         });
 
-        this.gestorVentanaFormulario.obtenerBoton("Volver").addActionListener(e -> {
-            VentanaMenuInventario ventana = new VentanaMenuInventario("Inventario");
-            ventana.iniciarVentana();
-            ventana.mostrarVentana();
-            this.cerrarVentana();
-        });
+        this.botonEditarLote.addActionListener(e -> {
+            String claveProducto = this.claveProducto.getText();
+            String numeroLote = this.numeroLote.getValue().toString();
+            String fechaCaducidad;
+            //format yyyy-MM-dd
+            fechaCaducidad = this.fechaCaducidadLote.getYearChooser().getYear() + "-" + (this.fechaCaducidadLote.getMonthChooser().getMonth() + 1) + "-" + this.fechaCaducidadLote.getDayChooser().getDay();
 
-        this.botonRegistrarLote.addActionListener(e -> {
-            // TODO: Agregar lote a la base de datos
+            String cantidadProductos = this.cantidadProductosLote.getValue().toString();
+            
+            if (claveProducto.isEmpty() || numeroLote.isEmpty() || fechaCaducidad.isEmpty() || cantidadProductos.isEmpty()){
+                javax.swing.JOptionPane.showMessageDialog(
+                    null,
+                    "Todos los campos son obligatorios",
+                    "Error",
+                    javax.swing.JOptionPane.ERROR_MESSAGE
+                );
+            } 
+            else {
+                boolean exito = this.admistradorInventario.registrarLoteProducto(claveProducto, numeroLote, fechaCaducidad, cantidadProductos);
+
+                if (exito){
+                    javax.swing.JOptionPane.showMessageDialog(
+                        null,
+                        "Lote registrado con exito",
+                        "Exito",
+                        javax.swing.JOptionPane.INFORMATION_MESSAGE
+                    );
+                }
+                else{
+                    javax.swing.JOptionPane.showMessageDialog(
+                        null,
+                        "Error al registrar el lote",
+                        "Error",
+                        javax.swing.JOptionPane.ERROR_MESSAGE
+                    );
+                }
+            }
+
         });
 
         this.botonLimpiar.addActionListener(e -> {
