@@ -30,7 +30,7 @@ public class VentanaSeleccionCaja extends VentanaFormulario {
     public Formulario crearCamposFormulario() {
         this.formulario = new Formulario();
         Cajero cajero = Cajero.obtenerCajero();
-        ArrayList<String> cajasDisponibles = cajero.consultasCaja.obtenerNombresCajasDisponibles();
+        ArrayList<String> cajasDisponibles = cajero.obtenerGestorCaja().obtenerNombresCajasDisponibles();
 
         if (cajasDisponibles.isEmpty()) {
             JOptionPane.showMessageDialog(null, "No hay cajas disponibles", "Error", JOptionPane.ERROR_MESSAGE);
@@ -77,7 +77,7 @@ public class VentanaSeleccionCaja extends VentanaFormulario {
             String cajaSeleccionada = (String) this.seleccionCaja.getSelectedItem();
             Cajero cajero = Cajero.obtenerCajero();
             cajero.colocarNombreCaja(cajaSeleccionada);
-            cajero.consultasCaja.ocuparCaja(cajaSeleccionada);
+            cajero.obtenerGestorCaja().ocuparCaja(cajaSeleccionada);
 
             // Avanzar a la ventana de registro de venta
             VentanaRegistroVenta ventana = new VentanaRegistroVenta("Registro de Venta");

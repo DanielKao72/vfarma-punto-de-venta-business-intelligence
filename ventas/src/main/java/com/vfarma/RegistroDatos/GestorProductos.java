@@ -18,12 +18,12 @@ public class GestorProductos {
         this.conexion = baseDeDatos.abrirConexion();
     }
 
-    public int contarExistenciaProducto(int id) {
+    public int contarExistenciaProducto(int idProducto) {
         String consultaSQL = "SELECT ExistenciaTotal FROM productos WHERE ClvProducto = ?";
         int existencia = 0;
 
         try (PreparedStatement peticion = conexion.prepareStatement(consultaSQL)) {
-            peticion.setInt(1, id);
+            peticion.setInt(1, idProducto);
             ResultSet resultado = peticion.executeQuery();
 
             if (resultado.next()) {
@@ -36,7 +36,7 @@ public class GestorProductos {
         return existencia;
     }
 
-    public InformacionProducto buscarProductoPorID(int id) {
+    public InformacionProducto buscarProductoPorID(int idProducto) {
         String consultaSQL = "SELECT p.ClvProducto, p.Nombre, p.Precio, p.ExistenciaTotal, i.FechaCaducidad "
                 + "FROM productos p "
                 + "JOIN inventario i ON p.ClvProducto = i.ClvProducto "
@@ -45,7 +45,7 @@ public class GestorProductos {
         InformacionProducto producto = new InformacionProducto();
 
         try (PreparedStatement peticion = conexion.prepareStatement(consultaSQL)) {
-            peticion.setInt(1, id);
+            peticion.setInt(1, idProducto);
             ResultSet conjuntoResultado = peticion.executeQuery();
 
             if (conjuntoResultado.next()) {
@@ -59,7 +59,7 @@ public class GestorProductos {
                 producto.colocarPrecioProducto(precio);
                 producto.colocarExistenciaProducto(existenciaTotal);
             } else {
-                System.out.println("No se encontró ningún producto con ID: " + id);
+                System.out.println("No se encontró ningún producto con ID: " + idProducto);
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -68,13 +68,13 @@ public class GestorProductos {
         return producto;
     }
 
-    public boolean restarExistenciaProducto(int id, int cantidadARestar) {
+    public boolean restarExistenciaProducto(int idProducto, int cantidadARestar) {
         String consultaSQL = "UPDATE productos SET ExistenciaTotal = ExistenciaTotal - ? WHERE ClvProducto = ? AND ExistenciaTotal >= ?";
         boolean exito = false;
 
         try (PreparedStatement peticion = conexion.prepareStatement(consultaSQL)) {
             peticion.setInt(1, cantidadARestar);
-            peticion.setInt(2, id);
+            peticion.setInt(2, idProducto);
             peticion.setInt(3, cantidadARestar);
 
             int filasActualizadas = peticion.executeUpdate();
@@ -130,39 +130,7 @@ public class GestorProductos {
         return null; // Si no se encuentra el producto
     }
 
-    public InformacionProducto obtenerProductoPorId(int idProducto) {
-        String consultaSQL = "SELECT p.ClvProducto, p.Nombre, p.Precio, p.ExistenciaTotal, i.FechaCaducidad "
-                + "FROM productos p "
-                + "JOIN inventario i ON p.ClvProducto = i.ClvProducto "
-                + "WHERE p.ClvProducto = ?";
-
-        InformacionProducto producto = null;
-
-        try (PreparedStatement peticion = conexion.prepareStatement(consultaSQL)) {
-            peticion.setInt(1, idProducto);
-            ResultSet resultado = peticion.executeQuery();
-
-            if (resultado.next()) {
-                int ClvProducto = resultado.getInt("ClvProducto");
-                String nombre = resultado.getString("Nombre");
-                int precio = resultado.getInt("Precio");
-                int existenciaTotal = resultado.getInt("ExistenciaTotal");
-
-                producto = new InformacionProducto();
-                producto.colocarClaveProducto(ClvProducto);
-                producto.colocarNombreProducto(nombre);
-                producto.colocarPrecioProducto(precio);
-                producto.colocarExistenciaProducto(existenciaTotal);
-
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return producto;
-    }
-
-    public int obtenerExistenciaProductoPorId(int idProducto) {
+    public int obtenerNumeroExistenciaProductoPorId(int idProducto) {
         String query = "SELECT Cantidad FROM inventario WHERE ClvProducto = ?";
         try (PreparedStatement peticion = conexion.prepareStatement(query)) {
             peticion.setInt(1, idProducto);

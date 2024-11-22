@@ -1,11 +1,14 @@
 package com.vfarma;
 
-import com.vfarma.VentanasPDV.ControlAcceso.VentanaControlAcceso;
-import com.vfarma.VentanasPDV.Inventario.VentanaMenuInventario;
+import com.vfarma.VentanasPDV.RecursosHumanos.VentanaMenuRH;
 
 public class Main {
     public static void main(String[] args) {
-        VentanaMenuInventario ventana = new VentanaMenuInventario("Inventario Local");
+        VentanaMenuRH   ventana = new VentanaMenuRH("Recursos Humanos");
+
+
+
+        //VentanaMenuInventario ventana = new VentanaMenuInventario("Inventario Local");
         ventana.iniciarVentana();
         ventana.mostrarVentana();
     }

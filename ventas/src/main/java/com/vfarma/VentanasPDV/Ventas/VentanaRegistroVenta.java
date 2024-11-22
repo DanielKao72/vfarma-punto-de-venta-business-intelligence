@@ -52,7 +52,7 @@ public class VentanaRegistroVenta extends VentanaFormulario {
         this.productosAlmacen = new JComboBox<>();
 
         Cajero cajero = Cajero.obtenerCajero();
-        cajero.consultasProducto.obtenerNombreProductosEnExistencia().forEach(producto -> {
+        cajero.obtenerGestorProductos().obtenerNombreProductosEnExistencia().forEach(producto -> {
             this.productosAlmacen.addItem(producto.obtenerNombreProducto() + " --- " + producto.obtenerClaveProducto());
         });
     }
@@ -164,13 +164,13 @@ public class VentanaRegistroVenta extends VentanaFormulario {
 
         this.gestorVentanaFormulario.obtenerBoton("CerrarSesion").addActionListener(e -> {
             String nombreCajaActual = cajero.obtenerNombreCaja();
-            cajero.consultasCaja.desOcuparCaja(nombreCajaActual);
+            cajero.obtenerGestorCaja().desOcuparCaja(nombreCajaActual);
             this.cerrarVentana();
         });
 
         this.gestorVentanaFormulario.obtenerBoton("Volver").addActionListener(e -> {
             String nombreCajaActual = cajero.obtenerNombreCaja();
-            cajero.consultasCaja.desOcuparCaja(nombreCajaActual);
+            cajero.obtenerGestorCaja().desOcuparCaja(nombreCajaActual);
 
             // Redireccion a la selección de caja
             VentanaSeleccionCaja ventana = new VentanaSeleccionCaja("Seleccionar Caja");
@@ -183,7 +183,7 @@ public class VentanaRegistroVenta extends VentanaFormulario {
             DefaultTableModel modeloCarrito = (DefaultTableModel) this.carritoCompras.getModel();
             modeloCarrito.setRowCount(0);
 
-            cajero.informacionVenta.obtenerCarritoCompras().vaciarCarrito();
+            cajero.obtenerInformacionVenta().obtenerCarritoCompras().vaciarCarrito();
             this.campoDineroRecibido.setValue(0);
             this.campoCantidad.setValue(0);
 
@@ -232,13 +232,13 @@ public class VentanaRegistroVenta extends VentanaFormulario {
                 return;
             }
 
-            int existenciaDisponible = cajero.consultasProducto.obtenerExistenciaProductoPorId(Integer.parseInt(idProducto));
+            int existenciaDisponible = cajero.obtenerGestorProductos().obtenerNumeroExistenciaProductoPorId(Integer.parseInt(idProducto));
             if (cantidadDeseadaDelProducto > existenciaDisponible) {
                 JOptionPane.showMessageDialog(null, "No hay suficiente inventario para el producto seleccionado.", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
-            float precioProducto = cajero.consultasProducto.obtenerPrecioProductoPorId(Integer.parseInt(idProducto));
+            float precioProducto = cajero.obtenerGestorProductos().obtenerPrecioProductoPorId(Integer.parseInt(idProducto));
             float precioProductos = cantidadDeseadaDelProducto * precioProducto;
 
             DefaultTableModel modeloCarrito = (DefaultTableModel) this.carritoCompras.getModel();
@@ -254,9 +254,9 @@ public class VentanaRegistroVenta extends VentanaFormulario {
             }
 
             // Actualizar el carrito de compras en la información de ventas
-            InformacionProducto productoEncontradoObj = cajero.consultasProducto.buscarProductoPorID(Integer.parseInt(idProducto));
+            InformacionProducto productoEncontradoObj = cajero.obtenerGestorProductos().buscarProductoPorID(Integer.parseInt(idProducto));
             for (int i = 0; i < cantidadDeseadaDelProducto; i++) {
-                cajero.informacionVenta.obtenerCarritoCompras().agregarProducto(productoEncontradoObj);
+                cajero.obtenerInformacionVenta().obtenerCarritoCompras().agregarProducto(productoEncontradoObj);
             }
 
             this.actualizarEstadoBotones();
@@ -277,8 +277,8 @@ public class VentanaRegistroVenta extends VentanaFormulario {
                 return;
             }
 
-            if (cantidadDineroRecibida < cajero.informacionVenta.obtenerMontoTotalVenta()) {
-                JOptionPane.showMessageDialog(null, "El dinero recibido es menor que el monto total de la venta. Monto Total Venta = $ " + cajero.informacionVenta.obtenerMontoTotalVenta(), "Error", JOptionPane.ERROR_MESSAGE);
+            if (cantidadDineroRecibida < cajero.obtenerInformacionVenta().obtenerMontoTotalVenta()) {
+                JOptionPane.showMessageDialog(null, "El dinero recibido es menor que el monto total de la venta. Monto Total Venta = $ " + cajero.obtenerInformacionVenta().obtenerMontoTotalVenta(), "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
 

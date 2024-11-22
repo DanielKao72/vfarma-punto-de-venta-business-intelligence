@@ -17,15 +17,15 @@ import com.vfarma.RegistroDatos.GestorProductos;
 public class Cajero {
 
     private static Cajero cajero;
-    public InformacionVenta informacionVenta;
-    public GestorProductos consultasProducto;
-    public GestorCaja consultasCaja;
+    private final InformacionVenta informacionVenta;
+    private final GestorProductos gestorProductos;
+    private final GestorCaja gestorCaja;
     private String nombreCaja;
 
     public Cajero() {
         this.informacionVenta = new InformacionVenta();
-        this.consultasProducto = new GestorProductos();
-        this.consultasCaja = new GestorCaja();
+        this.gestorProductos = new GestorProductos();
+        this.gestorCaja = new GestorCaja();
     }
 
     public static Cajero obtenerCajero() {
@@ -33,73 +33,6 @@ public class Cajero {
             cajero = new Cajero();
         }
         return cajero;
-    }
-
-    public String obtenerNombreCaja() {
-        return this.nombreCaja;
-    }
-
-    public void colocarNombreCaja(String nombreCaja) {
-        this.nombreCaja = nombreCaja;
-    }
-
-    public void agregarProductoACarrito(int idProducto) {
-        if (this.consultasProducto.contarExistenciaProducto(idProducto) == 0) {
-            System.out.println("Producto no disponible");
-            return;
-        }
-        InformacionProducto productoEncontrado = this.consultasProducto.buscarProductoPorID(idProducto);
-        this.informacionVenta.obtenerCarritoCompras().agregarProducto(productoEncontrado);
-    }
-
-    public void retirarProductoDeCarrito(int idProducto) {
-        InformacionProducto productoEncontrado = this.informacionVenta.obtenerCarritoCompras().buscarProductoPorIdDelProducto(idProducto);
-        this.informacionVenta.obtenerCarritoCompras().removerProducto(productoEncontrado);
-    }
-
-    public void seleccionarTipoCliente(InformacionCliente tipoCliente) {
-        this.informacionVenta.colocarInformacionCliente(tipoCliente);
-    }
-
-    public enum TipoPago {
-        EFECTIVO
-    }
-
-    public void seleccionarTipoPagoCliente(TipoPago tipoPago) {
-        switch (tipoPago) {
-            case EFECTIVO -> {
-                this.informacionVenta.obtenerInformacionCliente().obtenerPago().colocarMetodoPago(new Efectivo());
-            }
-            default ->
-                System.out.println("Tipo de pago no válido");
-        }
-
-    }
-
-    public float efectuarPago() {
-        return this.informacionVenta.obtenerInformacionCliente().obtenerPago().obtenerMetodoPago().realizarPago();
-    }
-
-    public void imprimirComprobante() {
-        try {
-            Document comprobanteLlenado = this.informacionVenta.obtenerComprobante().llenarInformacionComprobante();
-            this.informacionVenta.obtenerComprobante().enviarAImpresion(comprobanteLlenado);
-        } catch (FileNotFoundException e) {
-        }
-    }
-
-    public float calcularCambioVenta() {
-
-        float cambioDelCliente = this.efectuarPago();
-        this.informacionVenta.obtenerCarritoCompras().obtenerTodosProductos().forEach(producto -> {
-            this.consultasProducto.restarExistenciaProducto(producto.obtenerClaveProducto(), 1);
-        });
-
-        return cambioDelCliente;
-    }
-
-    public void terminarVenta() {
-        Cajero.cajero = null;
     }
 
     public void realizarVentaConRecibo(float cantidadDineroRecibida) {
@@ -117,7 +50,7 @@ public class Cajero {
         cajero.informacionVenta.colocarComprobante(new Recibo(cajero.informacionVenta));
 
         String nombreActualCaja = cajero.obtenerNombreCaja();
-        cajero.consultasCaja.desOcuparCaja(nombreActualCaja);
+        cajero.gestorCaja.desOcuparCaja(nombreActualCaja);
 
     }
 
@@ -131,7 +64,85 @@ public class Cajero {
         cajero.calcularCambioVenta();
 
         String nombreCaja = cajero.obtenerNombreCaja();
-        cajero.consultasCaja.desOcuparCaja(nombreCaja);
+        cajero.gestorCaja.desOcuparCaja(nombreCaja);
     }
 
+    public void agregarProductoACarrito(int idProducto) {
+        if (this.gestorProductos.contarExistenciaProducto(idProducto) == 0) {
+            System.out.println("Producto no disponible");
+            return;
+        }
+        InformacionProducto productoEncontrado = this.gestorProductos.buscarProductoPorID(idProducto);
+        this.informacionVenta.obtenerCarritoCompras().agregarProducto(productoEncontrado);
+    }
+
+    public void retirarProductoDeCarrito(int idProducto) {
+        InformacionProducto productoEncontrado = this.informacionVenta.obtenerCarritoCompras().buscarProductoPorIdDelProducto(idProducto);
+        this.informacionVenta.obtenerCarritoCompras().removerProducto(productoEncontrado);
+    }
+
+    public void seleccionarTipoCliente(InformacionCliente tipoCliente) {
+        this.informacionVenta.colocarInformacionCliente(tipoCliente);
+    }
+
+    private enum TipoPago {
+        EFECTIVO
+    }
+
+    private void seleccionarTipoPagoCliente(TipoPago tipoPago) {
+        switch (tipoPago) {
+            case EFECTIVO -> {
+                this.informacionVenta.obtenerInformacionCliente().obtenerPago().colocarMetodoPago(new Efectivo());
+            }
+            default ->
+                System.out.println("Tipo de pago no válido");
+        }
+
+    }
+
+    private float efectuarPago() {
+        return this.informacionVenta.obtenerInformacionCliente().obtenerPago().obtenerMetodoPago().realizarPago();
+    }
+
+    public float calcularCambioVenta() {
+
+        float cambioDelCliente = this.efectuarPago();
+        this.informacionVenta.obtenerCarritoCompras().obtenerTodosProductos().forEach(producto -> {
+            this.gestorProductos.restarExistenciaProducto(producto.obtenerClaveProducto(), 1);
+        });
+
+        return cambioDelCliente;
+    }
+
+    public void imprimirComprobante() {
+        try {
+            Document comprobanteLlenado = this.informacionVenta.obtenerComprobante().llenarInformacionComprobante();
+            this.informacionVenta.obtenerComprobante().enviarAImpresion(comprobanteLlenado);
+        } catch (FileNotFoundException e) {
+        }
+    }
+
+    public void terminarVenta() {
+        Cajero.cajero = null;
+    }
+
+    public GestorCaja obtenerGestorCaja() {
+        return this.gestorCaja;
+    }
+
+    public InformacionVenta obtenerInformacionVenta() {
+        return this.informacionVenta;
+    }
+
+    public GestorProductos obtenerGestorProductos() {
+        return this.gestorProductos;
+    }
+
+    public String obtenerNombreCaja() {
+        return this.nombreCaja;
+    }
+
+    public void colocarNombreCaja(String nombreCaja) {
+        this.nombreCaja = nombreCaja;
+    }
 }
